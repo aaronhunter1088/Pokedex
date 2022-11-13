@@ -18,11 +18,7 @@ public class Pokedex {
     @Autowired
     private PokeApiClient pokeApiClient;
 
-    public Pokedex(PokeApiClient pokeApiClient) {
-        this.pokeApiClient = pokeApiClient;
-    }
-
-    @RequestMapping(value = "/{nameOfPokemon}", method=RequestMethod.GET)
+    @RequestMapping(value = "/pokemon/{nameOfPokemon}", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getPokemon(@PathVariable("nameOfPokemon") String nameOfPokemon)
     {
@@ -39,9 +35,9 @@ public class Pokedex {
 
     @RequestMapping(value="/{nameOfPokemon}/description", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getPokemonInfoText(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Object> getPokemonDescription(@PathVariable("nameOfPokemon") String nameOfPokemon)
     {
-        System.out.println("pokemonName: " + nameOfPokemon);
+        System.out.println("infoText for: " + nameOfPokemon);
         List<FlavorText> pokemonDescriptions;
         try {
             pokemonDescriptions =  pokeApiClient.getResource(PokemonSpecies.class, nameOfPokemon).blockOptional().get()
@@ -52,12 +48,11 @@ public class Pokedex {
             System.out.println("description: " + description);
             return ResponseEntity.ok(description);
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(nameOfPokemon + " text was not found!");
         }
     }
 
-    @RequestMapping(value = "/{nameOfPokemon}/color", method= RequestMethod.GET)
+    @RequestMapping(value = "/{nameOfPokemon}/color", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getDesignatedColor(@PathVariable("nameOfPokemon") String nameOfPokemon)
     {
@@ -78,5 +73,19 @@ public class Pokedex {
         }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value="/{nameOfPokemon}/validateName", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Boolean> validateName(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    {
+        try {
+            Pokemon pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
+            System.out.println("valid name: " + nameOfPokemon);
+            return ResponseEntity.ok().body(true);
+        } catch (Exception e) {
+            System.out.println("invalid name: " + nameOfPokemon);
+            return ResponseEntity.badRequest().body(false);
+        }
     }
 }

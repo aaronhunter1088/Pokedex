@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href=""/>
+    <link rel="icon" type="image/x-icon" href="/images/pokeball.jpg"/>
     <title>Pokedex</title>
     <style>
         html {
@@ -44,38 +44,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- JavaScript Bundle with Popper -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 </head>
 
 <body style="justify-content:space-evenly;text-align: center;">
-    <h1 style="vertical-align: middle;">This is the <span class="center"><img alt="pokedex" src="/images/pokedexImage.jpg" height="150"></span> application.</h1>
+    <h1 id="title" style="vertical-align: middle;">
+        This is your
+        <span class="center"><img alt="pokedex" src="/images/pokedexImage.jpg" height=150></span>
+    </h1>
     <br>
-    <label for="pokemonName">Pokemon Name/ID</label> <input id="pokemonName" type="text"/>
-    <input id="pokemonBtn" type="button" onclick="return getPokemonInfo();" class="button cursor" value="Get Info"/>
+    <h4 style="vertical-align: middle;">
+        <label id="nameLabel" for="pokemonName">Pokemon Name/ID</label> <input id="pokemonName" type="text"/>
+        <input id="pokemonBtn" type="button" onclick="getPokemonInfo();" class="button cursor" value="Get Info"/>
+    </h4>
     <br>
-    <h2>Pokemon Info</h2>
     <div id="pokedex" style="display:inline-flex;">
-        <div id="imageAndImageBtns" style="width:300px;height:300px;">
-            <img id="imageOfPokemon" alt="pokemon" src="#" width="300" height="300"/>
-            <div id="photosDiv">
-                <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
-                <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>
+        <div style="display:flow;">
+            <h1 id="infoTitle">Pokemon Info</h1>
+            <div id="info" style="display:flow; width:300px;">
+                <div id="idAndName" style="display:inline-flex;">
+                    <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;
+                    <label for="nameOfPokemon">Name:</label> <h3 id="nameOfPokemon"></h3>
+                </div>
+                <br>
+                <div id="hAndW" style="display:inline-flex;">
+                    <label for="heightOfPokemon">Height:</label> <h3 id="heightOfPokemon"></h3> &nbsp;
+                    <label for="weightOfPokemon">Weight:</label> <h3 id="weightOfPokemon"></h3>
+                </div>
+                <br>
+                <div id="colorAndType" style="display:inline-flex;">
+                    <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;
+                    <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>
+                </div>
+                <h3 id="description"></h3>
             </div>
-        </div>
-        <div id="info" style="display:flow; width:300px;">
-            <div id="idAndName" style="display:inline-flex;">
-                <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;
-                <label for="nameOfPokemon">Name:</label> <h3 id="nameOfPokemon"></h3>
+            <div id="imageAndImageBtns">
+                <div id="photosDiv">
+                    <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
+                    <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>
+                </div>
+                <img id="imageOfPokemon" alt="pokemon" src="#" width="300" height="300"/>
             </div>
-            <br>
-            <div id="hAndW" style="display:inline-flex;">
-                <label for="heightOfPokemon">Height:</label> <h3 id="heightOfPokemon"></h3> &nbsp;
-                <label for="weightOfPokemon">Weight:</label> <h3 id="weightOfPokemon"></h3>
-            </div>
-            <div id="colorAndType" style="display:inline-flex;">
-                <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;
-                <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>
-            </div>
-            <h3 id="description"></h3>
         </div>
     </div>
     <script type="text/javascript">
@@ -84,22 +100,26 @@
         });
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
-            getPokemon();
-            getPokemonDescriptionText();
-            changeBackgroundColor();
+            let name = $('#pokemonName').val();
+            if (!isNameValid(name)) { alert("Not a valid name or ID"); }
+            else {
+                getPokemon(name);
+                getPokemonDescriptionText(name);
+                changeBackgroundColor(name);
+                $('#pokedex').show();
+            }
         }
         var pokemon = {}, sprites = {}, species = {};
         // Ajax to get Pokemon
-        function getPokemon() {
-            let name = $('#pokemonName').val();
+        function getPokemon(name) {
             $.ajax({
                 headers: {
                     accept: "application/json",
                     contentType: "application/json"
                 },
                 type: "GET",
-                url: "/pokedex/"+name,
-                async: true,
+                url: "/pokedex/pokemon/"+name,
+                async: false,
                 dataType: "application/json",
                 crossDomain: true,
                 statusCode: {
@@ -108,8 +128,6 @@
                         //console.log(name + ": " + JSON.stringify(pokemon));
                         sprites = pokemon["sprites"];
                         //console.log("sprites: " + JSON.stringify(sprites));
-                        let defaultFront = sprites["frontDefault"];
-                        //console.log("defaultImg: " + JSON.stringify(defaultFront));
                         $('#idOfPokemon').text(pokemon.id);
                         $('#nameOfPokemon').text(pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1));
                         showImage('default');
@@ -121,7 +139,6 @@
                         } else {
                             $('#typeOfPokemon').text(pokemonTypes[0].type.name);
                         }
-                        $('#pokedex').show();
                     },
                     400: function() {
                         $('#pokedex').hide();
@@ -136,11 +153,10 @@
                         console.log(JSON.stringify(data));
                     }
                 }
-            });
+            })
         }
         // Ajax to get Description text
-        function getPokemonDescriptionText() {
-            let name = $('#pokemonName').val();
+        function getPokemonDescriptionText(name) {
             $.ajax({
                 headers: {
                     accept: "application/json",
@@ -148,7 +164,7 @@
                 },
                 type: "GET",
                 url: "pokedex/"+name+"/description",
-                async: true,
+                async: false,
                 dataType: "application/json",
                 crossDomain: true,
                 statusCode: {
@@ -172,47 +188,97 @@
         }
         // Flips between regular and shiny images
         function showImage(type) {
+            var photoEle = $('#imageOfPokemon');
             var image;
             switch (type) {
-                case 'default' : image = sprites["frontDefault"]; break;
-                case 'shiny' : image = sprites["frontShiny"]; break;
+                case 'default' : {
+                    image = sprites["frontDefault"];
+                    if (image === null) {
+                        image = "/images/pokeball1.png";
+                    }
+                    break;
+                }
+                case 'shiny' : {
+                    image = sprites["frontShiny"];
+                    if (image === null) {
+                        image = "/images/pokeball1.jpg";
+                    }
+                    break;
+                }
+                default : {
+                    image = "/images/pokeball1.png";
+                    break;
+                }
             }
-            $('#imageOfPokemon').prop("src", image);
-            $('#imageOfPokemon').show();
+            photoEle.prop("src", image);
+            //$('#imageAndImageBtns').style.backgroundImage = photoEle;
+            photoEle.show();
         }
         // Ajax to get the color of the Pokemon
-        function changeBackgroundColor() {
-            let name = $('#pokemonName').val();
+        function changeBackgroundColor(name) {
             $.ajax({
-                headers: {
-                    accept: "application/json",
-                    contentType: "application/json"
-                },
                 type: "GET",
                 url: "/pokedex/"+name+"/color",
-                async: true,
+                async: false,
                 dataType: "application/json",
                 crossDomain: true,
                 statusCode: {
                     200: function(data) {
-                        console.log("background color: " + data.responseText);
-                        document.body.style.backgroundColor = data.responseText;
+                        //console.log("background color: " + data.responseText);
+                        var color = data.responseText;
+                        if (color === "red") { color = "#fa8072"; }
+                        else if (color === "yellow") { color = "#FFC300"; }
+                        else if (color === "green") { color = "#AFE1AF"; }
+                        else if (color === "blue") { color = "#ADD8E6"; }
+                        else if (color === "purple") { color = "#CBC3E3"; }
+                        else if (color === "brown") { color = "#D27D2D"; }
+                        document.body.style.backgroundColor = color;
                         $('#colorOfPokemon').text(data.responseText);
+                        if (data.responseText === "black") {
+                            var nameLabelEle = document.getElementById("nameLabel");
+                            nameLabelEle.style.color = "white";
+                            var infoTitleEle = document.getElementById("infoTitle");
+                            infoTitleEle.style.color = "white";
+                            var titleEle = document.getElementById("title");
+                            titleEle.style.color = "white";
+                            var infoEle = document.getElementById("info");
+                            infoEle.style.color = "white";
+                        } else {
+                            var nameLabelEle = document.getElementById("nameLabel");
+                            nameLabelEle.style.color = "black";
+                            var infoTitleEle = document.getElementById("infoTitle");
+                            infoTitleEle.style.color = "black";
+                            var titleEle = document.getElementById("title");
+                            titleEle.style.color = "black";
+                            var infoEle = document.getElementById("info");
+                            infoEle.style.color = "black";
+                        }
                     },
-                    400: function() {
-                        console.log("400: " + data.responseText);
-                    },
-                    404: function(data) {
-                        console.log("404: " + data.responseText);
-                    },
-                    405: function(data) {
-                        console.log("405: " + data.responseText);
-                    },
-                    500: function(data) {
-                        console.log("500: " + data.responseText);
+                    400: function(data) {
+                        console.log("color 400: " + data.responseText);
                     }
                 }
             });
+        }
+        // Determines if the input is valid or not
+        function isNameValid(name) {
+            var result = false;
+            $.ajax({
+                type: "GET",
+                url: "/pokedex/"+name+"/validateName",
+                async: false,
+                dataType: "application/json",
+                crossDomain: true,
+                statusCode: {
+                    200: function() {
+                        result = true;
+                    },
+                    400: function() {
+                        result = false;
+                    }
+                }
+            });
+            return result;
         }
     </script>
 </body>
