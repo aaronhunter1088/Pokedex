@@ -39,6 +39,41 @@
             display: inline-block;
             vertical-align: middle;
         }
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        /* Create an active/current tablink class */
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        /* Style the tab content */
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
     </style>
     <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -63,6 +98,7 @@
     <h4 style="vertical-align: middle;">
         <label id="nameLabel" for="pokemonName">Pokemon Name/ID</label> <input id="pokemonName" type="text"/>
         <input id="pokemonBtn" type="button" onclick="getPokemonInfo();" class="button cursor" value="Get Info"/>
+        <input id="pokemon" type="hidden"/>
     </h4>
     <br>
     <div id="pokedex" style="display:inline-flex;">
@@ -83,8 +119,28 @@
                     <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;
                     <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>
                 </div>
-                <h3 id="description"></h3>
+                <!-- Tab links -->
+                <div class="tabs">
+                    <button class="tab" onclick="showDivAndBoldText(this, 'descriptionDiv');">Description</button>
+                    <button class="tab" onclick="showDivAndBoldText(this, 'locationDiv')">Location</button>
+                    <button class="tab" onclick="showDivAndBoldText(this, 'movesDiv')">Moves</button>
+                    <button class="tab" onclick="showDivAndBoldText(this, 'berriesDiv')">Berries</button>
+                </div>
+                <br>
+                <div id="descriptionDiv">
+                    <h3 id="description"></h3>
+                </div>
+                <div id="locationDiv">
+                    <h3 id="location">Location of Pokemon</h3>
+                </div>
+                <div id="movesDiv">
+                    <h3 id="moves">Moves of Pokemon</h3>
+                </div>
+                <div id="berriesDiv">
+                    <h3 id="berries"> Berries edible by Pokemon</h3>
+                </div>
             </div>
+            <br>
             <div id="imageAndImageBtns">
                 <div id="photosDiv">
                     <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
@@ -98,66 +154,45 @@
         $(function(){
             $('#pokedex').hide();
         });
+        var pokemon = {}, sprites = {};
+        var desc = "", color = "";
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
             let name = $('#pokemonName').val();
             if (!isNameValid(name)) { alert("Not a valid name or ID"); }
             else {
-                getPokemon(name);
-                getPokemonDescriptionText(name);
-                changeBackgroundColor(name);
+                pokemon = getPokemon(name);
+                //console.log("pokemon set: " + JSON.stringify(pokemon));
+                sprites = JSON.parse(pokemon)["sprites"];
+                //console.log("sprites set: " + JSON.stringify(sprites));
+                desc = getPokemonDescriptionText(name);
+                color = changeBackgroundColor(name);
+                setupPokedex();
+                showImage('default');
+                $('#descriptionDiv').show();
+                $('#locationDiv').hide();
+                $('#movesDiv').hide();
+                $('#berriesDiv').hide();
                 $('#pokedex').show();
             }
         }
-        var pokemon = {}, sprites = {}, species = {};
         // Ajax to get Pokemon
         function getPokemon(name) {
-            $.ajax({
-                headers: {
-                    accept: "application/json",
-                    contentType: "application/json"
-                },
+            pokemon = $.ajax({
                 type: "GET",
                 url: "/pokedex/pokemon/"+name,
                 async: false,
                 dataType: "application/json",
-                crossDomain: true,
-                statusCode: {
-                    200: function(data) {
-                        pokemon = JSON.parse(data.responseText);
-                        //console.log(name + ": " + JSON.stringify(pokemon));
-                        sprites = pokemon["sprites"];
-                        //console.log("sprites: " + JSON.stringify(sprites));
-                        $('#idOfPokemon').text(pokemon.id);
-                        $('#nameOfPokemon').text(pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1));
-                        showImage('default');
-                        $('#heightOfPokemon').text(pokemon.height);
-                        $('#weightOfPokemon').text(pokemon.weight);
-                        let pokemonTypes = pokemon.types;
-                        if (pokemonTypes.length > 1) {
-                            $('#typeOfPokemon').text(pokemonTypes[0].type.name + " and " + pokemonTypes[1].type.name);
-                        } else {
-                            $('#typeOfPokemon').text(pokemonTypes[0].type.name);
-                        }
-                    },
-                    400: function() {
-                        $('#pokedex').hide();
-                    },
-                    404: function(data) {
-                        console.log(JSON.stringify(data));
-                    },
-                    405: function(data) {
-                        console.log(JSON.stringify(data));
-                    },
-                    500: function(data) {
-                        console.log(JSON.stringify(data));
-                    }
+                'success': function(data) {
+                    //console.log("initial grab: " + JSON.stringify(data.responseText));
+                    pokemon = JSON.parse(data.responseText);
                 }
-            })
+            });
+            return pokemon.responseText;
         }
         // Ajax to get Description text
         function getPokemonDescriptionText(name) {
-            $.ajax({
+            desc = $.ajax({
                 headers: {
                     accept: "application/json",
                     contentType: "application/json"
@@ -166,25 +201,12 @@
                 url: "pokedex/"+name+"/description",
                 async: false,
                 dataType: "application/json",
-                crossDomain: true,
-                statusCode: {
-                    200: function(data) {
-                        $('#description').text(data.responseText);
-                    },
-                    400: function(data) {
-                        $('#description').text(data.responseText);
-                    },
-                    404: function(data) {
-                        console.log(JSON.stringify(data));
-                    },
-                    405: function(data) {
-                        console.log(JSON.stringify(data));
-                    },
-                    500: function(data) {
-                        console.log(JSON.stringify(data));
-                    }
+                crossDomain: false,
+                'success': function(data) {
+                    desc = JSON.parse(data.responseText);
                 }
             });
+            return desc.responseText;
         }
         // Flips between regular and shiny images
         function showImage(type) {
@@ -216,49 +238,61 @@
         }
         // Ajax to get the color of the Pokemon
         function changeBackgroundColor(name) {
-            $.ajax({
+            color = $.ajax({
                 type: "GET",
                 url: "/pokedex/"+name+"/color",
                 async: false,
                 dataType: "application/json",
-                crossDomain: true,
-                statusCode: {
-                    200: function(data) {
-                        //console.log("background color: " + data.responseText);
-                        var color = data.responseText;
-                        if (color === "red") { color = "#fa8072"; }
-                        else if (color === "yellow") { color = "#FFC300"; }
-                        else if (color === "green") { color = "#AFE1AF"; }
-                        else if (color === "blue") { color = "#ADD8E6"; }
-                        else if (color === "purple") { color = "#CBC3E3"; }
-                        else if (color === "brown") { color = "#D27D2D"; }
-                        document.body.style.backgroundColor = color;
-                        $('#colorOfPokemon').text(data.responseText);
-                        if (data.responseText === "black") {
-                            var nameLabelEle = document.getElementById("nameLabel");
-                            nameLabelEle.style.color = "white";
-                            var infoTitleEle = document.getElementById("infoTitle");
-                            infoTitleEle.style.color = "white";
-                            var titleEle = document.getElementById("title");
-                            titleEle.style.color = "white";
-                            var infoEle = document.getElementById("info");
-                            infoEle.style.color = "white";
-                        } else {
-                            var nameLabelEle = document.getElementById("nameLabel");
-                            nameLabelEle.style.color = "black";
-                            var infoTitleEle = document.getElementById("infoTitle");
-                            infoTitleEle.style.color = "black";
-                            var titleEle = document.getElementById("title");
-                            titleEle.style.color = "black";
-                            var infoEle = document.getElementById("info");
-                            infoEle.style.color = "black";
-                        }
-                    },
-                    400: function(data) {
-                        console.log("color 400: " + data.responseText);
+                crossDomain: false,
+                'success': function(data) {
+                    color = JSON.parse(data.responseText);
+                    if (color === "red") { color = "#fa8072"; }
+                    else if (color === "yellow") { color = "#FFC300"; }
+                    else if (color === "green") { color = "#AFE1AF"; }
+                    else if (color === "blue") { color = "#ADD8E6"; }
+                    else if (color === "purple") { color = "#CBC3E3"; }
+                    else if (color === "brown") { color = "#D27D2D"; }
+                    if (data.responseText === "black") {
+                        var nameLabelEle = document.getElementById("nameLabel");
+                        nameLabelEle.style.color = "white";
+                        var infoTitleEle = document.getElementById("infoTitle");
+                        infoTitleEle.style.color = "white";
+                        var titleEle = document.getElementById("title");
+                        titleEle.style.color = "white";
+                        var infoEle = document.getElementById("info");
+                        infoEle.style.color = "white";
+                    }
+                    else {
+                        var nameLabelEle = document.getElementById("nameLabel");
+                        nameLabelEle.style.color = "black";
+                        var infoTitleEle = document.getElementById("infoTitle");
+                        infoTitleEle.style.color = "black";
+                        var titleEle = document.getElementById("title");
+                        titleEle.style.color = "black";
+                        var infoEle = document.getElementById("info");
+                        infoEle.style.color = "black";
                     }
                 }
             });
+            return color.responseText;
+        }
+        // Sets the text fields
+        function setupPokedex() {
+            pokemon = JSON.parse(pokemon);
+            $('#idOfPokemon').text(pokemon.id);
+            $('#nameOfPokemon').text(pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1));
+            $('#heightOfPokemon').text(pokemon.height);
+            $('#weightOfPokemon').text(pokemon.weight);
+            $('#colorOfPokemon').text(color);
+            document.body.style.backgroundColor = color;
+            let pokemonTypes = pokemon["types"];
+            if (pokemonTypes.length > 1) {
+                $('#typeOfPokemon').text(pokemonTypes[0].type.name + " and " + pokemonTypes[1].type.name);
+            }
+            else {
+                $('#typeOfPokemon').text(pokemonTypes[0].type.name);
+            }
+            $('#description').text(desc);
         }
         // Determines if the input is valid or not
         function isNameValid(name) {
@@ -279,6 +313,33 @@
                 }
             });
             return result;
+        }
+        // Shows the div based on the tab click
+        function showDivAndBoldText(button, div) {
+            if (div === "descriptionDiv") {
+                $('#descriptionDiv').show();
+                $('#locationDiv').hide();
+                $('#movesDiv').hide();
+                $('#berriesDiv').hide();
+            }
+            else if (div === "locationDiv") {
+                $('#descriptionDiv').hide();
+                $('#locationDiv').show();
+                $('#movesDiv').hide();
+                $('#berriesDiv').hide();
+            }
+            else if (div === "movesDiv") {
+                $('#descriptionDiv').hide();
+                $('#locationDiv').hide();
+                $('#movesDiv').show();
+                $('#berriesDiv').hide();
+            }
+            else if (div === "berriesDiv") {
+                $('#descriptionDiv').hide();
+                $('#locationDiv').hide();
+                $('#movesDiv').hide();
+                $('#berriesDiv').show();
+            }
         }
     </script>
 </body>

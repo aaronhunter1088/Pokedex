@@ -16,7 +16,6 @@ public class MyPokeApiReactorCachingConfiguration {
     public HttpClient httpClient() {
         return HttpClient.create()
                 .compress(true)
-                .resolver(DefaultAddressResolverGroup.INSTANCE)
-                .baseUrl("https://pokeapi.co/api/v2/");
+                .resolver(DefaultAddressResolverGroup.INSTANCE);
     }
 }

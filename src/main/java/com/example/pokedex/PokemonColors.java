@@ -12,6 +12,11 @@ import skaro.pokeapi.resource.pokemoncolor.PokemonColor;
 
 import java.net.URI;
 
+/**
+ * The purpose of this class was to demonstrate how to
+ * create a client object in another class to use.
+ */
+
 public class PokemonColors {
 
     private static HttpClient http = new MyPokeApiReactorCachingConfiguration().httpClient();

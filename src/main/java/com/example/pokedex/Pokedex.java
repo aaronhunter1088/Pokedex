@@ -37,7 +37,6 @@ public class Pokedex {
     @ResponseBody
     public ResponseEntity<Object> getPokemonDescription(@PathVariable("nameOfPokemon") String nameOfPokemon)
     {
-        System.out.println("infoText for: " + nameOfPokemon);
         List<FlavorText> pokemonDescriptions;
         try {
             pokemonDescriptions =  pokeApiClient.getResource(PokemonSpecies.class, nameOfPokemon).blockOptional().get()
@@ -64,15 +63,12 @@ public class Pokedex {
                     String colorOfPokemon = speciesInfo.getColor().getName();
                     System.out.println("color: " + colorOfPokemon);
                     return ResponseEntity.ok(colorOfPokemon);
-                } else {
-                    return ResponseEntity.notFound().build();
                 }
             } catch (Exception e) {
-                return ResponseEntity.badRequest().body("e: " + e.getMessage());
+                return ResponseEntity.badRequest().body(nameOfPokemon + " doesn't have a species!");
             }
         }
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
     @RequestMapping(value="/{nameOfPokemon}/validateName", method=RequestMethod.GET)
