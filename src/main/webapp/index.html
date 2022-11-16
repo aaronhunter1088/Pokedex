@@ -121,16 +121,16 @@
                 </div>
                 <!-- Tab links -->
                 <div class="tabs">
-                    <button class="tab" onclick="showDivAndBoldText(this, 'descriptionDiv');">Description</button>
-                    <button class="tab" onclick="showDivAndBoldText(this, 'locationDiv')">Location</button>
-                    <button class="tab" onclick="showDivAndBoldText(this, 'movesDiv')">Moves</button>
-                    <button class="tab" onclick="showDivAndBoldText(this, 'berriesDiv')">Berries</button>
+                    <button id="descTabBtn" class="tab" onclick="showDivAndBoldText('descriptionDiv');">Description</button>
+                    <button id="locTabBtn" class="tab" onclick="showDivAndBoldText('locationsDiv')">Location</button>
+                    <button id="movesTabBtn" class="tab" onclick="showDivAndBoldText('movesDiv')">Moves</button>
+                    <button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>
                 </div>
                 <br>
                 <div id="descriptionDiv">
                     <h3 id="description"></h3>
                 </div>
-                <div id="locationDiv" style="overflow: scroll; height:75px;">
+                <div id="locationsDiv" style="overflow: scroll; height:75px;">
                     <h3 id="location"></h3>
                 </div>
                 <div id="movesDiv">
@@ -160,7 +160,7 @@
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
             let name = $('#pokemonName').val();
-            name = name.toLowerCase();
+            name = name.toLowerCase().trim();
             if (!isNameValid(name)) { alert("Not a valid name or ID"); }
             else {
                 pokemon = getPokemon(name);
@@ -172,11 +172,12 @@
                 color = setBackgroundAndGetColor(name);
                 setupPokedex();
                 showImage('default');
+                $('#pokedex').show();
                 $('#descriptionDiv').show();
-                $('#locationDiv').hide();
+                $('#descTabBtn').css('font-weight', 'bold');
+                $('#locationsDiv').hide();
                 $('#movesDiv').hide();
                 $('#berriesDiv').hide();
-                $('#pokedex').show();
             }
         }
         // Ajax to get Pokemon
@@ -277,14 +278,12 @@
                     console.log("color before: " + colorRes);
                     if (colorRes === "red") { document.body.style.backgroundColor = "#FA8072"; }
                     else if (colorRes === "yellow") { document.body.style.backgroundColor  = "#FFC300"; }
-                    else if (colorRes === "green") {
-                        document.body.style.backgroundColor  = "#AFE1AF";
-                        console.log("colorRes: " + colorRes);
-                    }
+                    else if (colorRes === "green") { document.body.style.backgroundColor  = "#AFE1AF"; }
                     else if (colorRes === "blue") { document.body.style.backgroundColor  = "#ADD8E6"; }
                     else if (colorRes === "purple") { document.body.style.backgroundColor  = "#CBC3E3"; }
                     else if (colorRes === "brown") { document.body.style.backgroundColor  = "#D27D2D"; }
                     else if (colorRes === "white") { document.body.style.backgroundColor  = "#d3cbcb"; }
+                    else if (colorRes === "pink") { document.body.style.backgroundColor = colorRes; }
                     if (data.responseText === "black") {
                         var nameLabelEle = document.getElementById("nameLabel");
                         nameLabelEle.style.color = "white";
@@ -330,13 +329,13 @@
             $('#description').text(desc);
 
             console.log(locations.length + " before location text adding");
-            $('#locationDiv').html("");
+            $('#locationsDiv').innerHTML = "";
             if (locations.length === 0) {
-                $('#locationDiv').append("<h3 id=\"location\">No known locations!</h3>");
+                $('#locationsDiv').append("<h3 id=\"location\">No known locations!</h3>");
             }
             else {
                 for(let i=0; i<locations.length; i++) {
-                    $('#locationDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
+                    $('#locationsDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
                 }
             }
         }
@@ -361,30 +360,46 @@
             return result;
         }
         // Shows the div based on the tab click
-        function showDivAndBoldText(button, div) {
+        function showDivAndBoldText(div) {
             if (div === "descriptionDiv") {
                 $('#descriptionDiv').show();
-                $('#locationDiv').hide();
+                $('#locationsDiv').hide();
                 $('#movesDiv').hide();
                 $('#berriesDiv').hide();
+                $('#descTabBtn').css('font-weight', 'bold');
+                $('#locTabBtn').css('font-weight', 'normal')
+                $('#movesTabBtn').css('font-weight', 'normal')
+                $('#berriesTabBtn').css('font-weight', 'normal')
             }
-            else if (div === "locationDiv") {
+            else if (div === "locationsDiv") {
                 $('#descriptionDiv').hide();
-                $('#locationDiv').show();
+                $('#locationsDiv').show();
                 $('#movesDiv').hide();
                 $('#berriesDiv').hide();
+                $('#descTabBtn').css('font-weight', 'normal');
+                $('#locTabBtn').css('font-weight', 'bold')
+                $('#movesTabBtn').css('font-weight', 'normal')
+                $('#berriesTabBtn').css('font-weight', 'normal')
             }
             else if (div === "movesDiv") {
                 $('#descriptionDiv').hide();
-                $('#locationDiv').hide();
+                $('#locationsDiv').hide();
                 $('#movesDiv').show();
                 $('#berriesDiv').hide();
+                $('#descTabBtn').css('font-weight', 'normal');
+                $('#locTabBtn').css('font-weight', 'normal')
+                $('#movesTabBtn').css('font-weight', 'bold')
+                $('#berriesTabBtn').css('font-weight', 'normal')
             }
             else if (div === "berriesDiv") {
                 $('#descriptionDiv').hide();
-                $('#locationDiv').hide();
+                $('#locationsDiv').hide();
                 $('#movesDiv').hide();
                 $('#berriesDiv').show();
+                $('#descTabBtn').css('font-weight', 'normal');
+                $('#locTabBtn').css('font-weight', 'normal')
+                $('#movesTabBtn').css('font-weight', 'normal')
+                $('#berriesTabBtn').css('font-weight', 'bold')
             }
         }
     </script>
