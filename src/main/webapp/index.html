@@ -124,7 +124,7 @@
                     <button id="descTabBtn" class="tab" onclick="showDivAndBoldText('descriptionDiv');">Description</button>
                     <button id="locTabBtn" class="tab" onclick="showDivAndBoldText('locationsDiv')">Location</button>
                     <button id="movesTabBtn" class="tab" onclick="showDivAndBoldText('movesDiv')">Moves</button>
-                    <button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>
+                    <!--<button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>-->
                 </div>
                 <br>
                 <div id="descriptionDiv">
@@ -136,9 +136,9 @@
                 <div id="movesDiv" style="overflow: scroll; height:75px;">
                     <h3 id="moves"></h3>
                 </div>
-                <div id="berriesDiv">
-                    <h3 id="berries"> Berries edible by Pokemon</h3>
-                </div>
+<!--                <div id="berriesDiv">-->
+<!--                    <h3 id="berries"> Berries edible by Pokemon</h3>-->
+<!--                </div>-->
             </div>
             <br>
             <div id="imageAndImageBtns">
@@ -174,11 +174,8 @@
                 setupPokedex();
                 showImage('default');
                 $('#pokedex').show();
-                $('#descriptionDiv').show();
                 setButtonWeightDefaults();
-                $('#locationsDiv').hide();
-                $('#movesDiv').hide();
-                $('#berriesDiv').hide();
+                setTabDivDefaults();
             }
         }
         // Ajax to get Pokemon
@@ -195,8 +192,17 @@
             return pokemon.responseText;
         }
         // Ajax to get Moves
-        function  getMoves() {
+        function getMoves() {
             moves = JSON.parse(pokemon)["moves"];
+            //console.log(moves.length + " before moves text adding")
+            let moveNames = [];
+            moves.forEach(m => {
+                let move = m['move'].name;
+                //console.log(move);
+                move = move[0].toUpperCase() + move.substring(1);
+                moveNames.push(move);
+            });
+            moves = moveNames.sort();
             return moves;
         }
         // Ajax to get Locations
@@ -208,7 +214,7 @@
                 crossDomain: false,
                 'success': function(data) {
                     locations = JSON.parse(data);
-                    console.log("length: " + locations.length + " locations: " + locations);
+                    //console.log("length: " + locations.length + " locations: " + locations);
                     let locationText = [];
                     for(let i=0; i<locations.length; i++) {
                         let theName = locations[i];
@@ -221,7 +227,7 @@
                         locationText.push(newName.toString());
                     }
                     locations = locationText;
-                    console.log("after: " + locations);
+                    //console.log("after: " + locations);
                 }
             });
             return locations;
@@ -281,7 +287,7 @@
                 crossDomain: false,
                 'success': function(data) {
                     let colorRes = JSON.stringify(data).replaceAll("\"", "");
-                    console.log("color before: " + colorRes);
+                    //console.log("color before: " + colorRes);
                     if (colorRes === "red") { document.body.style.backgroundColor = "#FA8072"; }
                     else if (colorRes === "yellow") { document.body.style.backgroundColor  = "#FFC300"; }
                     else if (colorRes === "green") { document.body.style.backgroundColor  = "#AFE1AF"; }
@@ -292,31 +298,11 @@
                     else if (colorRes === "pink") { document.body.style.backgroundColor = colorRes; }
                     else if (colorRes === "black") { document.body.style.backgroundColor = "#8f8b8b"}
                     else if (colorRes === "gray" || colorRes === "grey") { document.body.style.backgroundColor = "#8f8b8b"}
-                    // if (data.responseText === "black") {
-                    //     var nameLabelEle = document.getElementById("nameLabel");
-                    //     nameLabelEle.style.color = "white";
-                    //     var infoTitleEle = document.getElementById("infoTitle");
-                    //     infoTitleEle.style.color = "white";
-                    //     var titleEle = document.getElementById("title");
-                    //     titleEle.style.color = "white";
-                    //     var infoEle = document.getElementById("info");
-                    //     infoEle.style.color = "white";
-                    // }
-                    // else {
-                    //     var nameLabelEle = document.getElementById("nameLabel");
-                    //     nameLabelEle.style.color = "black";
-                    //     var infoTitleEle = document.getElementById("infoTitle");
-                    //     infoTitleEle.style.color = "black";
-                    //     var titleEle = document.getElementById("title");
-                    //     titleEle.style.color = "black";
-                    //     var infoEle = document.getElementById("info");
-                    //     infoEle.style.color = "black";
-                    // }
-                    console.log("colorRes: " + colorRes);
+                    //console.log("colorRes: " + colorRes);
                     color = colorRes;
                 }
             });
-            console.log("color after: " + color);
+            //console.log("color after: " + color);
             return color;
         }
         // Sets the text fields
@@ -347,20 +333,8 @@
             }
 
             $('#movesDiv').html("");
-            console.log(moves.length + " before moves text adding")
-            let moveNames = [];
-            moves.forEach(m => {
-                let move = m['move'].name;
-                console.log(move);
-                moveNames.push(move)
-            });
-            let finalMoveNames = [];
-            moveNames.sort().forEach(name => {
-                name = name[0].toUpperCase() + name.substring(1);
-                finalMoveNames.push(name);
-            });
             for(let i=0; i<moves.length; i++) {
-                $('#movesDiv').append("<ul><h3 id=\"moves"+i+"\">"+finalMoveNames[i]+"</h3></ul>");
+                $('#movesDiv').append("<h3 id=\"moves"+i+"\">"+moves[i]+"</h3>");
             }
         }
         // Determines if the input is valid or not
@@ -431,7 +405,14 @@
             $('#descTabBtn').css('font-weight', 'bold');
             $('#locTabBtn').css('font-weight', 'normal');
             $('#movesTabBtn').css('font-weight', 'normal');
-            $('#berriesTabBtn').css('font-weight', 'normal');
+            //$('#berriesTabBtn').css('font-weight', 'normal');
+        }
+        // Default setting for tab visuals
+        function setTabDivDefaults() {
+            $('#descriptionDiv').show();
+            $('#locationsDiv').hide();
+            $('#movesDiv').hide();
+            //$('#berriesDiv').hide();
         }
     </script>
 </body>
