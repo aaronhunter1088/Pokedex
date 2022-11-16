@@ -133,8 +133,8 @@
                 <div id="locationsDiv" style="overflow: scroll; height:75px;">
                     <h3 id="location"></h3>
                 </div>
-                <div id="movesDiv">
-                    <h3 id="moves">Moves of Pokemon</h3>
+                <div id="movesDiv" style="overflow: scroll; height:75px;">
+                    <h3 id="moves"></h3>
                 </div>
                 <div id="berriesDiv">
                     <h3 id="berries"> Berries edible by Pokemon</h3>
@@ -155,7 +155,7 @@
             $('#pokedex').hide();
         });
         let pokemon = {}, sprites = {};
-        let locations = [];
+        let locations = [], moves = [];
         let desc = "", color = "";
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
@@ -169,12 +169,13 @@
                 //console.log("sprites set: " + JSON.stringify(sprites));
                 desc = getPokemonDescriptionText(name);
                 locations = getLocations(name);
+                moves = getMoves(name);
                 color = setBackgroundAndGetColor(name);
                 setupPokedex();
                 showImage('default');
                 $('#pokedex').show();
                 $('#descriptionDiv').show();
-                $('#descTabBtn').css('font-weight', 'bold');
+                setButtonWeightDefaults();
                 $('#locationsDiv').hide();
                 $('#movesDiv').hide();
                 $('#berriesDiv').hide();
@@ -192,6 +193,11 @@
                 }
             });
             return pokemon.responseText;
+        }
+        // Ajax to get Moves
+        function  getMoves() {
+            moves = JSON.parse(pokemon)["moves"];
+            return moves;
         }
         // Ajax to get Locations
         function getLocations(name) {
@@ -284,26 +290,28 @@
                     else if (colorRes === "brown") { document.body.style.backgroundColor  = "#D27D2D"; }
                     else if (colorRes === "white") { document.body.style.backgroundColor  = "#d3cbcb"; }
                     else if (colorRes === "pink") { document.body.style.backgroundColor = colorRes; }
-                    if (data.responseText === "black") {
-                        var nameLabelEle = document.getElementById("nameLabel");
-                        nameLabelEle.style.color = "white";
-                        var infoTitleEle = document.getElementById("infoTitle");
-                        infoTitleEle.style.color = "white";
-                        var titleEle = document.getElementById("title");
-                        titleEle.style.color = "white";
-                        var infoEle = document.getElementById("info");
-                        infoEle.style.color = "white";
-                    }
-                    else {
-                        var nameLabelEle = document.getElementById("nameLabel");
-                        nameLabelEle.style.color = "black";
-                        var infoTitleEle = document.getElementById("infoTitle");
-                        infoTitleEle.style.color = "black";
-                        var titleEle = document.getElementById("title");
-                        titleEle.style.color = "black";
-                        var infoEle = document.getElementById("info");
-                        infoEle.style.color = "black";
-                    }
+                    else if (colorRes === "black") { document.body.style.backgroundColor = "#8f8b8b"}
+                    else if (colorRes === "gray" || colorRes === "grey") { document.body.style.backgroundColor = "#8f8b8b"}
+                    // if (data.responseText === "black") {
+                    //     var nameLabelEle = document.getElementById("nameLabel");
+                    //     nameLabelEle.style.color = "white";
+                    //     var infoTitleEle = document.getElementById("infoTitle");
+                    //     infoTitleEle.style.color = "white";
+                    //     var titleEle = document.getElementById("title");
+                    //     titleEle.style.color = "white";
+                    //     var infoEle = document.getElementById("info");
+                    //     infoEle.style.color = "white";
+                    // }
+                    // else {
+                    //     var nameLabelEle = document.getElementById("nameLabel");
+                    //     nameLabelEle.style.color = "black";
+                    //     var infoTitleEle = document.getElementById("infoTitle");
+                    //     infoTitleEle.style.color = "black";
+                    //     var titleEle = document.getElementById("title");
+                    //     titleEle.style.color = "black";
+                    //     var infoEle = document.getElementById("info");
+                    //     infoEle.style.color = "black";
+                    // }
                     console.log("colorRes: " + colorRes);
                     color = colorRes;
                 }
@@ -328,8 +336,7 @@
             }
             $('#description').text(desc);
 
-            console.log(locations.length + " before location text adding");
-            $('#locationsDiv').innerHTML = "";
+            $('#locationsDiv').html("");
             if (locations.length === 0) {
                 $('#locationsDiv').append("<h3 id=\"location\">No known locations!</h3>");
             }
@@ -337,6 +344,23 @@
                 for(let i=0; i<locations.length; i++) {
                     $('#locationsDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
                 }
+            }
+
+            $('#movesDiv').html("");
+            console.log(moves.length + " before moves text adding")
+            let moveNames = [];
+            moves.forEach(m => {
+                let move = m['move'].name;
+                console.log(move);
+                moveNames.push(move)
+            });
+            let finalMoveNames = [];
+            moveNames.sort().forEach(name => {
+                name = name[0].toUpperCase() + name.substring(1);
+                finalMoveNames.push(name);
+            });
+            for(let i=0; i<moves.length; i++) {
+                $('#movesDiv').append("<ul><h3 id=\"moves"+i+"\">"+finalMoveNames[i]+"</h3></ul>");
             }
         }
         // Determines if the input is valid or not
@@ -401,6 +425,13 @@
                 $('#movesTabBtn').css('font-weight', 'normal')
                 $('#berriesTabBtn').css('font-weight', 'bold')
             }
+        }
+        // Default setting for button weights
+        function setButtonWeightDefaults()  {
+            $('#descTabBtn').css('font-weight', 'bold');
+            $('#locTabBtn').css('font-weight', 'normal');
+            $('#movesTabBtn').css('font-weight', 'normal');
+            $('#berriesTabBtn').css('font-weight', 'normal');
         }
     </script>
 </body>
