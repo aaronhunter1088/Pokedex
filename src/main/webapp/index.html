@@ -130,8 +130,8 @@
                 <div id="descriptionDiv">
                     <h3 id="description"></h3>
                 </div>
-                <div id="locationDiv" style="overflow: scroll; height:100px;">
-                    <h3 id="location" ></h3>
+                <div id="locationDiv" style="overflow: scroll; height:75px;">
+                    <h3 id="location"></h3>
                 </div>
                 <div id="movesDiv">
                     <h3 id="moves">Moves of Pokemon</h3>
@@ -160,6 +160,7 @@
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
             let name = $('#pokemonName').val();
+            name = name.toLowerCase();
             if (!isNameValid(name)) { alert("Not a valid name or ID"); }
             else {
                 pokemon = getPokemon(name);
@@ -168,7 +169,7 @@
                 //console.log("sprites set: " + JSON.stringify(sprites));
                 desc = getPokemonDescriptionText(name);
                 locations = getLocations(name);
-                color = changeBackgroundColor(name);
+                color = setBackgroundAndGetColor(name);
                 setupPokedex();
                 showImage('default');
                 $('#descriptionDiv').show();
@@ -193,7 +194,6 @@
         }
         // Ajax to get Locations
         function getLocations(name) {
-            //locations = $.ajax({
             $.ajax({
                 type: "GET",
                 url: "/pokedex/locations/"+name,
@@ -259,21 +259,25 @@
             photoEle.show();
         }
         // Ajax to get the color of the Pokemon
-        function changeBackgroundColor(name) {
-            color = $.ajax({
+        function setBackgroundAndGetColor(name) {
+            $.ajax({
                 type: "GET",
                 url: "/pokedex/"+name+"/color",
                 async: false,
-                dataType: "application/json",
                 crossDomain: false,
                 'success': function(data) {
-                    color = JSON.parse(data.responseText);
-                    if (color === "red") { color = "#fa8072"; }
-                    else if (color === "yellow") { color = "#FFC300"; }
-                    else if (color === "green") { color = "#AFE1AF"; }
-                    else if (color === "blue") { color = "#ADD8E6"; }
-                    else if (color === "purple") { color = "#CBC3E3"; }
-                    else if (color === "brown") { color = "#D27D2D"; }
+                    let colorRes = JSON.stringify(data).replaceAll("\"", "");
+                    console.log("color before: " + colorRes);
+                    if (colorRes === "red") { document.body.style.backgroundColor = "#FA8072"; }
+                    else if (colorRes === "yellow") { document.body.style.backgroundColor  = "#FFC300"; }
+                    else if (colorRes === "green") {
+                        document.body.style.backgroundColor  = "#AFE1AF";
+                        console.log("colorRes: " + colorRes);
+                    }
+                    else if (colorRes === "blue") { document.body.style.backgroundColor  = "#ADD8E6"; }
+                    else if (colorRes === "purple") { document.body.style.backgroundColor  = "#CBC3E3"; }
+                    else if (colorRes === "brown") { document.body.style.backgroundColor  = "#D27D2D"; }
+                    else if (colorRes === "white") { document.body.style.backgroundColor  = "#d3cbcb"; }
                     if (data.responseText === "black") {
                         var nameLabelEle = document.getElementById("nameLabel");
                         nameLabelEle.style.color = "white";
@@ -294,9 +298,12 @@
                         var infoEle = document.getElementById("info");
                         infoEle.style.color = "black";
                     }
+                    console.log("colorRes: " + colorRes);
+                    color = colorRes;
                 }
             });
-            return color.responseText;
+            console.log("color after: " + color);
+            return color;
         }
         // Sets the text fields
         function setupPokedex() {
@@ -306,7 +313,6 @@
             $('#heightOfPokemon').text(pokemon.height);
             $('#weightOfPokemon').text(pokemon.weight);
             $('#colorOfPokemon').text(color);
-            document.body.style.backgroundColor = color;
             let pokemonTypes = pokemon["types"];
             if (pokemonTypes.length > 1) {
                 $('#typeOfPokemon').text(pokemonTypes[0].type.name + " and " + pokemonTypes[1].type.name);
@@ -318,8 +324,13 @@
 
             console.log(locations.length + " before location text adding");
             $('#locationDiv').html("");
-            for(let i=0; i<locations.length; i++) {
-                $('#locationDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
+            if (locations.length === 0) {
+                $('#locationDiv').append("<h3 id=\"location\">No known locations!</h3>");
+            }
+            else {
+                for(let i=0; i<locations.length; i++) {
+                    $('#locationDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
+                }
             }
         }
         // Determines if the input is valid or not

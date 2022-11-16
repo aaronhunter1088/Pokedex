@@ -68,7 +68,7 @@ public class Pokedex {
                 if (speciesInfo != null) {
                     String colorOfPokemon = speciesInfo.getColor().getName();
                     System.out.println("color: " + colorOfPokemon);
-                    return ResponseEntity.ok(colorOfPokemon);
+                    return new ResponseEntity<>(colorOfPokemon, HttpStatus.OK);
                 }
             } catch (Exception e) {
                 return ResponseEntity.badRequest().body(nameOfPokemon + " doesn't have a species!");
