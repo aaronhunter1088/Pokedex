@@ -130,8 +130,8 @@
                 <div id="descriptionDiv">
                     <h3 id="description"></h3>
                 </div>
-                <div id="locationDiv">
-                    <h3 id="location">Location of Pokemon</h3>
+                <div id="locationDiv" style="overflow: scroll; height:100px;">
+                    <h3 id="location" ></h3>
                 </div>
                 <div id="movesDiv">
                     <h3 id="moves">Moves of Pokemon</h3>
@@ -154,8 +154,9 @@
         $(function(){
             $('#pokedex').hide();
         });
-        var pokemon = {}, sprites = {};
-        var desc = "", color = "";
+        let pokemon = {}, sprites = {};
+        let locations = [];
+        let desc = "", color = "";
         // Actions performed when you click "Get Info"
         function getPokemonInfo() {
             let name = $('#pokemonName').val();
@@ -166,6 +167,7 @@
                 sprites = JSON.parse(pokemon)["sprites"];
                 //console.log("sprites set: " + JSON.stringify(sprites));
                 desc = getPokemonDescriptionText(name);
+                locations = getLocations(name);
                 color = changeBackgroundColor(name);
                 setupPokedex();
                 showImage('default');
@@ -184,11 +186,31 @@
                 async: false,
                 dataType: "application/json",
                 'success': function(data) {
-                    //console.log("initial grab: " + JSON.stringify(data.responseText));
                     pokemon = JSON.parse(data.responseText);
                 }
             });
             return pokemon.responseText;
+        }
+        // Ajax to get Locations
+        function getLocations(name) {
+            //locations = $.ajax({
+            $.ajax({
+                type: "GET",
+                url: "/pokedex/locations/"+name,
+                async: false,
+                crossDomain: false,
+                'success': function(data) {
+                    locations = JSON.parse(data);
+                    console.log("length: " + locations.length + " locations: " + locations);
+                    let locationText = [];
+                    for(let i=0; i<locations.length; i++) {
+                        locationText.push(locations[i]);
+                    }
+                    locations = locationText;
+                    console.log("after: " + locations);
+                }
+            });
+            return locations;
         }
         // Ajax to get Description text
         function getPokemonDescriptionText(name) {
@@ -293,6 +315,12 @@
                 $('#typeOfPokemon').text(pokemonTypes[0].type.name);
             }
             $('#description').text(desc);
+
+            console.log(locations.length + " before location text adding");
+            $('#locationDiv').html("");
+            for(let i=0; i<locations.length; i++) {
+                $('#locationDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
+            }
         }
         // Determines if the input is valid or not
         function isNameValid(name) {

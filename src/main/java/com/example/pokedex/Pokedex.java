@@ -1,6 +1,9 @@
 package com.example.pokedex;
 
+import org.apache.tomcat.util.json.JSONParser;
+import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -8,8 +11,11 @@ import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.util.List;
-import java.util.Random;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
 
 @RestController
 @RequestMapping("/pokedex")
@@ -83,5 +89,44 @@ public class Pokedex {
             System.out.println("invalid name: " + nameOfPokemon);
             return ResponseEntity.badRequest().body(false);
         }
+    }
+
+    @RequestMapping(value="/locations/{nameOfPokemon}", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Object> getLocations(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    {
+        Pokemon pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
+        if (pokemon == null) return null; //return ResponseEntity.badRequest().build();
+        String encountersString = pokemon.getLocationAreaEncounters();
+        HttpResponse<String> response;
+        List<String> namesOfAreas = new ArrayList<>();
+        JSONParser jsonParser;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(encountersString))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    //.send(request, HttpResponse.BodyHandlers.ofString());
+                    .send(request,  HttpResponse.BodyHandlers.ofString());
+            System.out.println("response: " + response.body());
+            jsonParser = new JSONParser(response.body());
+            List<LinkedHashMap<String, String>> map = (List<LinkedHashMap<String, String>>) jsonParser.parse();
+            for(Map m : map) {
+                LinkedHashMap<String, String> area = (LinkedHashMap<String, String>) m.get("location_area");
+                namesOfAreas.add(area.get("name"));
+            }
+            namesOfAreas.forEach(System.out::println);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //return null;
+            return ResponseEntity.badRequest().build();
+        }
+
+        //return namesOfAreas.toArray(new String[0]);
+        JSONArray array = new JSONArray();
+        array.addAll(namesOfAreas);
+        return new ResponseEntity<>(array.toJSONString(), HttpStatus.OK);
     }
 }
