@@ -204,7 +204,14 @@
                     console.log("length: " + locations.length + " locations: " + locations);
                     let locationText = [];
                     for(let i=0; i<locations.length; i++) {
-                        locationText.push(locations[i]);
+                        let theName = locations[i];
+                        let newName = "";
+                        let names = theName.split("-");
+                        names.forEach(name => {
+                            name = name[0].toUpperCase() + name.substring(1);
+                            newName += name + " ";
+                        });
+                        locationText.push(newName.toString());
                     }
                     locations = locationText;
                     console.log("after: " + locations);
