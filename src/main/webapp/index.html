@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html lang="HTML">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/images/pokeball.jpg"/>
@@ -97,13 +97,21 @@
     <br>
     <h4 style="vertical-align: middle;">
         <label id="nameLabel" for="pokemonName">Pokemon Name/ID</label> <input id="pokemonName" type="text"/>
-        <input id="pokemonBtn" type="button" onclick="getPokemonInfo();" class="button cursor" value="Get Info"/>
-        <input id="pokemon" type="hidden"/>
+        <input id="pokemonInfoBtn" type="submit" onclick="getPokemonInfo();" class="button cursor" value="Get Info"/>
     </h4>
     <br>
-    <div id="pokedex" style="display:inline-flex;">
-        <div style="display:flow;">
-            <h1 id="infoTitle">Pokemon Info</h1>
+    <div id="pokedex" style="display:flow;">
+        <h1 id="infoTitle">Pokemon Info</h1>
+        <br>
+        <div style="display:inline-flex;">
+            <div id="imageAndImageBtns">
+                <img id="imageOfPokemon" alt="pokemon" src="#" width="200" height="200"/>
+                <div id="photosDiv">
+                    <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
+                    <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>
+                </div>
+            </div>
+            <br>
             <div id="info" style="display:flow; width:300px;">
                 <div id="idAndName" style="display:inline-flex;">
                     <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;
@@ -130,29 +138,29 @@
                 <div id="descriptionDiv">
                     <h3 id="description"></h3>
                 </div>
-                <div id="locationsDiv" style="overflow: scroll; height:75px;">
+                <div id="locationsDiv" style="overflow: scroll; height:100px;">
                     <h3 id="location"></h3>
                 </div>
-                <div id="movesDiv" style="overflow: scroll; height:75px;">
+                <div id="movesDiv" style="overflow: scroll; height:100px;">
                     <h3 id="moves"></h3>
                 </div>
 <!--                <div id="berriesDiv">-->
 <!--                    <h3 id="berries"> Berries edible by Pokemon</h3>-->
 <!--                </div>-->
             </div>
-            <br>
-            <div id="imageAndImageBtns">
-                <div id="photosDiv">
-                    <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
-                    <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>
-                </div>
-                <img id="imageOfPokemon" alt="pokemon" src="#" width="300" height="300"/>
-            </div>
         </div>
     </div>
     <script type="text/javascript">
         $(function(){
             $('#pokedex').hide();
+            //checks whether the pressed key is "Enter"
+            //document.getElementById('pokemonName').onkeypress = function(e) {
+            $('#pokemonName').on('keypress', function(e) {
+                if ($('#pokemonName').val() === '') return;
+                if (e.code === 'Enter' || e.code === 'Return') {
+                    getPokemonInfo();
+                }
+            });
         });
         let pokemon = {}, sprites = {};
         let locations = [], moves = [];
@@ -212,7 +220,7 @@
                 url: "/pokedex/locations/"+name,
                 async: false,
                 crossDomain: false,
-                'success': function(data) {
+                success: function(data) {
                     locations = JSON.parse(data);
                     //console.log("length: " + locations.length + " locations: " + locations);
                     let locationText = [];
@@ -252,14 +260,16 @@
         }
         // Flips between regular and shiny images
         function showImage(type) {
-            var photoEle = $('#imageOfPokemon');
-            var image;
+            let photoEle = $('#imageOfPokemon');
+            let image;
             switch (type) {
                 case 'default' : {
                     image = sprites["frontDefault"];
                     if (image === null) {
-                        image = "/images/pokeball1.png";
+                        image = "/images/pokeball1.jpg";
                     }
+                    $('#pokemonDefaultImgBtn').css('font-weight', 'bold');
+                    $('#pokemonShinyImgBtn').css('font-weight', 'normal');
                     break;
                 }
                 case 'shiny' : {
@@ -267,15 +277,16 @@
                     if (image === null) {
                         image = "/images/pokeball1.jpg";
                     }
+                    $('#pokemonDefaultImgBtn').css('font-weight', 'normal');
+                    $('#pokemonShinyImgBtn').css('font-weight', 'bold');
                     break;
                 }
                 default : {
-                    image = "/images/pokeball1.png";
+                    image = "/images/pokeball1.jpg";
                     break;
                 }
             }
             photoEle.prop("src", image);
-            //$('#imageAndImageBtns').style.backgroundImage = photoEle;
             photoEle.show();
         }
         // Ajax to get the color of the Pokemon
@@ -312,13 +323,15 @@
             $('#nameOfPokemon').text(pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1));
             $('#heightOfPokemon').text(pokemon.height);
             $('#weightOfPokemon').text(pokemon.weight);
-            $('#colorOfPokemon').text(color);
+            $('#colorOfPokemon').text(color[0].toUpperCase()+color.slice(1));
             let pokemonTypes = pokemon["types"];
             if (pokemonTypes.length > 1) {
-                $('#typeOfPokemon').text(pokemonTypes[0].type.name + " and " + pokemonTypes[1].type.name);
+                $('#typeOfPokemon').text(pokemonTypes[0].type.name[0].toUpperCase()+pokemonTypes[0].type.name.slice(1) +
+                    " and " +
+                    pokemonTypes[1].type.name[0].toUpperCase()+pokemonTypes[1].type.name.slice(1));
             }
             else {
-                $('#typeOfPokemon').text(pokemonTypes[0].type.name);
+                $('#typeOfPokemon').text(pokemonTypes[0].type.name[0].toUpperCase()+pokemonTypes[0].type.name.slice(1));
             }
             $('#description').text(desc);
 
@@ -328,7 +341,7 @@
             }
             else {
                 for(let i=0; i<locations.length; i++) {
-                    $('#locationsDiv').append("<ul><h3 id=\"location"+i+"\">"+locations[i]+"</h3></ul>");
+                    $('#locationsDiv').append("<h3 id=\"location"+i+"\">"+locations[i]+"</h3>");
                 }
             }
 
@@ -339,7 +352,7 @@
         }
         // Determines if the input is valid or not
         function isNameValid(name) {
-            var result = false;
+            let result = false;
             $.ajax({
                 type: "GET",
                 url: "/pokedex/"+name+"/validateName",
@@ -389,16 +402,16 @@
                 $('#movesTabBtn').css('font-weight', 'bold')
                 $('#berriesTabBtn').css('font-weight', 'normal')
             }
-            else if (div === "berriesDiv") {
-                $('#descriptionDiv').hide();
-                $('#locationsDiv').hide();
-                $('#movesDiv').hide();
-                $('#berriesDiv').show();
-                $('#descTabBtn').css('font-weight', 'normal');
-                $('#locTabBtn').css('font-weight', 'normal')
-                $('#movesTabBtn').css('font-weight', 'normal')
-                $('#berriesTabBtn').css('font-weight', 'bold')
-            }
+            // else if (div === "berriesDiv") {
+            //     $('#descriptionDiv').hide();
+            //     $('#locationsDiv').hide();
+            //     $('#movesDiv').hide();
+            //     $('#berriesDiv').show();
+            //     $('#descTabBtn').css('font-weight', 'normal');
+            //     $('#locTabBtn').css('font-weight', 'normal')
+            //     $('#movesTabBtn').css('font-weight', 'normal')
+            //     $('#berriesTabBtn').css('font-weight', 'bold')
+            // }
         }
         // Default setting for button weights
         function setButtonWeightDefaults()  {
