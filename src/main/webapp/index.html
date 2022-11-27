@@ -1,18 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="HTML">
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/images/pokeball.jpg"/>
-    <title>Pokedex</title>
+    <title>Pokédex</title>
     <style>
         html {
-            <!-- background-image: url(); -->
             background-position: center center;
             background-repeat:  no-repeat;
             background-attachment: fixed;
             background-size:  cover;
         }
-        <!-- NEEDED -->
         body {
             display: block;
             margin: 8px;
@@ -45,7 +43,6 @@
             border: 1px solid #ccc;
             background-color: #f1f1f1;
         }
-
         /* Style the buttons that are used to open the tab content */
         .tab button {
             background-color: inherit;
@@ -56,23 +53,18 @@
             padding: 14px 16px;
             transition: 0.3s;
         }
-
-        /* Change background color of buttons on hover */
-        .tab button:hover {
-            background-color: #ddd;
+        .pokedexStyle {
+            display: flow;
+            text-align: center;
+            vertical-align: middle;
         }
-
-        /* Create an active/current tablink class */
-        .tab button.active {
-            background-color: #ccc;
-        }
-
-        /* Style the tab content */
-        .tabcontent {
-            display: none;
-            padding: 6px 12px;
-            border: 1px solid #ccc;
-            border-top: none;
+        @media only screen and (max-width: 300px) {
+            .pokedexStyle {
+                display: inline-flex;
+                text-align: center;
+                vertical-align: middle;
+                width: 100px;
+            }
         }
     </style>
     <!-- jQuery -->
@@ -100,10 +92,10 @@
         <input id="pokemonInfoBtn" type="submit" onclick="getPokemonInfo();" class="button cursor" value="Get Info"/>
     </h4>
     <br>
-    <div id="pokedex" style="display:flow;">
+    <div id="pokedex" class="pokedexStyle">
         <h1 id="infoTitle">Pokemon Info</h1>
         <br>
-        <div style="display:inline-flex;">
+        <div>
             <div id="imageAndImageBtns">
                 <img id="imageOfPokemon" alt="pokemon" src="#" width="200" height="200"/>
                 <div id="photosDiv">
@@ -112,7 +104,7 @@
                 </div>
             </div>
             <br>
-            <div id="info" style="display:flow; width:300px;">
+            <div id="info">
                 <div id="idAndName" style="display:inline-flex;">
                     <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;
                     <label for="nameOfPokemon">Name:</label> <h3 id="nameOfPokemon"></h3>
@@ -127,15 +119,14 @@
                     <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;
                     <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>
                 </div>
-                <!-- Tab links -->
-                <div class="tabs">
+                <div style="display: flow;">
                     <button id="descTabBtn" class="tab" onclick="showDivAndBoldText('descriptionDiv');">Description</button>
                     <button id="locTabBtn" class="tab" onclick="showDivAndBoldText('locationsDiv')">Location</button>
                     <button id="movesTabBtn" class="tab" onclick="showDivAndBoldText('movesDiv')">Moves</button>
                     <!--<button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>-->
                 </div>
                 <br>
-                <div id="descriptionDiv">
+                <div id="descriptionDiv" style="display:inline-flex; width: 300px;">
                     <h3 id="description"></h3>
                 </div>
                 <div id="locationsDiv" style="overflow: scroll; height:100px;">
