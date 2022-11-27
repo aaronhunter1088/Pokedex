@@ -154,7 +154,6 @@
         $(function(){
             $('#pokedex').hide();
             //checks whether the pressed key is "Enter"
-            //document.getElementById('pokemonName').onkeypress = function(e) {
             $('#pokemonName').on('keypress', function(e) {
                 if ($('#pokemonName').val() === '') return;
                 if (e.code === 'Enter' || e.code === 'Return') {
