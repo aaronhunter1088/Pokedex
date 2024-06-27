@@ -141,7 +141,7 @@
             <c:set var="pokemonId" value="${pokemon.value.id}" />
             <div id="pokemon${pokemonId}">
                 <a href="search/${pokemon.value.id}">
-                    <div class="box" title="Click for more info" style="background-color:${pokemon.value.color}">
+                    <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color}">
                         <div id="nameAndId" style="display:inline-flex;">
                             <h3 id="name" style="color:black;">${pokemon.value.name}</h3>
                             <div style="display: block;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -211,6 +211,13 @@
         console.log("showGifs: " + showGifs);
         if (showGifs === 'true') $("#gifSwitch").attr("checked", true);
         else $("#gifSwitch").attr("checked", false);
+
+        let ids = ${pokemonIds};
+        for(let i=0; i<ids.length; i++) {
+            let pokemonBox = document.getElementById("pokemon"+(i+1)+"Box");
+            let currentColor = pokemonBox.style.backgroundColor;
+            pokemonBox.style.backgroundColor = changeColor(currentColor);
+        }
     });
 
     function toggleGifs() {
@@ -249,6 +256,21 @@
         <%--        }--%>
         <%--    }--%>
         <%--});--%>
+    }
+
+    function changeColor(pokemonColor) {
+        console.log('changeColor: ' + pokemonColor);
+        if (pokemonColor === "red") { return "#FA8072"; }
+        else if (pokemonColor === "yellow") { return "#ffeb18"; }
+        else if (pokemonColor === "green") { return "#AFE1AF"; }
+        else if (pokemonColor === "blue") { return "#ADD8E6"; }
+        else if (pokemonColor === "purple") { return "#CBC3E3"; }
+        else if (pokemonColor === "brown") { return "#D27D2D"; }
+        else if (pokemonColor === "white") { return "#d2cbd3"; }
+        else if (pokemonColor === "pink") { return "#ef6bb6ff"; }
+        else if (pokemonColor === "black") { return "#8f8b8b"}
+        else if (pokemonColor === "gray" || pokemonColor === "grey") { return "#8f8b8b"}
+        else return "#ffffff";
     }
 
 </script>
