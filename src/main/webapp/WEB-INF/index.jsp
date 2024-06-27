@@ -116,7 +116,7 @@
 <!--        <mat-slide-toggle (click)="showGifs = !showGifs;" title="If GIF is not present, official artwork will show!">-->
 <!--            Show GIFs-->
 <!--        </mat-slide-toggle>-->
-        <label class="switch">
+        <label class="switch" title="If GIF is not present, official artwork will show!">
             <input id="gifSwitch" type="checkbox" onclick="toggleGifs();">
             <span class="slider round"></span>
         </label>
@@ -202,7 +202,6 @@
     </nav>
 </body>
 
-<%--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>--%>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
@@ -236,26 +235,13 @@
                     location.reload();
                 },
                 404: function() {
-                    console.log('Failed')
+                    console.log('Failed');
+                },
+                500: function() {
+                    console.log('Server Error');
                 }
             }
         });
-        <%--$.ajax({--%>
-        <%--    type: "GET",--%>
-        <%--    url: "/toggleGifs",--%>
-        <%--    async: false,--%>
-        <%--    dataType: "application/json",--%>
-        <%--    success: function(data) {--%>
-        <%--        let showGifs = data;--%>
-        <%--        console.log("showGifs: " + showGifs);--%>
-        <%--        if (showGifs === 'true') $("#gifSwitch").attr("checked", true);--%>
-        <%--        else $("#gifSwitch").attr("checked", false);--%>
-        <%--        let ids = ${pokemonIds};--%>
-        <%--        for(let i=0; i<ids.length; i++) {--%>
-        <%--            $("#pokemon"+i+1).load(location.href + " #pokemon"+i+1);--%>
-        <%--        }--%>
-        <%--    }--%>
-        <%--});--%>
     }
 
     function changeColor(pokemonColor) {

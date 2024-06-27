@@ -16,6 +16,7 @@ import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 @Service(value = "PokemonService")
@@ -40,9 +41,10 @@ public class PokemonService {
 //                offset: _offset
 //    }
         //return this.Pokedex.getPokemonsList(interval);
-        if (_limit >= 0) {
+        if (_limit > 0) {
             PageQuery query = new PageQuery(_limit, offset);
-            return pokeApiClient.getResource(Pokemon.class, query).block().getResults();
+            List<NamedApiResource<Pokemon>> results = pokeApiClient.getResource(Pokemon.class, query).block().getResults();
+            return results;
         } else {
             return pokeApiClient.getResource(Pokemon.class).block().getResults();
         }
@@ -63,6 +65,10 @@ public class PokemonService {
         //console.log("service: ", this.Pokedex.getPokemonSpecies(pokemonIDName).then((res: any) => res.body))
         //return this.Pokedex.getPokemonSpecies(pokemonIDName);
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();
+    }
+
+    public int getTotalPokemon(String pokedex) {
+        return pokeApiClient.getResource(Pokedex.class, Objects.requireNonNullElse(pokedex, "1")).block().getPokemonEntries().size();
     }
 
     public void saveCurrentPage(int page) {

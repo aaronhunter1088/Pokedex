@@ -61,16 +61,16 @@ public class PokemonListController {
     }
 
     public Map<Integer, com.example.pokedex.entities.Pokemon> getPokemonMap() {
-        logger.info("page number is {}", this.page);
-        logger.info("itemsPerPage: {}", this.pkmnPerPage);
+        logger.info("page number is {}", page);
+        logger.info("itemsPerPage: {}", pkmnPerPage);
         // @ts-ignore this.pkmnPerPage
-        List<NamedApiResource<Pokemon>> pokemonList = pokemonService.getPokemonList(0, (this.page - 1) * this.pkmnPerPage);
+        List<NamedApiResource<Pokemon>> pokemonList = pokemonService.getPokemonList(pkmnPerPage, (this.page - 1) * this.pkmnPerPage);
         if (null != pokemonList && !pokemonList.isEmpty()) {
             logger.info("pokemonList size: " + pokemonList.size());
             pokemonList = pokemonList.stream().limit(pkmnPerPage).collect(toList());
             logger.info("pokemonList limit size: " + pokemonList.size());
             pokemonMap = new TreeMap<>();
-            numberOfPkmn = pokemonList.size();
+            numberOfPkmn = pokemonService.getTotalPokemon(null);
             pokemonList.forEach(pkmn -> {
                 Pokemon pokemonResource = pokemonService.getPokemonByName(pkmn.getName());
                 com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
