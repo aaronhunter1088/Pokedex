@@ -1,4 +1,4 @@
-package com.example.pokedex;
+package com.example.pokedex.controllers;
 
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.simple.JSONArray;
@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 import skaro.pokeapi.client.PokeApiClient;
+import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.FlavorText;
+import skaro.pokeapi.resource.NamedApiResource;
+import skaro.pokeapi.resource.NamedApiResourceList;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-//import reactor.netty.http.client.HttpClient;
+import javax.ws.rs.Path;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -19,20 +23,37 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 @RestController
-@RequestMapping("/pokedex")
-public class Pokedex {
+@CrossOrigin(origins = "*")
+@RequestMapping("pokemon")
+public class PokemonApi {
 
     @Autowired
     private PokeApiClient pokeApiClient;
 
-    @RequestMapping(value = "/pokemon/{nameOfPokemon}", method=RequestMethod.GET)
+//    @RequestMapping(value = "/?limit={limit}&offset={offset}", method=RequestMethod.GET) // /pokemon/
+//    @ResponseBody
+//    public ResponseEntity<Object> getAllPokemon(@RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
+//                                                @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
+//        List<NamedApiResource<Pokemon>> allPokemon;
+//        try {
+//            //"https://pokeapi.co/api/v2/pokemon/?limit=20&offset=0"
+//            allPokemon = pokeApiClient.getResource(Pokemon.class, new PageQuery(limit, offset))
+//                    .block().getResults();
+//            return ResponseEntity.ok(allPokemon);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.badRequest().body("Could not fetch all pokemon");
+//        }
+//    }
+
+    @RequestMapping(value = "/{nameOfPokemon}", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getPokemon(@PathVariable("nameOfPokemon") String nameOfPokemon)
     {
         System.out.println("pokemonName: " + nameOfPokemon);
         Pokemon pokemon;
         try {
-            pokemon =  pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
+            pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
             return ResponseEntity.ok(pokemon);
         } catch (Exception e) {
             e.printStackTrace();

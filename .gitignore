@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### OTHER ###
+.DS_Store
+.mvn/
+src/.DS_Store
+src/main/.DS_Store
+src/main/resources/.DS_Store
+src/main/webapp/.DS_Store
+src/main/webapp/images/.DS_Store
