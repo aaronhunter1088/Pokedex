@@ -4,19 +4,18 @@ import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import skaro.pokeapi.resource.NamedApiResource;
-import skaro.pokeapi.resource.NamedApiResourceList;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import javax.servlet.http.HttpSession;
+import javax.ws.rs.PathParam;
+import java.net.http.HttpRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class PokemonListController {
     int page = 1;
     String blankPageNumber = "";
     int pkmnPerPage = 10; // itemsPerPage
-    int numberOfPkmn = 0;
+    int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
             gifImagePresent = false,
@@ -49,13 +48,17 @@ public class PokemonListController {
     }
 
     @GetMapping("/")
-    public ModelAndView homepage(ModelAndView mav){
+    public ModelAndView homepage(ModelAndView mav) {
         mav.addObject("pokemonMap", getPokemonMap());
         mav.addObject("pokemonIds", new ArrayList<>(getPokemonMap().keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
         mav.addObject("gifImagePresent", gifImagePresent);
         mav.addObject("showGifs", showGifs);
+        mav.addObject("pkmnPerPage", pkmnPerPage);
+        mav.addObject("totalPokemon", totalPokemon);
+        mav.addObject("totalPages", (int)Math.ceil((double) totalPokemon /pkmnPerPage));
+        mav.addObject("page", page);
         mav.setViewName("index");
         return mav;
     }
@@ -70,7 +73,7 @@ public class PokemonListController {
             pokemonList = pokemonList.stream().limit(pkmnPerPage).collect(toList());
             logger.info("pokemonList limit size: " + pokemonList.size());
             pokemonMap = new TreeMap<>();
-            numberOfPkmn = pokemonService.getTotalPokemon(null);
+            totalPokemon = pokemonService.getTotalPokemon(null);
             pokemonList.forEach(pkmn -> {
                 Pokemon pokemonResource = pokemonService.getPokemonByName(pkmn.getName());
                 com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
@@ -115,4 +118,27 @@ public class PokemonListController {
         return showGifs;
     }
 
+    @GetMapping("/{page}")
+    public void page(@PathVariable(value="page") String pageNumber, ModelAndView mav) {
+        logger.info("pagination page: {}", pageNumber);
+        try {
+            this.page = Integer.parseInt(pageNumber);
+        } catch (NumberFormatException nfe) {
+            logger.error("Couldn't update page because {}", nfe.getMessage());
+        }
+        homepage(mav);
+    }
+
+    @GetMapping("/pkmnPerPage")
+    @ResponseBody
+    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name="pkmnPerPage", required=false, defaultValue="10") int pkmnPerPage) {
+        if (pkmnPerPage <= 0) {
+            return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
+        }
+        else {
+            if (pkmnPerPage > 50) logger.info(pkmnPerPage + " is too high. Defaulting to 50");
+            this.pkmnPerPage = pkmnPerPage;
+        }
+        return ResponseEntity.ok().body("PkmnPerPage set");
+    }
 }

@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -99,19 +100,34 @@
         </a>
     </h1>
     <br>
-    <nav aria-label="Page navigation example">
+
+    <nav aria-label="Pokedex navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">Previous</a>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-            </li>
+            <c:forEach begin="${page}" end="8" var="pageNumber">
+                <c:if test="${pageNumber == 1}">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                </c:if>
+                <c:if test="${pageNumber <= 8}">
+                    <li class="page-item"><a class="page-link" href="/${pageNumber}">${pageNumber}</a></li>
+                </c:if>
+                <c:if test="${pageNumber >= 8}">
+                    <li class="page-item"><a class="page-link" href="/">...</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="/${totalPages}" >
+                                ${totalPages}</a>
+                    </li>
+                </c:if>
+                <c:if test="${pageNumber != totalPages && pageNumber == 8}">
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </c:if>
+            </c:forEach>
         </ul>
     </nav>
+
     <div style="display:inline-flex;align-items:center;">
 <!--        <mat-slide-toggle (click)="showGifs = !showGifs;" title="If GIF is not present, official artwork will show!">-->
 <!--            Show GIFs-->
@@ -131,8 +147,8 @@
         &emsp;
         <div id="showPokemon" style="display:flex;">
             <label for="showPkmnNumber"></label>
-            <input id="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:auto;"/>
-            <button class="icon">Show Pokemon</button>
+            <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:auto;"/>
+            <button class="icon" onclick="setPkmnPerPage();">Show Pokemon</button>
         </div>
     </div>
     <br>
@@ -151,7 +167,8 @@
                             <c:choose>
                                 <c:when test="${defaultImagePresent}">
                                     <c:if test="${!showGifs}">
-                                        <img src="${pokemon.value.defaultImage}" alt="${pokemon.value.name}-default">
+                                        <img onmouseover="showArtwork(this, '${pokemon.value.officialImage}')" onmouseout="showArtwork(this, '${pokemon.value.defaultImage}');"
+                                             src="${pokemon.value.defaultImage}" alt="${pokemon.value.name}-default">
                                     </c:if>
                                     <c:if test="${showGifs && gifImagePresent}">
                                         <img src="${pokemon.value.gifImage}" alt="${pokemon.value.name}-gif">
@@ -187,29 +204,40 @@
         </c:forEach>
     </div>
 
-    <nav aria-label="Page navigation example">
+    <nav aria-label="Pokedex navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item disabled">
-                <a class="page-link" href="#" tabindex="-1">Previous</a>
-            </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-                <a class="page-link" href="#">Next</a>
-            </li>
+            <c:forEach begin="${page}" end="8" var="pageNumber">
+                <c:if test="${pageNumber == 1}">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                </c:if>
+                <c:if test="${pageNumber <= 8}">
+                    <li class="page-item"><a class="page-link" href="/${pageNumber}">${pageNumber}</a></li>
+                </c:if>
+                <c:if test="${pageNumber >= 8}">
+                    <li class="page-item"><a class="page-link" href="/">...</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="/${totalPages}" >
+                                ${totalPages}</a>
+                    </li>
+                </c:if>
+                <c:if test="${pageNumber != totalPages && pageNumber == 8}">
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </c:if>
+            </c:forEach>
         </ul>
     </nav>
+
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
     $(function(){
-        let showGifs = "${showGifs}";
-        console.log("showGifs: " + showGifs);
-        if (showGifs === 'true') $("#gifSwitch").attr("checked", true);
-        else $("#gifSwitch").attr("checked", false);
+        updateGifToggle(false, "${showGifs}");
 
         let ids = ${pokemonIds};
         for(let i=0; i<ids.length; i++) {
@@ -228,11 +256,7 @@
             crossDomain: true,
             statusCode: {
                 200: function(data) {
-                    let showGifs = JSON.parse(data.responseText);
-                    console.log("showGifs: " + showGifs);
-                    if (showGifs === 'true') $("#gifSwitch").attr("checked", true);
-                    else $("#gifSwitch").attr("checked", false);
-                    location.reload();
+                    updateGifToggle(true, data);
                 },
                 404: function() {
                     console.log('Failed');
@@ -242,6 +266,19 @@
                 }
             }
         });
+    }
+
+    function updateGifToggle(reload, data) {
+        let showGifs;
+        try {
+            showGifs = JSON.parse(data.responseText);
+        } catch (error) {
+            showGifs = data;
+        }
+        console.log("showGifs: " + showGifs);
+        if (showGifs === 'true') $("#gifSwitch").attr("checked", true);
+        else $("#gifSwitch").attr("checked", false);
+        if (reload) location.reload();
     }
 
     function changeColor(pokemonColor) {
@@ -257,6 +294,40 @@
         else if (pokemonColor === "black") { return "#8f8b8b"}
         else if (pokemonColor === "gray" || pokemonColor === "grey") { return "#8f8b8b"}
         else return "#ffffff";
+    }
+
+    function showArtwork(imgTag, artwork) {
+        imgTag.src = artwork;
+    }
+
+    function setPkmnPerPage() {
+        let value = $("#showPkmnNumber").val();
+        console.log("showPkmnNumber: " + value);
+        $.ajax({
+            type: "GET",
+            url: "pkmnPerPage",
+            data: {
+                pkmnPerPage: value
+            },
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    location.reload();
+                },
+                400: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    },
+                404: function() {
+                    console.log('Resource not found');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
     }
 
 </script>
