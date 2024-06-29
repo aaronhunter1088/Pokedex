@@ -3,6 +3,8 @@ package com.example.pokedex.service;
 import com.fasterxml.jackson.annotation.JacksonInject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -16,10 +18,13 @@ import skaro.pokeapi.resource.pokedex.Pokedex;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
 
 @Service(value = "PokemonService")
 public class PokemonService {
@@ -67,8 +72,40 @@ public class PokemonService {
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();
     }
 
-    public Location getPokemonLocationEncounters(String id) {
-        return pokeApiClient.getResource(Location.class, id).block();
+    public List<String> getPokemonLocationEncounters(String url) {
+        //return pokeApiClient.getResource(Location.class, id).block();
+        HttpResponse<String> response;
+        JSONParser jsonParser;
+        List<String> areas = new ArrayList<>();
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    .send(request,  HttpResponse.BodyHandlers.ofString());
+            logger.info("response: {}", response);
+            jsonParser = new JSONParser(response.body());
+            List<LinkedHashMap<String, String>> map = (List<LinkedHashMap<String, String>>) jsonParser.parse();
+            for(Map m : map) {
+                LinkedHashMap<String, String> area = (LinkedHashMap<String, String>) m.get("location_area");
+                areas.add(area.get("name"));
+            }
+        } catch (URISyntaxException use) {
+            use.printStackTrace();
+            logger.error("The url is malformed... {}", use.getMessage());
+        } catch (IOException | InterruptedException ioe) {
+            ioe.printStackTrace();
+            logger.error("There was an error sending the request");
+        } catch (ParseException pe) {
+            pe.printStackTrace();
+            logger.error("There was an error parsing the response: {}", pe.getMessage());
+        }
+        if (!areas.isEmpty()) {
+            areas = areas.stream().sorted().toList();
+        }
+        return areas;
     }
 
     public int getTotalPokemon(String pokedex) {

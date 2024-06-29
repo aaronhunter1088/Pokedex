@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.location.Location;
+import skaro.pokeapi.resource.locationarea.LocationArea;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
@@ -39,7 +40,7 @@ public class PokedexController {
     String pokemonType = "";
     List<FlavorText> pokemonDescriptions = Collections.emptyList();
     String pokemonDescription = "";
-    Location pokemonLocation;
+    String pokemonLocation; // url
     List<String> pokemonLocations = Collections.emptyList();
     List<String> pokemonMoves = Collections.emptyList();
     boolean descriptionDiv = true,
@@ -96,11 +97,9 @@ public class PokedexController {
             //logger.info("One pokemonType");
             pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1);
         }
-        pokemonLocation = pokemonService.getPokemonLocationEncounters(String.valueOf(pokemonId));
-        pokemonLocations = pokemonLocation.getNames().stream()
-                .map(skaro.pokeapi.resource.Name::getName)
-                .sorted()
-                .collect(toList());
+        pokemonLocation = pokemon.getLocationAreaEncounters();
+        pokemonLocations = pokemonService.getPokemonLocationEncounters(pokemonLocation);
+
         pokemonMoves = pokemon.getMoves().stream()
                 .map(skaro.pokeapi.resource.pokemon.PokemonMove::getMove)
                 .map(NamedApiResource::getName)
