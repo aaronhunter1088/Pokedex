@@ -10,6 +10,8 @@ import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
+import skaro.pokeapi.resource.location.Location;
+import skaro.pokeapi.resource.locationarea.LocationArea;
 import skaro.pokeapi.resource.pokedex.Pokedex;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
@@ -24,8 +26,6 @@ public class PokemonService {
 
     private static final Logger logger = LogManager.getLogger(PokemonService.class);
     private final PokeApiClient pokeApiClient;
-    //PokeAPI = require("pokeapi-js-wrapper")
-    //Pokedex = new this.PokeAPI.Pokedex();
     private int savedPageNumber = 1;
     private int pokemonID = 0;
     private int pkmnPerPage = 10; // itemsPerPage
@@ -35,7 +35,7 @@ public class PokemonService {
         this.pokeApiClient = pokeApiClient;
     }
 
-    public List<NamedApiResource<Pokemon>> getPokemonList(int _limit, int offset) {
+    public NamedApiResourceList<Pokemon> getPokemonList(int _limit, int offset) {
 //    const interval = {
 //                limit: _limit,
 //                offset: _offset
@@ -43,10 +43,10 @@ public class PokemonService {
         //return this.Pokedex.getPokemonsList(interval);
         if (_limit > 0) {
             PageQuery query = new PageQuery(_limit, offset);
-            List<NamedApiResource<Pokemon>> results = pokeApiClient.getResource(Pokemon.class, query).block().getResults();
+            NamedApiResourceList<Pokemon> results = pokeApiClient.getResource(Pokemon.class, query).block();
             return results;
         } else {
-            return pokeApiClient.getResource(Pokemon.class).block().getResults();
+            return pokeApiClient.getResource(Pokemon.class).block();
         }
     }
 
@@ -65,6 +65,10 @@ public class PokemonService {
         //console.log("service: ", this.Pokedex.getPokemonSpecies(pokemonIDName).then((res: any) => res.body))
         //return this.Pokedex.getPokemonSpecies(pokemonIDName);
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();
+    }
+
+    public Location getPokemonLocationEncounters(String id) {
+        return pokeApiClient.getResource(Location.class, id).block();
     }
 
     public int getTotalPokemon(String pokedex) {

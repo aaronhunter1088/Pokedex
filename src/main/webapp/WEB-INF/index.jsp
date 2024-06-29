@@ -101,37 +101,9 @@
     </h1>
     <br>
 
-    <nav aria-label="Pokedex navigation">
-        <ul class="pagination justify-content-center">
-            <c:forEach begin="${page}" end="8" var="pageNumber">
-                <c:if test="${pageNumber == 1}">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
-                    </li>
-                </c:if>
-                <c:if test="${pageNumber <= 8}">
-                    <li class="page-item"><a class="page-link" href="/${pageNumber}">${pageNumber}</a></li>
-                </c:if>
-                <c:if test="${pageNumber >= 8}">
-                    <li class="page-item"><a class="page-link" href="/">...</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="/${totalPages}" >
-                                ${totalPages}</a>
-                    </li>
-                </c:if>
-                <c:if test="${pageNumber != totalPages && pageNumber == 8}">
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </c:if>
-            </c:forEach>
-        </ul>
-    </nav>
+    <jsp:include page="navigation.jsp"/>
 
     <div style="display:inline-flex;align-items:center;">
-<!--        <mat-slide-toggle (click)="showGifs = !showGifs;" title="If GIF is not present, official artwork will show!">-->
-<!--            Show GIFs-->
-<!--        </mat-slide-toggle>-->
         <label class="switch" title="If GIF is not present, official artwork will show!">
             <input id="gifSwitch" type="checkbox" onclick="toggleGifs();">
             <span class="slider round"></span>
@@ -141,8 +113,8 @@
         &emsp;
         <div id="jumpToPage" style="display:flex;">
             <label for="pageNumber"></label>
-            <input id="pageNumber" type="text" placeholder="Page #" style="width:auto;"/>
-            <button class="icon">Jump to Page</button>
+            <input id="pageNumber" name="pageNumber" type="text" placeholder="Page #" style="width:auto;"/>
+            <button class="icon" onclick="setPageToView();">Jump to Page</button>
         </div>
         &emsp;
         <div id="showPokemon" style="display:flex;">
@@ -156,8 +128,8 @@
         <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
             <c:set var="pokemonId" value="${pokemon.value.id}" />
             <div id="pokemon${pokemonId}">
-                <a href="search/${pokemon.value.id}">
-                    <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color}">
+                <a href="pokedex/${pokemon.value.id}">
+                    <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                         <div id="nameAndId" style="display:inline-flex;">
                             <h3 id="name" style="color:black;">${pokemon.value.name}</h3>
                             <div style="display: block;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
@@ -204,32 +176,7 @@
         </c:forEach>
     </div>
 
-    <nav aria-label="Pokedex navigation">
-        <ul class="pagination justify-content-center">
-            <c:forEach begin="${page}" end="8" var="pageNumber">
-                <c:if test="${pageNumber == 1}">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Previous</a>
-                    </li>
-                </c:if>
-                <c:if test="${pageNumber <= 8}">
-                    <li class="page-item"><a class="page-link" href="/${pageNumber}">${pageNumber}</a></li>
-                </c:if>
-                <c:if test="${pageNumber >= 8}">
-                    <li class="page-item"><a class="page-link" href="/">...</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="/${totalPages}" >
-                                ${totalPages}</a>
-                    </li>
-                </c:if>
-                <c:if test="${pageNumber != totalPages && pageNumber == 8}">
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </c:if>
-            </c:forEach>
-        </ul>
-    </nav>
+    <jsp:include page="navigation.jsp"/>
 
 </body>
 
@@ -241,7 +188,7 @@
 
         let ids = ${pokemonIds};
         for(let i=0; i<ids.length; i++) {
-            let pokemonBox = document.getElementById("pokemon"+(i+1)+"Box");
+            let pokemonBox = document.getElementById("pokemon"+(ids[i])+"Box");
             let currentColor = pokemonBox.style.backgroundColor;
             pokemonBox.style.backgroundColor = changeColor(currentColor);
         }
@@ -298,6 +245,43 @@
 
     function showArtwork(imgTag, artwork) {
         imgTag.src = artwork;
+    }
+
+    function setPageToView(pageNumber) {
+        let value = $("#pageNumber").val();
+        if (pageNumber !== undefined) value = pageNumber;
+        console.log("page to view: " + value);
+        $.ajax({
+            type: "GET",
+            url: "page",
+            data: {
+                pageNumber: value
+            },
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    location.reload();
+                    let ids = ${pokemonIds};
+                    for(let i=0; i<ids.length; i++) {
+                        let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");
+                        let currentColor = pokemonBox.style.backgroundColor;
+                        pokemonBox.style.backgroundColor = changeColor(currentColor);
+                    }
+                },
+                400: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                },
+                404: function() {
+                    console.log('Resource not found');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
     }
 
     function setPkmnPerPage() {

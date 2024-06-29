@@ -24,27 +24,27 @@ import java.util.*;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("pokemon")
+@RequestMapping("/pokemon")
 public class PokemonApi {
 
     @Autowired
     private PokeApiClient pokeApiClient;
 
-//    @RequestMapping(value = "/?limit={limit}&offset={offset}", method=RequestMethod.GET) // /pokemon/
-//    @ResponseBody
-//    public ResponseEntity<Object> getAllPokemon(@RequestParam(value = "limit", required = false, defaultValue = "20") int limit,
-//                                                @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
-//        List<NamedApiResource<Pokemon>> allPokemon;
-//        try {
-//            //"https://pokeapi.co/api/v2/pokemon/?limit=20&offset=0"
-//            allPokemon = pokeApiClient.getResource(Pokemon.class, new PageQuery(limit, offset))
-//                    .block().getResults();
-//            return ResponseEntity.ok(allPokemon);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.badRequest().body("Could not fetch all pokemon");
-//        }
-//    }
+    @RequestMapping(value = "/list", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Object> getAllPokemon(@RequestParam(value="limit", required=false, defaultValue="10") int limit,
+                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset) {
+        NamedApiResourceList<Pokemon> allPokemon;
+        try {
+            //"https://pokeapi.co/api/v2/pokemon/?limit=10&offset=0"
+            allPokemon = pokeApiClient.getResource(Pokemon.class, new PageQuery(limit, offset))
+                    .block();
+            return ResponseEntity.ok(allPokemon);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Could not fetch all pokemon because " + e.getMessage());
+        }
+    }
 
     @RequestMapping(value = "/{nameOfPokemon}", method=RequestMethod.GET)
     @ResponseBody
