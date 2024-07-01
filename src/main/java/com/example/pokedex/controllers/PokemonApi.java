@@ -1,5 +1,7 @@
 package com.example.pokedex.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +14,10 @@ import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
+import skaro.pokeapi.resource.evolutionchain.EvolutionChain;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import javax.ws.rs.Path;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,6 +29,7 @@ import java.util.*;
 @RequestMapping("/pokemon")
 public class PokemonApi {
 
+    private static final Logger logger = LogManager.getLogger(PokemonApi.class);
     @Autowired
     private PokeApiClient pokeApiClient;
 
@@ -46,6 +49,7 @@ public class PokemonApi {
         }
     }
 
+    // Can be name or id
     @RequestMapping(value = "/{nameOfPokemon}", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getPokemon(@PathVariable("nameOfPokemon") String nameOfPokemon)
@@ -150,5 +154,66 @@ public class PokemonApi {
         JSONArray array = new JSONArray();
         array.addAll(namesOfAreas);
         return new ResponseEntity<>(array.toJSONString(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value="/species/{pokemonId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSpeciesData(@PathVariable("pokemonId") String pokemonId)
+    {
+        Pokemon pokemonResource = (Pokemon) getPokemon(pokemonId).getBody();
+        NamedApiResource<PokemonSpecies> speciesResource = pokemonResource.getSpecies();
+        if (null == speciesResource) {
+            return ResponseEntity.noContent().build();
+        }
+        String speciesUrl = speciesResource.getUrl();
+        HttpResponse<String> response;
+        JSONParser jsonParser;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(speciesUrl))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    .send(request,  HttpResponse.BodyHandlers.ofString());
+            logger.info("response: {}", response.body());
+            jsonParser = new JSONParser(response.body());
+            Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            logger.error("Error retrieving response because {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @RequestMapping(value="/evolutionChain/{pokemonId}", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getEvolutionChain(@PathVariable("pokemonId") String pokemonId)
+    {
+        Map<String, Object> speciesData = getSpeciesData(pokemonId).getBody();
+        //JSONParser jsonParser = new JSONParser(String.valueOf(speciesData));
+        try {
+            //Map<String, Object> species = (Map<String, Object>) jsonParser.parse();
+            //jsonParser = new JSONParser(String.valueOf(species.get("evolutionChain")));
+            Map<String, Object> chainData = (LinkedHashMap<String, Object>) speciesData.get("evolution_chain");
+            String chainUrl = (String) chainData.get("url");
+            logger.info("chainUrl: " + chainUrl);
+            HttpResponse<String> response;
+            JSONParser jsonParser;
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(chainUrl))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    .send(request,  HttpResponse.BodyHandlers.ofString());
+            logger.info("response: {}", response.body());
+            jsonParser = new JSONParser(response.body());
+            Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            logger.error("Error parsing species data");
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

@@ -12,6 +12,7 @@ import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
+import skaro.pokeapi.resource.evolutionchain.EvolutionChain;
 import skaro.pokeapi.resource.location.Location;
 import skaro.pokeapi.resource.locationarea.LocationArea;
 import skaro.pokeapi.resource.pokedex.Pokedex;
@@ -106,6 +107,28 @@ public class PokemonService {
             areas = areas.stream().sorted().toList();
         }
         return areas;
+    }
+
+    public Map<String, Object> getPokemonChainData(String pokemonChainId) {
+        //PokemonSpecies speciesData = getPokemonSpeciesData(pokemonId);
+        String chainUrl = "https://pokeapi.co/api/v2/evolution-chain/"+pokemonChainId+'/';
+        HttpResponse<String> response;
+        JSONParser jsonParser;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(chainUrl))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    .send(request,  HttpResponse.BodyHandlers.ofString());
+            logger.info("response: {}", response);
+            jsonParser = new JSONParser(response.body());
+            return (Map<String, Object>) jsonParser.parse();
+        } catch (Exception e) {
+            logger.error("Internal Server Error: {}", e.getMessage());
+            return Collections.emptyMap();
+        }
     }
 
     public int getTotalPokemon(String pokedex) {

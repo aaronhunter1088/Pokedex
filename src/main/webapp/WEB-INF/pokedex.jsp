@@ -108,7 +108,7 @@
                 </c:forEach>
             </div>
             <div id="evolutionsDiv" style="overflow-y: scroll; overflow-x: hidden; height:200px;">
-                <jsp:include page="evolves-how.jsp"/>
+                <jsp:include page="evolves-how.jsp" />
             </div>
         </div>
     </div>
@@ -227,6 +227,28 @@
                 break;
             }
             case 'evolvesHow' : {
+                $.ajax({
+                    type: "GET",
+                    url: "${pageContext.request.contextPath}/evolves-how",
+                    async: false,
+                    data: {
+                        pokemonId: Number.parseInt('${pokemonId}')
+                    },
+                    dataType: "application/json",
+                    crossDomain: true,
+                    statusCode: {
+                        200: function(data) {
+                            $("#evolutionsDiv").html(data.responseText);
+                        },
+                        404: function() {
+                            console.log('Failed');
+                            $("#evolutionsDiv").html('Request failed');
+                        },
+                        500: function() {
+                            console.log('Server Error');
+                        }
+                    }
+                });
                 $("#evolutionsDiv").show();
                 break;
             }
