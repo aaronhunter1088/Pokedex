@@ -16,15 +16,12 @@ import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
 @Controller
-public class PokedexController {
+public class PokedexController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokedexController.class);
     Map<String, String> sprites;
@@ -38,15 +35,16 @@ public class PokedexController {
     Integer pokemonWeight;
     String pokemonColor = "";
     String pokemonType = "";
-    List<FlavorText> pokemonDescriptions = Collections.emptyList();
+    List<FlavorText> pokemonDescriptions = new ArrayList<>();
     String pokemonDescription = "";
     String pokemonLocation; // url
-    List<String> pokemonLocations = Collections.emptyList();
-    List<String> pokemonMoves = Collections.emptyList();
-    boolean descriptionDiv = true,
-            locationsDiv = false,
-            movesDiv = false,
-            evolutionsDiv = false,
+    List<String> pokemonLocations = new ArrayList<>();
+    List<String> pokemonMoves = new ArrayList<>();
+    boolean
+//            descriptionDiv = true,
+//            locationsDiv = false,
+//            movesDiv = false,
+//            evolutionsDiv = false,
 //    normal = 'normal'
 //    bold = 'bold'
 //    screenWidth: number = 0
@@ -58,6 +56,7 @@ public class PokedexController {
 
     @Autowired
     public PokedexController(PokemonService pokemonService) {
+        super(pokemonService);
         this.pokemonService = pokemonService;
 
     }
@@ -65,65 +64,67 @@ public class PokedexController {
     @GetMapping(value="/pokedex/{pokemonId}")
     public ModelAndView pokedex(@PathVariable(name="pokemonId") int pokemonId, ModelAndView mav) {
         skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(String.valueOf(pokemonId));
-        com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
-        pokemonName = pokemon.getName();
-        //sprites = pokemon.getSprites();
-        this.pokemonId = pokemon.getId();
-        defaultImage = null != pokemon.getSprites().getFrontDefault()
-                ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg";
-        officialImage = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png";
-        gifImage = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif";
-        shinyImage = pokemon.getSprites().getFrontShiny();
+        com.example.pokedex.entities.Pokemon pokemon = createPokemon(pokemonResource, pokemonService.getPokemonSpeciesData(String.valueOf(pokemonId)));
+//        new com.example.pokedex.entities.Pokemon(pokemonResource);
+//        pokemonName = pokemon.getName();
+//        //sprites = pokemon.getSprites();
+//        this.pokemonId = pokemon.getId();
+//        defaultImage = null != pokemon.getSprites().getFrontDefault()
+//                ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg";
+//        officialImage = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png";
+//        gifImage = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif";
+//        shinyImage = pokemon.getSprites().getFrontShiny();
         sprites = new TreeMap<>() {{
-           put("default", defaultImage);
-           put("official", officialImage);
-           put("shiny", shinyImage);
-           put("gif", gifImage);
+           put("default", pokemon.getDefaultImage());
+           put("official", pokemon.getOfficialImage());
+           put("shiny", pokemon.getShinyImage());
+           put("gif", pokemon.getGifImage());
         }};
-        pokemonWeight = pokemon.getWeight();
-        pokemonHeight = pokemon.getHeight();
-        PokemonSpecies speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonId));
-        pokemonColor = speciesData.getColor().getName();
-        pokemonDescriptions = speciesData.getFlavorTextEntries();
-        pokemonDescription = pokemonDescriptions.stream()
-                .filter(flavorText -> "en".equals(flavorText.getLanguage().getName()))
-                .findFirst().get().getFlavorText();
-        List<PokemonType> types = pokemon.getTypes();
-        if (types.size() > 1) {
-            //.info("More than 1 pokemonType");
-            pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1)
-                    + " & " + types.get(1).getType().getName().substring(0,1).toUpperCase() + types.get(1).getType().getName().substring(1);
-        } else {
-            //logger.info("One pokemonType");
-            pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1);
-        }
-        pokemonLocation = pokemon.getLocationAreaEncounters();
-        pokemonLocations = pokemonService.getPokemonLocationEncounters(pokemonLocation);
+//        pokemonWeight = pokemon.getWeight();
+//        pokemonHeight = pokemon.getHeight();
+//        PokemonSpecies speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonId));
+//        pokemonColor = speciesData.getColor().getName();
+//        pokemonDescriptions = speciesData.getFlavorTextEntries();
+//        pokemonDescription = pokemonDescriptions.stream()
+//                .filter(flavorText -> "en".equals(flavorText.getLanguage().getName()))
+//                .findFirst().get().getFlavorText();
+//        List<PokemonType> types = pokemon.getTypes();
+//        if (types.size() > 1) {
+//            //.info("More than 1 pokemonType");
+//            pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1)
+//                    + " & " + types.get(1).getType().getName().substring(0,1).toUpperCase() + types.get(1).getType().getName().substring(1);
+//        } else {
+//            //logger.info("One pokemonType");
+//            pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1);
+//        }
+//        pokemonLocation = pokemon.getLocationAreaEncounters();
+//        pokemonLocations = pokemonService.getPokemonLocationEncounters(pokemonLocation);
+//
+//        pokemonMoves = pokemon.getMoves().stream()
+//                .map(skaro.pokeapi.resource.pokemon.PokemonMove::getMove)
+//                .map(NamedApiResource::getName)
+//                .sorted()
+//                .toList();
 
-        pokemonMoves = pokemon.getMoves().stream()
-                .map(skaro.pokeapi.resource.pokemon.PokemonMove::getMove)
-                .map(NamedApiResource::getName)
-                .sorted()
-                .toList();
-
-        mav.addObject("pkmnName", pokemonName);
+        mav.addObject("pkmnName", pokemon.getName());
         mav.addObject("sprites", sprites);
-        mav.addObject("pkmnId", this.pokemonId);
-        mav.addObject("defaultImage", defaultImage);
-        mav.addObject("officialImage", officialImage);
-        mav.addObject("gifImage", gifImage);
-        mav.addObject("shinyImage", shinyImage);
-        mav.addObject("weight", pokemonWeight);
-        mav.addObject("height", pokemonHeight);
-        mav.addObject("color", pokemonColor);
-        mav.addObject("descriptions", pokemonDescriptions);
-        mav.addObject("description", pokemonDescription);
-        mav.addObject("pkmnType", pokemonType);
-        mav.addObject("pkmnLocations", pokemonLocations);
-        mav.addObject("pkmnLocation", pokemonLocation);
-        mav.addObject("pkmnMoves", pokemonMoves);
+        mav.addObject("pkmnId", pokemonId);
+        mav.addObject("defaultImage", sprites.get("default"));
+        mav.addObject("officialImage", sprites.get("official"));
+        mav.addObject("gifImage", sprites.get("gif"));
+        mav.addObject("shinyImage", sprites.get("shiny"));
+        mav.addObject("weight", pokemon.getWeight());
+        mav.addObject("height", pokemon.getHeight());
+        mav.addObject("color", pokemon.getColor());
+        mav.addObject("descriptions", pokemon.getDescriptions());
+        mav.addObject("description", pokemon.getDescription());
+        mav.addObject("pkmnType", pokemon.getType());
+        mav.addObject("pkmnLocations", pokemon.getLocations());
+        //mav.addObject("pkmnLocation", pokemonLocation);
+        mav.addObject("pkmnMoves", pokemon.getPokemonMoves());
         mav.addObject("pokemon", pokemon);
         mav.setViewName("pokedex");
         return mav;
     }
+
 }

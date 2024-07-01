@@ -1,12 +1,7 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: michaelball
-  Date: 6/28/24
-  Time: 5:37 PM
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/pokeball.jpg"/>
@@ -32,15 +27,69 @@
           type="text/css" rel="stylesheet">
     <style></style>
 </head>
-<body>
-Evolutions
+<body id="">
+    <h2>Evolutions</h2>
+    <c:forEach var="stage" items="${stages}">
+        <div id="stagesHeader" style="display:inline-flex;justify-content:center;text-align-all:center;width:300px;height:10px;" class="pokemon-grid box">
+            <h2>Stage ${stage}</h2>
+        </div>
+    </c:forEach>
+    <div id="evolutions" style="display:inline-flex; justify-content: center; width:100%; height:45%;">
+        <c:forEach var="pokemonList" items="${pokemonFamily}">
+            <div style="overflow-y:scroll; height:460px;">
+                <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
+                    <div class="pokemon-grid">
+                        <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}" style="text-decoration: none; color: black;">
+                            <div style="background-color:${pokemon.color};display:inline-block;" class="box">
+                                <div id="idAndName" style="display:inline-flex;">
+                                    <h3 id="name">${pokemon.name}</h3>
+                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                                    <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
+                                </div>
+                                <div id="image">
+                                    <img style="width:100px; height:100px;"
+                                         src="${pokemon.defaultImage}" alt="${pokemon.name}-default">
+                                </div>
+                                <h3 id="heightOfPokemon">Height: ${pokemon.height} m</h3>
+                                <h3 id="weightOfPokemon">Weight: ${pokemon.weight} kg</h3>
+                                <h3 id="colorOfPokemon">Color: ${pokemon.color}</h3>
+                                <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
+                            </div>
+                        </a>
+                            <%--                        <div style="padding-top:25px; text-align:center; justify-content:center;"--%>
+                            <%--                             *ngIf="!isNotLast">--%>
+                            <%--                            <img style="width:25px; height:25px;"--%>
+                            <%--                                 src="./assets/images/pokeball1.jpg">--%>
+                            <%--                        </div>--%>
+                        </div>
+                </c:forEach>
+            </div>
+        </c:forEach>
+    </div>
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
     $(function(){
-
+        <%--$.ajax({--%>
+        <%--    type: "GET",--%>
+        <%--    url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",--%>
+        <%--    async: false,--%>
+        <%--    dataType: "json",--%>
+        <%--    crossDomain: true,--%>
+        <%--    success: function(data) {--%>
+        <%--        //$("#evolutions").html(data.responseText);--%>
+        <%--    },--%>
+        <%--    error: function(jqXHR, textStatus, errorThrown) {--%>
+        <%--        if (jqXHR.status === 404) {--%>
+        <%--            console.log('Failed');--%>
+        <%--            $("#evolutions").html('Request failed');--%>
+        <%--        } else if (jqXHR.status === 500) {--%>
+        <%--            console.log('Server Error');--%>
+        <%--        }--%>
+        <%--    }--%>
+        <%--});--%>
     });
 </script>
 

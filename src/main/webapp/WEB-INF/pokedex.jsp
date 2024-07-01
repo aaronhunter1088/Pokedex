@@ -96,10 +96,16 @@
                 <h3 id="description">${description}</h3>
             </div>
             <div id="locationsDiv" style="overflow-y: scroll; overflow-x: hidden; height:200px;">
-                <c:forEach var="location" items="${pkmnLocations}">
-                    <h3 id="locations" class="listStyle"
-                    >${location}</h3>
-                </c:forEach>
+                <c:choose>
+                    <c:when test="${pkmnLocations.size() == 0}">
+                        <h3 id="locations" class="listStyle">No known locations</h3>
+                    </c:when>
+                    <c:when test="${pkmnLocations.size() > 0}">
+                        <c:forEach var="location" items="${pkmnLocations}">
+                            <h3 id="locations" class="listStyle">${location}</h3>
+                        </c:forEach>
+                    </c:when>
+                </c:choose>
             </div>
             <div id="movesDiv" style="overflow-y: scroll; overflow-x: hidden; height:200px;">
                 <c:forEach var="move" items="${pkmnMoves}">
@@ -107,14 +113,19 @@
                     >${move}</h3>
                 </c:forEach>
             </div>
-            <div id="evolutionsDiv" style="overflow-y: scroll; overflow-x: hidden; height:200px;">
+            <div id="evolvesHowDiv" style="overflow-y: scroll; overflow-x: hidden; height:200px;">
                 <jsp:include page="evolves-how.jsp" />
             </div>
         </div>
     </div>
 </div>
 
-<jsp:include page="evolutions.jsp"/>
+<div id="evolutions">
+
+</div>
+<%--<jsp:include page="evolutions.jsp">--%>
+<%--    <jsp:param name="pokemonID" value="${pkmnId}" />--%>
+<%--</jsp:include>--%>
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -130,6 +141,7 @@
 
         defaultInfoDivs();
         $("#descriptionDiv").show();
+        setEvolutionsDiv();
     });
 
     function showImage(type) {
@@ -238,7 +250,7 @@
                     crossDomain: true,
                     statusCode: {
                         200: function(data) {
-                            $("#evolutionsDiv").html(data.responseText);
+                            $("#evolvesHowDiv").html(data.responseText);
                         },
                         404: function() {
                             console.log('Failed');
@@ -257,6 +269,30 @@
                 $("descriptionDiv").show();
             }
         }
+    }
+
+    function setEvolutionsDiv() {
+        let response = $.ajax({
+            type: "GET",
+            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",
+            async: false,
+            dataType: "json",
+            crossDomain: true,
+            success: function(data) {
+                //$("#evolutions").html(data.responseText);
+                console.log('evolutions: ' + data.responseText);
+                return data.responseText;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                if (jqXHR.status === 404) {
+                    console.log('Failed');
+                    $("#evolutions").html('Request failed');
+                } else if (jqXHR.status === 500) {
+                    console.log('Server Error');
+                }
+            }
+        });
+        if (response.responseText !== undefined) $("#evolutions").html(response.responseText);
     }
 
 </script>

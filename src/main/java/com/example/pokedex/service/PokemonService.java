@@ -67,7 +67,7 @@ public class PokemonService {
         return getPokemonByName(pokemonName);
     }
 
-    public PokemonSpecies getPokemonSpeciesData(String id) { // speciesURL: string
+    public PokemonSpecies getPokemonSpeciesData(String id) {
         //console.log("service: ", this.Pokedex.getPokemonSpecies(pokemonIDName).then((res: any) => res.body))
         //return this.Pokedex.getPokemonSpecies(pokemonIDName);
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();

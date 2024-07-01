@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 @Controller
-public class EvolvesHowController {
+public class EvolvesHowController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(EvolvesHowController.class);
 
@@ -58,6 +58,7 @@ public class EvolvesHowController {
 
     @Autowired
     public EvolvesHowController(PokemonService pokemonService) {
+        super(pokemonService);
         this.pokemonService = pokemonService;
     }
 
@@ -91,7 +92,7 @@ public class EvolvesHowController {
     private void setupEvolvesHow() {
         this.pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
         this.specificAttributesMap = this.generateDefaultAttributesMap();
-        this.pokemonChainID = this.getEvolutionChainID(this.pokemonID);
+        this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, String.valueOf(pokemonID));
         logger.info("chainId: {}", pokemonChainID);
         this.family = this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID);
         this.allIDs = family.stream().flatMap(Collection::stream).toList();
@@ -159,21 +160,21 @@ public class EvolvesHowController {
         }};
     }
 
-    private Integer getEvolutionChainID(int pokemonId) {
-        List<Integer> keys = this.pokemonIDToEvolutionChainMap.keySet().stream().toList();
-        Integer keyToReturn = 0;
-        keysLoop:
-        for(Integer key: keys) {
-            List<List<Integer>> pokemonIds = pokemonIDToEvolutionChainMap.get(key);
-            for (List<Integer> chainIds : pokemonIds) {
-                if (chainIds.contains(pokemonId)) {
-                    keyToReturn = key;
-                    break keysLoop;
-                }
-            }
-        }
-        return keyToReturn;
-    }
+//    private Integer getEvolutionChainID(int pokemonId) {
+//        List<Integer> keys = this.pokemonIDToEvolutionChainMap.keySet().stream().toList();
+//        Integer keyToReturn = 0;
+//        keysLoop:
+//        for(Integer key: keys) {
+//            List<List<Integer>> pokemonIds = pokemonIDToEvolutionChainMap.get(key);
+//            for (List<Integer> chainIds : pokemonIds) {
+//                if (chainIds.contains(pokemonId)) {
+//                    keyToReturn = key;
+//                    break keysLoop;
+//                }
+//            }
+//        }
+//        return keyToReturn;
+//    }
 
     private void getEvolutionDetails(Map<String, Object> chain) {
         logger.info("chain: {}", chain);
