@@ -177,6 +177,20 @@
         if (element !== undefined) {
             element.addClass("active");
         }
+
+        $('#pageNumber').on('keypress', function(e) {
+            if ($('#pageNumber').val() === '') return;
+            if (e.code === 'Enter' || e.code === 'Return') {
+                setPageToView($('#pageNumber').val());
+            }
+        });
+
+        $('#showPkmnNumber').on('keypress', function(e) {
+            if ($('#showPkmnNumber').val() === '') return;
+            if (e.code === 'Enter' || e.code === 'Return') {
+                setPkmnPerPage();
+            }
+        });
     });
 
     function toggleGifs() {
