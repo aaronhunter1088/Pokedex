@@ -56,11 +56,12 @@
                                 <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
                             </div>
                         </a>
-                            <%--                        <div style="padding-top:25px; text-align:center; justify-content:center;"--%>
-                            <%--                             *ngIf="!isNotLast">--%>
-                            <%--                            <img style="width:25px; height:25px;"--%>
-                            <%--                                 src="./assets/images/pokeball1.jpg">--%>
-                            <%--                        </div>--%>
+                            <div style="padding-top:25px; text-align:center; justify-content:center;">
+                                <c:if test="${!status.last}">
+                                    <img style="width:25px; height:25px;" alt="pokeball"
+                                         src="${pageContext.request.contextPath}/images/pokeball1.jpg">
+                                </c:if>
+                            </div>
                         </div>
                 </c:forEach>
             </div>
