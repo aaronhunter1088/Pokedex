@@ -34,7 +34,7 @@
     </style>
 </head>
 <body>
-<h1 id="title" class="center">
+<h1 id="pokedexSearchTitle" class="center">
     <a href="${pageContext.request.contextPath}/search">
         <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="">
     </a>
@@ -141,8 +141,10 @@
 
         defaultInfoDivs();
         $("#descriptionDiv").show();
-        setEvolutionsDiv();
-        updateEvolutionsDiv();
+        if (Number.parseInt('${pokemonId}') !== 0) {
+            setEvolutionsDiv();
+            updateEvolutionsDiv();
+        }
     });
 
     function showImage(type) {

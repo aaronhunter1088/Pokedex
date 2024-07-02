@@ -30,7 +30,7 @@ public class PokedexController extends BaseController {
     String gifImage;
     String shinyImage;
     String pokemonName = "";
-    Integer pokemonId;
+    //Integer pokemonId;
     Integer pokemonHeight;
     Integer pokemonWeight;
     String pokemonColor = "";
@@ -105,10 +105,11 @@ public class PokedexController extends BaseController {
 //                .map(NamedApiResource::getName)
 //                .sorted()
 //                .toList();
+        super.pokemonId = pokemonId;
 
         mav.addObject("pkmnName", pokemon.getName());
         mav.addObject("sprites", sprites);
-        mav.addObject("pkmnId", pokemonId);
+        mav.addObject("pokemonId", super.pokemonId);
         mav.addObject("defaultImage", sprites.get("default"));
         mav.addObject("officialImage", sprites.get("official"));
         mav.addObject("gifImage", sprites.get("gif"));

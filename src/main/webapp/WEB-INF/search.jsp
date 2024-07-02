@@ -87,71 +87,77 @@
         }
     </style>
 </head>
-<body>
-
+<body style="justify-content:space-evenly;text-align:center;">
     <h1 id="title" style="vertical-align: middle;">
-        <span class="center">
-            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" height=150></span>
+        <a href="${pageContext.request.contextPath}/search">
+            <span class="center">
+                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
+        </a>
     </h1>
 
     <h4 style="vertical-align: middle;">
         <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left" style="color: #000000;"></i></a>
         <label id="nameLabel" for="pokemonName"></label>
         <input id="pokemonName" placeholder="Pokemon Name/ID" type="text"/>
-        <img alt="pokeball" onclick="getPokemonInfo();" class="button cursor"
+<%--        <img alt="pokeball" onclick="getPokemonInfo();" class="button cursor"--%>
+        <img alt="pokeball" onclick="getPokemonFromSearch($('#pokemonName').val())" class="button cursor"
              src="${pageContext.request.contextPath}/images/pokeball1.jpg" height="30">
     </h4>
 
-    <br>
-    <div id="pokedex" class="pokedexStyle">
-        <h1 id="infoTitle">Pokemon Info</h1>
-        <br>
-        <div>
-            <div id="imageAndImageBtns">
-                <img id="imageOfPokemon" alt="pokemon" src="#" width="200" height="200"/>
-                <div id="photosDiv">
-                    <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>
-                    <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>
-                </div>
-            </div>
-            <br>
-            <div id="info">
-                <div id="idAndName" style="display:inline-flex;">
-                    <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;
-                    <label for="nameOfPokemon">Name:</label> <h3 id="nameOfPokemon"></h3>
-                </div>
-                <br>
-                <div id="hAndW" style="display:inline-flex;">
-                    <label for="heightOfPokemon">Height:</label> <h3 id="heightOfPokemon"></h3> &nbsp;
-                    <label for="weightOfPokemon">Weight:</label> <h3 id="weightOfPokemon"></h3>
-                </div>
-                <br>
-                <div id="colorAndType" style="display:inline-flex;">
-                    <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;
-                    <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>
-                </div>
-                <div style="display: flow;">
-                    <button id="descTabBtn" class="tab" onclick="showDivAndBoldText('descriptionDiv');">Description</button>
-                    <button id="locTabBtn" class="tab" onclick="showDivAndBoldText('locationsDiv')">Location</button>
-                    <button id="movesTabBtn" class="tab" onclick="showDivAndBoldText('movesDiv')">Moves</button>
-                    <!--<button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>-->
-                </div>
-                <br>
-                <div id="descriptionDiv" style="display:inline-flex; width: 300px;">
-                    <h3 id="description"></h3>
-                </div>
-                <div id="locationsDiv" style="overflow: scroll; height:100px;">
-                    <h3 id="location"></h3>
-                </div>
-                <div id="movesDiv" style="overflow: scroll; height:100px;">
-                    <h3 id="moves"></h3>
-                </div>
-                <!--                <div id="berriesDiv">-->
-                <!--                    <h3 id="berries"> Berries edible by Pokemon</h3>-->
-                <!--                </div>-->
-            </div>
-        </div>
+    <div id="pokedex">
+
     </div>
+
+<%--    <br>--%>
+<%--    <div id="pokedex" class="pokedexStyle">--%>
+<%--        <h1 id="infoTitle">Pokemon Info</h1>--%>
+<%--        <br>--%>
+<%--        <div>--%>
+<%--            <div id="imageAndImageBtns">--%>
+<%--                <img id="imageOfPokemon" alt="pokemon" src="#" width="200" height="200"/>--%>
+<%--                <div id="photosDiv">--%>
+<%--                    <input id="pokemonDefaultImgBtn" type="button" onclick="showImage('default');" class="button cursor" value="Show default"/>--%>
+<%--                    <input id="pokemonShinyImgBtn" type="button" onclick="showImage('shiny');" class="button cursor" value="Show shiny"/>--%>
+<%--                </div>--%>
+<%--            </div>--%>
+<%--            <br>--%>
+<%--            <div id="info">--%>
+<%--                <div id="idAndName" style="display:inline-flex;">--%>
+<%--                    <label for="idOfPokemon">ID:</label> <h3 id="idOfPokemon"></h3> &nbsp;--%>
+<%--                    <label for="nameOfPokemon">Name:</label> <h3 id="nameOfPokemon"></h3>--%>
+<%--                </div>--%>
+<%--                <br>--%>
+<%--                <div id="hAndW" style="display:inline-flex;">--%>
+<%--                    <label for="heightOfPokemon">Height:</label> <h3 id="heightOfPokemon"></h3> &nbsp;--%>
+<%--                    <label for="weightOfPokemon">Weight:</label> <h3 id="weightOfPokemon"></h3>--%>
+<%--                </div>--%>
+<%--                <br>--%>
+<%--                <div id="colorAndType" style="display:inline-flex;">--%>
+<%--                    <label for="colorOfPokemon">Color:</label> <h3 id="colorOfPokemon"></h3> &nbsp;--%>
+<%--                    <label for="typeOfPokemon">Type:</label> <h3 id="typeOfPokemon"></h3>--%>
+<%--                </div>--%>
+<%--                <div style="display: flow;">--%>
+<%--                    <button id="descTabBtn" class="tab" onclick="showDivAndBoldText('descriptionDiv');">Description</button>--%>
+<%--                    <button id="locTabBtn" class="tab" onclick="showDivAndBoldText('locationsDiv')">Location</button>--%>
+<%--                    <button id="movesTabBtn" class="tab" onclick="showDivAndBoldText('movesDiv')">Moves</button>--%>
+<%--                    <!--<button id="berriesTabBtn" class="tab" onclick="showDivAndBoldText('berriesDiv')">Berries</button>-->--%>
+<%--                </div>--%>
+<%--                <br>--%>
+<%--                <div id="descriptionDiv" style="display:inline-flex; width: 300px;">--%>
+<%--                    <h3 id="description"></h3>--%>
+<%--                </div>--%>
+<%--                <div id="locationsDiv" style="overflow: scroll; height:100px;">--%>
+<%--                    <h3 id="location"></h3>--%>
+<%--                </div>--%>
+<%--                <div id="movesDiv" style="overflow: scroll; height:100px;">--%>
+<%--                    <h3 id="moves"></h3>--%>
+<%--                </div>--%>
+<%--                <!--                <div id="berriesDiv">-->--%>
+<%--                <!--                    <h3 id="berries"> Berries edible by Pokemon</h3>-->--%>
+<%--                <!--                </div>-->--%>
+<%--            </div>--%>
+<%--        </div>--%>
+<%--    </div>--%>
 
 </body>
 
@@ -164,10 +170,37 @@
         $('#pokemonName').on('keypress', function(e) {
             if ($('#pokemonName').val() === '') return;
             if (e.code === 'Enter' || e.code === 'Return') {
-                getPokemonInfo();
+                //getPokemonInfo();
+                getPokemonFromSearch($('#pokemonName').val());
             }
         });
     });
+
+    function getPokemonFromSearch(nameOrId) {
+        //if (nameOrId === undefined) nameOrId = $('#pokemonName').val();
+        console.log('nameOrId: ' + nameOrId);
+        $.ajax({
+            type: "GET",
+            url: "${pageContext.request.contextPath}/pokedex/"+nameOrId,
+            async: false,
+            dataType: "application/json",
+            statusCode: {
+                200: function(data) {
+                    $("#pokedex").html(data.responseText);
+                    $("#pokedex").show();
+                    $("#pokedexSearchTitle").hide();
+                },
+                404: function() {
+                    console.log('Failed');
+                    $("#evolutionsDiv").html('Request failed');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
+    }
+
     let pokemon = {}, sprites = {};
     let locations = [], moves = [];
     let desc = "", color = "";
@@ -181,15 +214,15 @@
             //console.log("pokemon set: " + JSON.stringify(pokemon));
             sprites = JSON.parse(pokemon)["sprites"];
             //console.log("sprites set: " + JSON.stringify(sprites));
-            desc = getPokemonDescriptionText(name);
-            locations = getLocations(name);
-            moves = getMoves(name);
-            color = setBackgroundAndGetColor(name);
-            setupPokedex();
-            showImage('default');
-            $('#pokedex').show();
-            setButtonWeightDefaults();
-            setTabDivDefaults();
+            // // desc = getPokemonDescriptionText(name);
+            // // locations = getLocations(name);
+            // // moves = getMoves(name);
+            // // color = setBackgroundAndGetColor(name);
+            // // setupPokedex();
+            // // showImage('default');
+            // // $('#pokedex').show();
+            // // setButtonWeightDefaults();
+            // // setTabDivDefaults();
         }
     }
     // Ajax to get Pokemon
@@ -199,7 +232,7 @@
             url: "/pokemon/"+name,
             async: false,
             dataType: "application/json",
-            'success': function(data) {
+            success: function(data) {
                 pokemon = JSON.parse(data.responseText);
             }
         });
