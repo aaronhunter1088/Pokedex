@@ -1,4 +1,4 @@
-.pokemon-grid {
+.evolution-grid {
     display: grid;
     grid-gap: 15px;
     padding: 20px;
@@ -6,10 +6,15 @@
     grid-template-columns: 300px;
 }
 
-.pokemon-grid .box {
-    width: 100%;
+.evolution .box {
+    width: 300px;
     height: 100%;
     box-shadow: 1px 2px 5px rgba(0,0,0,0.3);
+}
+
+img {
+    width: 200px;
+    height: 200px;
 }
 
 ::-webkit-scrollbar {
