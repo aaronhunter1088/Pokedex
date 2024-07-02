@@ -9,41 +9,42 @@
 </head>
 <body id="">
     <h2>Evolutions</h2>
-    <c:forEach var="stage" items="${stages}">
-        <div id="stagesHeader" style="display:inline-flex;justify-content:center;text-align-all:center;width:300px;height:10px;" class=""> <!-- class="pokemon-grid box" -->
-            <h2>Stage ${stage}</h2>
-        </div>
-    </c:forEach>
     <div id="evolutions" style="display:inline-flex; justify-content: center; width:100%; height:45%;">
-        <c:forEach var="pokemonList" items="${pokemonFamily}">
-            <div style="overflow-y:scroll;overflow-x:hidden;height:460px;width:90%;">
-                <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
-                    <div class="evolution-grid" style="">
-                        <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}" style="text-decoration:none;color:black;">
-                            <div id="pokemon${pokemon.id}" style="background-color:${pokemon.color};display:inline-block;" class="box">
-                                <div id="idAndName" style="display:inline-flex;">
-                                    <h3 id="${pokemon.name}-name">${pokemon.name}</h3>
-                                    <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                                    <h3 id="${pokemon.id}-id">ID: ${pokemon.id}</h3>
+        <c:forEach var="pokemonList" items="${pokemonFamily}" varStatus="status">
+            <c:set var="listNumber" value="${status.count}"/>
+            <div style="display:block;">
+                <div id="stagesHeader" style="display:inline-flex;justify-content:center;text-align-all:center;width:300px;height:10px;" class=""> <!-- class="pokemon-grid box" -->
+                    <h2>Stage ${listNumber}</h2>
+                </div>
+                <div style="overflow-y:scroll;overflow-x:hidden;height:460px;width:90%;">
+                    <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
+                        <div class="evolution-grid" style="">
+                            <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}" style="text-decoration:none;color:black;">
+                                <div id="pokemon${pokemon.id}" style="background-color:${pokemon.color};display:inline-block;" class="box">
+                                    <div id="idAndName" style="display:inline-flex;">
+                                        <h3 id="${pokemon.name}-name">${pokemon.name}</h3>
+                                        <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                                        <h3 id="${pokemon.id}-id">ID: ${pokemon.id}</h3>
+                                    </div>
+                                    <div id="${pokemon.id}-img">
+                                        <img style=""
+                                             src="${pokemon.defaultImage}" alt="${pokemon.name}-default">
+                                    </div>
+                                    <h3 id="${pokemon.id}-height">Height: ${pokemon.height} m</h3>
+                                    <h3 id="${pokemon.id}-weight">Weight: ${pokemon.weight} kg</h3>
+                                    <h3 id="${pokemon.id}-color">Color: ${pokemon.color}</h3>
+                                    <h3 id="${pokemon.id}-type">Type: ${pokemon.type}</h3>
                                 </div>
-                                <div id="${pokemon.id}-img">
-                                    <img style=""
-                                         src="${pokemon.defaultImage}" alt="${pokemon.name}-default">
+                            </a>
+                            <c:if test="${!status.last}">
+                                <div style="padding-top:25px; text-align:center; justify-content:center;">
+                                    <img style="width:25px; height:25px;" alt="pokeball"
+                                         src="${pageContext.request.contextPath}/images/pokeball1.jpg">
                                 </div>
-                                <h3 id="${pokemon.id}-height">Height: ${pokemon.height} m</h3>
-                                <h3 id="${pokemon.id}-weight">Weight: ${pokemon.weight} kg</h3>
-                                <h3 id="${pokemon.id}-color">Color: ${pokemon.color}</h3>
-                                <h3 id="${pokemon.id}-type">Type: ${pokemon.type}</h3>
-                            </div>
-                        </a>
-                        <c:if test="${!status.last}">
-                            <div style="padding-top:25px; text-align:center; justify-content:center;">
-                                <img style="width:25px; height:25px;" alt="pokeball"
-                                     src="${pageContext.request.contextPath}/images/pokeball1.jpg">
-                            </div>
-                        </c:if> <!-- pokeball divider -->
-                    </div>
-                </c:forEach>
+                            </c:if> <!-- pokeball divider -->
+                        </div>
+                    </c:forEach>
+                </div>
             </div>
         </c:forEach>
     </div>
