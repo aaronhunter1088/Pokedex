@@ -192,6 +192,13 @@
             let currentColor = pokemonBox.style.backgroundColor;
             pokemonBox.style.backgroundColor = changeColor(currentColor);
         }
+
+        let element = $(".page-link").filter(function() {
+            return $(this).html() === '${page}';
+        });
+        if (element !== undefined) {
+            element.addClass("active");
+        }
     });
 
     function toggleGifs() {
@@ -262,6 +269,7 @@
             crossDomain: true,
             statusCode: {
                 200: function(data) {
+                    console.log('200 setPageToView');
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     location.reload();
                     let ids = ${pokemonIds};
