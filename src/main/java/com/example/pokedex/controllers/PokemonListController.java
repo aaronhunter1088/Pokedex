@@ -108,10 +108,9 @@ public class PokemonListController {
 
     @GetMapping("/toggleGifs")
     @ResponseBody
-    public Boolean toggleGifs(ModelAndView mav) {
+    public Boolean toggleGifs() {
         logger.info("showGifs: {}", !showGifs);
         showGifs = !showGifs;
-        //homepage(mav);
         return showGifs;
     }
 
@@ -120,19 +119,17 @@ public class PokemonListController {
     public void page(@RequestParam(name="pageNumber", required=false, defaultValue="10") int pageNumber, ModelAndView mav) {
         logger.info("pagination, page to view: {}", pageNumber);
         if (pageNumber < 0) {
-            //return ResponseEntity.badRequest().body("Page number cannot be negative");
             logger.error("Page number cannot be negative");
             return;
         }
         else if (pageNumber > Math.round((float) totalPokemon /pkmnPerPage)) {
-            //return ResponseEntity.badRequest().body("Cannot pick a number more than there are pages");
             logger.error("Cannot pick a number more than there are pages");
             return;
         }
         this.page = pageNumber;
         this.pokemonService.saveCurrentPage(this.page);
-        //getPokemonMap();
         this.blankPageNumber = "";
+        logger.info("page updated to {}", page);
         homepage(mav);
     }
 
@@ -146,6 +143,8 @@ public class PokemonListController {
             if (pkmnPerPage > 50) logger.info(pkmnPerPage + " is too high. Defaulting to 50");
             this.pkmnPerPage = pkmnPerPage;
         }
+        logger.info("pkmnPerPage updated to: {}", pkmnPerPage);
         return ResponseEntity.ok().body("PkmnPerPage set");
     }
+
 }

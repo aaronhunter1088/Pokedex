@@ -91,7 +91,7 @@ public class EvolvesHowController extends BaseController {
 
     private void setupEvolvesHow() {
         this.pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
-        this.specificAttributesMap = this.generateDefaultAttributesMap();
+        this.specificAttributesMap = generateDefaultAttributesMap();
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, String.valueOf(pokemonID));
         logger.info("chainId: {}", pokemonChainID);
         this.family = this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID);
@@ -100,22 +100,7 @@ public class EvolvesHowController extends BaseController {
         if (pokemonChainID != 0) {
             Map<String, Object> chainResponse = pokemonService.getPokemonChainData(String.valueOf(pokemonChainID));
             logger.info("chainResponse: {}", chainResponse);
-            /*
-            "baby_trigger_item": null,
-            "chain": {
-                "evolution_details": List,
-                "evolves_to": List,
-                "is_baby": boolean
-                "species": {
-                    "name": "Pichu" String
-                    "url": https://pokeapi.co/api/v2/pokemon-species/172/
-                },
-            },
-            "id": "10"
-             */
-            if (chainResponse.isEmpty()) {
-                return;
-            } else {
+            if (!chainResponse.isEmpty()) {
                 emptyChain = false;
                 getEvolutionDetails((LinkedHashMap<String, Object>) chainResponse.get("chain"));
                 for(Integer id : allIDs) {
@@ -137,50 +122,11 @@ public class EvolvesHowController extends BaseController {
         }
     }
 
-    private Map<String, Object> generateDefaultAttributesMap() {
-        return new TreeMap<>() {{
-            put("name", null); // on screen
-            put("gender", null);
-            put("isBaby", null);
-            put("heldItem", null); // on screen
-            put("useItem", null); // on screen
-            put("knownMove", null); // on screen
-            put("knownMoveType", null); // on screen
-            put("location", null); // on screen
-            put("minAffection", null); // on screen
-            put("minBeauty", null); // on screen
-            put("minHappiness", null); // on screen
-            put("minLevel", null); // on screen
-            put("needsRain", null); // on screen
-            put("timeOfDay", null); // on screen
-            put("partySpecies", null);
-            put("relativePhysicalStats", null);
-            put("tradeSpecies", null);
-            put("turnUpsideDown", null); // on screen
-        }};
-    }
-
-//    private Integer getEvolutionChainID(int pokemonId) {
-//        List<Integer> keys = this.pokemonIDToEvolutionChainMap.keySet().stream().toList();
-//        Integer keyToReturn = 0;
-//        keysLoop:
-//        for(Integer key: keys) {
-//            List<List<Integer>> pokemonIds = pokemonIDToEvolutionChainMap.get(key);
-//            for (List<Integer> chainIds : pokemonIds) {
-//                if (chainIds.contains(pokemonId)) {
-//                    keyToReturn = key;
-//                    break keysLoop;
-//                }
-//            }
-//        }
-//        return keyToReturn;
-//    }
-
     private void getEvolutionDetails(Map<String, Object> chain) {
         logger.info("chain: {}", chain);
         String name = (String) ((Map<String,Object>)chain.get("species")).get("name");
         String pkmnId = ((String) ((Map<String,Object>)chain.get("species")).get("url")).split("/")[6];
-        Map<String, Object> evolutionDetails = generateDefaultAttributesMap(); //new HashMap<>();
+        Map<String, Object> evolutionDetails;
         logger.info("name: {}, id: {}", name, pkmnId);
         for (int i=0; i<((List<Object>)chain.get("evolves_to")).size(); i++) {
             Map<String,Object> evolvesTo = (Map<String,Object>) ((List<Object>) chain.get("evolves_to")).get(i);
@@ -206,7 +152,7 @@ public class EvolvesHowController extends BaseController {
                     for (int k = 0; k < ((List<Object>) evolvesTo.get("evolves_to")).size(); k++) {
                         name = (String) ((Map<String,Object>) ((Map<String,Object>) ((List<Object>)evolvesTo.get("evolves_to")).get(k)).get("species")).get("name");
                         pkmnId = ((String) ((Map<String,Object>) ((Map<String, Object>) ((List<Object>) evolvesTo.get("evolves_to")).get(k)).get("species")).get("url")).split("/")[6];
-                        evolutionDetails = generateDefaultAttributesMap(); //new HashMap<>();
+                        evolutionDetails = generateDefaultAttributesMap();
                         evolutionDetails.put("is_baby", ((Map<String,Object>) ((List<Object>)evolvesTo.get("evolves_to")).get(k)).get("is_baby"));
                         evolutionDetails.put("id", pkmnId);
                         evolutionDetails.put("name", name);
@@ -223,7 +169,6 @@ public class EvolvesHowController extends BaseController {
     public void setAttributesMap(Map<String, Object> details) {
         logger.info("evolution_details for: {} = {}", details.get("name"), details);
         this.specificAttributesMap = this.generateDefaultAttributesMap();
-        //if (details == null) return attributesMap
         this.specificAttributesMap.put("name", details.get("name"));
         this.specificAttributesMap.put("gender", null != details.get("gender") ? details.get("gender") : null);
         this.specificAttributesMap.put("isBaby", details.get("is_baby"));

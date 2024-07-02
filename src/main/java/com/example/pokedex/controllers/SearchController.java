@@ -19,6 +19,5 @@ public class SearchController extends BaseController {
         mav.addObject("pokemonId", 0);
         mav.setViewName("search");
         return mav;
-        //return "search";
     }
 }

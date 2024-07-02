@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.evolutionchain.EvolutionChain;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
@@ -37,6 +35,7 @@ public class PokemonApi {
     @ResponseBody
     public ResponseEntity<Object> getAllPokemon(@RequestParam(value="limit", required=false, defaultValue="10") int limit,
                                                 @RequestParam(value="offset", required=false, defaultValue="0") int offset) {
+        logger.info("getAllPokemon limit:{} offset:{}", limit, offset);
         NamedApiResourceList<Pokemon> allPokemon;
         try {
             //"https://pokeapi.co/api/v2/pokemon/?limit=10&offset=0"
@@ -49,80 +48,87 @@ public class PokemonApi {
         }
     }
 
-    // Can be name or id
-    @RequestMapping(value = "/{nameOfPokemon}", method=RequestMethod.GET)
+    @RequestMapping(value = "/{nameOrId}", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getPokemon(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Object> getPokemon(@PathVariable("nameOrId") String nameOrId)
     {
-        System.out.println("pokemonName: " + nameOfPokemon);
-        Pokemon pokemon;
-        try {
-            pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
+        logger.info("getPokemon: {}", nameOrId);
+        Pokemon pokemon = retrievePokemon(nameOrId);
+        if (null != pokemon) {
+            pokemon = pokeApiClient.getResource(Pokemon.class, nameOrId).block();
             return ResponseEntity.ok(pokemon);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(nameOfPokemon + " was not found!");
+        } else {
+            logger.warn("pokemon was not found!");
+            return ResponseEntity.badRequest().body(nameOrId + " was not found!");
         }
     }
 
-    @RequestMapping(value="/{nameOfPokemon}/description", method=RequestMethod.GET)
+    @RequestMapping(value="/{nameOrId}/description", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getPokemonDescription(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Object> getPokemonDescription(@PathVariable("nameOrId") String nameOrId)
     {
+        logger.info("getPkmnDescription: {}", nameOrId);
         List<FlavorText> pokemonDescriptions;
         try {
-            pokemonDescriptions =  pokeApiClient.getResource(PokemonSpecies.class, nameOfPokemon).blockOptional().get()
+            pokemonDescriptions =  pokeApiClient.getResource(PokemonSpecies.class, nameOrId).blockOptional().get()
                     .getFlavorTextEntries().stream().filter(entry -> entry.getLanguage().getName().equals("en"))
                     .toList();
             int randomEntry = new Random().nextInt(pokemonDescriptions.size());
             String description = pokemonDescriptions.get(randomEntry).getFlavorText().replace("\n", " ");
-            System.out.println("description: " + description);
+            logger.info("description: {}", description);
             return ResponseEntity.ok(description);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(nameOfPokemon + " text was not found!");
+            return ResponseEntity.badRequest().body(nameOrId + " text was not found!");
         }
     }
 
-    @RequestMapping(value = "/{nameOfPokemon}/color", method=RequestMethod.GET)
+    @RequestMapping(value = "/{nameOrId}/color", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getDesignatedColor(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Object> getDesignatedColor(@PathVariable("nameOrId") String nameOrId)
     {
         PokemonSpecies speciesInfo;
-        for(int i=1; i!=-1; i++) {
-            try {
-                speciesInfo = pokeApiClient.getResource(PokemonSpecies.class, nameOfPokemon).block();
-                if (speciesInfo != null) {
-                    String colorOfPokemon = speciesInfo.getColor().getName();
-                    System.out.println("color: " + colorOfPokemon);
-                    return new ResponseEntity<>(colorOfPokemon, HttpStatus.OK);
-                }
-            } catch (Exception e) {
-                return ResponseEntity.badRequest().body(nameOfPokemon + " doesn't have a species!");
+        try {
+            speciesInfo = pokeApiClient.getResource(PokemonSpecies.class, nameOrId).block();
+            if (speciesInfo != null) {
+                String colorOfPokemon = speciesInfo.getColor().getName();
+                logger.info("color: {}", colorOfPokemon);
+                return ResponseEntity.ok(colorOfPokemon);
             }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(nameOrId + " doesn't have a species!");
         }
         return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping(value="/{nameOfPokemon}/validateName", method=RequestMethod.GET)
+    @RequestMapping(value="/{nameOrId}/validateNameOrId", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Boolean> validateName(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Boolean> validateNameOrId(@PathVariable("nameOrId") String nameOrId)
     {
         try {
-            Pokemon pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
-            System.out.println("valid name: " + nameOfPokemon);
-            return ResponseEntity.ok().body(true);
+            Pokemon pokemon = retrievePokemon(nameOrId);
+            if (null != pokemon) {
+                logger.info("valid nameOrId: {}", nameOrId);
+                return ResponseEntity.ok().body(true);
+            } else {
+                logger.warn("invalid nameOrId: {}", nameOrId);
+                return ResponseEntity.badRequest().body(false);
+            }
         } catch (Exception e) {
-            System.out.println("invalid name: " + nameOfPokemon);
-            return ResponseEntity.badRequest().body(false);
+            logger.warn("There was an error fetching the Pokemon '{}' because {}", nameOrId, e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    @RequestMapping(value="/locations/{nameOfPokemon}", method=RequestMethod.GET)
+    @RequestMapping(value="/{nameOrId}/locations", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Object> getLocations(@PathVariable("nameOfPokemon") String nameOfPokemon)
+    public ResponseEntity<Object> getLocations(@PathVariable("nameOrId") String nameOrId)
     {
-        Pokemon pokemon = pokeApiClient.getResource(Pokemon.class, nameOfPokemon).block();
-        if (pokemon == null) return null; //return ResponseEntity.badRequest().build();
+        logger.info("getLocations for: {}", nameOrId);
+        Pokemon pokemon = retrievePokemon(nameOrId);
+        if (null == pokemon) {
+            return ResponseEntity.badRequest()
+                    .body("Could not find pokemon with value:" + nameOrId);
+        }
         String encountersString = pokemon.getLocationAreaEncounters();
         HttpResponse<String> response;
         List<String> namesOfAreas = new ArrayList<>();
@@ -134,33 +140,30 @@ public class PokemonApi {
                     .build();
             response = HttpClient.newBuilder()
                     .build()
-                    //.send(request, HttpResponse.BodyHandlers.ofString());
                     .send(request,  HttpResponse.BodyHandlers.ofString());
-            System.out.println("response: " + response.body());
+            logger.debug("response: " + response.body());
             jsonParser = new JSONParser(response.body());
             List<LinkedHashMap<String, String>> map = (List<LinkedHashMap<String, String>>) jsonParser.parse();
             for(Map m : map) {
                 LinkedHashMap<String, String> area = (LinkedHashMap<String, String>) m.get("location_area");
                 namesOfAreas.add(area.get("name"));
             }
-            namesOfAreas.forEach(System.out::println);
+            namesOfAreas.forEach(area -> logger.debug("area: {}", area));
         } catch (Exception e) {
-            e.printStackTrace();
-            //return null;
-            return ResponseEntity.badRequest().build();
+            logger.error("Error retrieving response because {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-
-        //return namesOfAreas.toArray(new String[0]);
         JSONArray array = new JSONArray();
         array.addAll(namesOfAreas);
         return new ResponseEntity<>(array.toJSONString(), HttpStatus.OK);
     }
 
-    @RequestMapping(value="/species/{pokemonId}")
+    @RequestMapping(value="/{nameOrId}/species")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getSpeciesData(@PathVariable("pokemonId") String pokemonId)
+    public ResponseEntity<Map<String, Object>> getSpeciesData(@PathVariable("nameOrId") String nameOrId)
     {
-        Pokemon pokemonResource = (Pokemon) getPokemon(pokemonId).getBody();
+        logger.info("getSpeciesData: {}", nameOrId);
+        Pokemon pokemonResource = (Pokemon) getPokemon(nameOrId).getBody();
         NamedApiResource<PokemonSpecies> speciesResource = pokemonResource.getSpecies();
         if (null == speciesResource) {
             return ResponseEntity.noContent().build();
@@ -186,15 +189,12 @@ public class PokemonApi {
         }
     }
 
-    @RequestMapping(value="/evolutionChain/{pokemonId}", method=RequestMethod.GET)
+    @RequestMapping(value= "/{nameOrId}/evolutionChain", method=RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getEvolutionChain(@PathVariable("pokemonId") String pokemonId)
+    public ResponseEntity<Map<String, Object>> getEvolutionChain(@PathVariable("nameOrId") String nameOrId)
     {
-        Map<String, Object> speciesData = getSpeciesData(pokemonId).getBody();
-        //JSONParser jsonParser = new JSONParser(String.valueOf(speciesData));
+        Map<String, Object> speciesData = getSpeciesData(nameOrId).getBody();
         try {
-            //Map<String, Object> species = (Map<String, Object>) jsonParser.parse();
-            //jsonParser = new JSONParser(String.valueOf(species.get("evolutionChain")));
             Map<String, Object> chainData = (LinkedHashMap<String, Object>) speciesData.get("evolution_chain");
             String chainUrl = (String) chainData.get("url");
             logger.info("chainUrl: " + chainUrl);
@@ -212,8 +212,23 @@ public class PokemonApi {
             Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
             return ResponseEntity.ok(results);
         } catch (Exception e) {
-            logger.error("Error parsing species data");
+            logger.error("Error parsing species data because {}", e.getMessage());
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * Fetch the pokemon resource
+     * @param nameOrId String the name or id of a Pokemon
+     * @return the Pokemon or null
+     */
+    public Pokemon retrievePokemon(String nameOrId) {
+        logger.info("retrievePokemon");
+        try {
+            return pokeApiClient.getResource(Pokemon.class, nameOrId).block();
+        } catch (Exception e) {
+            logger.error("Could not find pokemon with value: {}", nameOrId);
+            return null;
         }
     }
 }

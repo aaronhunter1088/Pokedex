@@ -31,7 +31,7 @@ public class EvolutionsController extends BaseController {
     List<Integer> pokemonFamilyAltLevels;
     Map<String,Object> pokemonIdAndAttributesMap;
     Map<String,Object> specificAttributesMap;
-    Map pokemonMap;
+    Map<Integer, Pokemon> pokemonMap;
     Integer pokemonFamilySize;
     Boolean defaultImagePresent = false,
             gifImagePresent = false,
@@ -52,7 +52,7 @@ public class EvolutionsController extends BaseController {
         super(pokemonService);
         this.pokemonService = pokemonService;
         pokemonIDToEvolutionChainMap = pokemonService.getEvolutionsMap();
-        specificAttributesMap = this.generateDefaultAttributesMap();
+        specificAttributesMap = generateDefaultAttributesMap();
         pokemonChainID = 0;
         pokemonFamilySize = 0;
         pokemonFamily = new ArrayList<List<Pokemon>>();
@@ -74,29 +74,6 @@ public class EvolutionsController extends BaseController {
         return mav;
     }
 
-    private Map<String, Object> generateDefaultAttributesMap() {
-        return new TreeMap<>() {{
-            put("name", null); // on screen
-            put("gender", null);
-            put("isBaby", null);
-            put("heldItem", null); // on screen
-            put("useItem", null); // on screen
-            put("knownMove", null); // on screen
-            put("knownMoveType", null); // on screen
-            put("location", null); // on screen
-            put("minAffection", null); // on screen
-            put("minBeauty", null); // on screen
-            put("minHappiness", null); // on screen
-            put("minLevel", null); // on screen
-            put("needsRain", null); // on screen
-            put("timeOfDay", null); // on screen
-            put("partySpecies", null);
-            put("relativePhysicalStats", null);
-            put("tradeSpecies", null);
-            put("turnUpsideDown", null); // on screen
-        }};
-    }
-
     private void resetEvolutionParameters() {
         if (null != pokemonFamily) pokemonFamily.clear();
         this.pokemonFamilySize = 0;
@@ -108,8 +85,7 @@ public class EvolutionsController extends BaseController {
     }
 
     private void setupEvolutions() {
-        List<List<Integer>> lists = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        pokemonFamilyIDs = lists;
+        pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
         setFamilySize();
         setStages();
         setAllIDs();
@@ -150,7 +126,6 @@ public class EvolutionsController extends BaseController {
         String previousId = "";
         for (Integer id : idList) {
             logger.info("id:{}", id);
-            //pokemonList = new ArrayList<>();
             skaro.pokeapi.resource.pokemon.Pokemon pokemonResponse = pokemonService.getPokemonByName(String.valueOf(id));
             PokemonSpecies speciesData = null;
             try {
@@ -159,8 +134,8 @@ public class EvolutionsController extends BaseController {
             } catch (Exception e) {
                 logger.warn("No species data found for {}. Using previousId {}", pokemonResponse.getId(), previousId);
                 speciesData = pokemonService.getPokemonSpeciesData(previousId);
-                //previousId = String.valueOf(id);
             }
+            assert speciesData != null;
             Pokemon pokemon = createPokemon(pokemonResponse, speciesData);
             pokemonList.add(pokemon);
         }

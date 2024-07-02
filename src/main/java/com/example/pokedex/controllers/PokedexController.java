@@ -63,6 +63,7 @@ public class PokedexController extends BaseController {
 
     @GetMapping(value="/pokedex/{pokemonId}")
     public ModelAndView pokedex(@PathVariable(name="pokemonId") String nameOrId, ModelAndView mav) {
+        logger.info("loading pokedex info for {}", nameOrId);
         skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
         com.example.pokedex.entities.Pokemon pokemon = createPokemon(pokemonResource, pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId())));
         sprites = new TreeMap<>() {{
