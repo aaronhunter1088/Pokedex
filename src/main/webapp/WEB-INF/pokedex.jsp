@@ -142,6 +142,7 @@
         defaultInfoDivs();
         $("#descriptionDiv").show();
         setEvolutionsDiv();
+        updateEvolutionsDiv();
     });
 
     function showImage(type) {
@@ -292,7 +293,17 @@
                 }
             }
         });
-        if (response.responseText !== undefined) $("#evolutions").html(response.responseText);
+        if (response.responseText !== undefined) {
+            $("#evolutions").html(response.responseText);
+        }
+    }
+
+    function updateEvolutionsDiv() {
+        let pokemonDivs = $("#evolutions div div a div.box");
+        pokemonDivs.each((index, div) => {
+            div.style.backgroundColor = changeColor(div.style.backgroundColor);
+            console.log('updated color of ' + div.id);
+        });
     }
 
 </script>

@@ -40,7 +40,7 @@
                 <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
                     <div class="pokemon-grid">
                         <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}" style="text-decoration: none; color: black;">
-                            <div style="background-color:${pokemon.color};display:inline-block;" class="box">
+                            <div id="pokemon${pokemon.id}" style="background-color:${pokemon.color};display:inline-block;" class="box">
                                 <div id="idAndName" style="display:inline-flex;">
                                     <h3 id="name">${pokemon.name}</h3>
                                     <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
@@ -72,25 +72,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
     $(function(){
-        <%--$.ajax({--%>
-        <%--    type: "GET",--%>
-        <%--    url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",--%>
-        <%--    async: false,--%>
-        <%--    dataType: "json",--%>
-        <%--    crossDomain: true,--%>
-        <%--    success: function(data) {--%>
-        <%--        //$("#evolutions").html(data.responseText);--%>
-        <%--    },--%>
-        <%--    error: function(jqXHR, textStatus, errorThrown) {--%>
-        <%--        if (jqXHR.status === 404) {--%>
-        <%--            console.log('Failed');--%>
-        <%--            $("#evolutions").html('Request failed');--%>
-        <%--        } else if (jqXHR.status === 500) {--%>
-        <%--            console.log('Server Error');--%>
-        <%--        }--%>
-        <%--    }--%>
-        <%--});--%>
     });
+
+
 </script>
 
 </html>

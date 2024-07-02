@@ -69,6 +69,7 @@ public class EvolutionsController extends BaseController {
         mav.addObject("pokemonId", pokemonId);
         mav.addObject("stages", stages);
         mav.addObject("pokemonFamily", pokemonFamily);
+        mav.addObject("allIDs", allIDs);
         mav.setViewName("evolutions");
         return mav;
     }
