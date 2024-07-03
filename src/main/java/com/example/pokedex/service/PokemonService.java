@@ -83,14 +83,8 @@ public class PokemonService {
         return getPokemonByName(pokemonName);
     }
 
-    public PokemonSpecies getPokemonSpeciesData(String id) {
-        PokemonSpecies speciesData = null;
-        try {
-            speciesData = pokeApiClient.getResource(PokemonSpecies.class, id).block();
-        } catch (Exception e) {
-            throw e;
-        }
-        return speciesData;
+    public PokemonSpecies getPokemonSpeciesData(String id) throws Exception {
+        return pokeApiClient.getResource(PokemonSpecies.class, id).block();
     }
 
     public List<String> getPokemonLocationEncounters(String url) {

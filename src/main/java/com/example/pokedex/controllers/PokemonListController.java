@@ -90,12 +90,17 @@ public class PokemonListController extends BaseController {
                 if (null != pokemon.getOfficialImage()) officialImagePresent = true;
                 pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
                 if (null != pokemon.getGifImage()) gifImagePresent = true;
-                PokemonSpecies speciesData = pokemonService.getPokemonSpeciesData(pokemon.getId().toString());
-                if (null != speciesData) {
-                    //logger.info("speciesData: {}", speciesData);
-                    if (null != speciesData.getColor()) {
-                        pokemon.setColor(speciesData.getColor().getName());
+                PokemonSpecies speciesData;
+                try {
+                    speciesData = pokemonService.getPokemonSpeciesData(pokemon.getId().toString());
+                    if (null != speciesData) {
+                        logger.info("speciesData: {}", speciesData);
+                        if (null != speciesData.getColor()) {
+                            pokemon.setColor(speciesData.getColor().getName());
+                        }
                     }
+                } catch (Exception e) {
+                    logger.error("No speciesData found using {}", pokemon.getId());
                 }
                 pokemonMap.put(pokemon.getId(), pokemon);
             });

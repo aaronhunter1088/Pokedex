@@ -130,7 +130,8 @@ public class EvolutionsController extends BaseController {
                 if (null != speciesData) previousId = String.valueOf(id);
             } catch (Exception e) {
                 logger.warn("No species data found for {}. Using previousId {}", pokemonResponse.getId(), previousId);
-                speciesData = pokemonService.getPokemonSpeciesData(previousId);
+                try { speciesData = pokemonService.getPokemonSpeciesData(previousId); }
+                catch (Exception e2) { logger.error("No species data found using previousId {}", previousId); }
             }
             assert speciesData != null;
             Pokemon pokemon = createPokemon(pokemonResponse, speciesData);

@@ -61,14 +61,20 @@ public class PokedexController extends BaseController {
     public ModelAndView pokedex(@PathVariable(name="pokemonId") String nameOrId, ModelAndView mav) {
         logger.info("loading pokedex info for {}", nameOrId);
         skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
-        com.example.pokedex.entities.Pokemon pokemon = createPokemon(pokemonResource, pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId())));
-        sprites = new TreeMap<>() {{
-           put("default", pokemon.getDefaultImage());
-           put("official", pokemon.getOfficialImage());
-           put("shiny", pokemon.getShinyImage());
-           put("gif", pokemon.getGifImage());
-        }};
-        super.pokemonId = pokemon.getId();
+        PokemonSpecies speciesData;
+        com.example.pokedex.entities.Pokemon pokemon = null;
+        try {
+            speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId()));
+            pokemon = createPokemon(pokemonResource, speciesData);
+            sprites = new TreeMap<>();
+            sprites.put("default", pokemon.getDefaultImage());
+            sprites.put("official", pokemon.getOfficialImage());
+            sprites.put("shiny", pokemon.getShinyImage());
+            sprites.put("gif", pokemon.getGifImage());
+            super.pokemonId = pokemon.getId();
+        } catch (Exception e) {
+            logger.error("No species data found using {}", pokemonResource.getId());
+        }
 
         mav.addObject("sprites", sprites);
         mav.addObject("pokemonId", super.pokemonId);
