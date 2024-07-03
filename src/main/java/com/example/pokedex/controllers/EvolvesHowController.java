@@ -17,25 +17,13 @@ public class EvolvesHowController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(EvolvesHowController.class);
 
-    Integer pokemonID;
+    //Integer pokemonID;
     Map<Integer, Map<String, Object>> pokemonIdAndAttributesMap;
     Map<String, Object> specificAttributesMap = Collections.emptyMap();
     Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID = 0;
     List<Integer> allIDs = new ArrayList<>();
-    List<List<Integer>> family = new ArrayList<>(); //number[][] = []
-    Integer minimumLevel = 0;
-    String useItem = "";
-    String heldItem = "";
-    String minimumHappiness = "";
-    String dayNight = ""; // day or night
-    List<String> locations = new ArrayList<>(); // String locations
-    Integer minimumAffection = 0;
-    Integer minimumBeauty = 0;
-    List<String> knownMoves = new ArrayList<>(); // String moves
-    List<String> knownMoveTypes = new ArrayList<>(); // String types
-    String needsRain = ""; // yes or no
-    String turnUpsideDown = ""; // yes or no
+    List<List<Integer>> family = new ArrayList<>();
     boolean doesPokemonEvolve = false,
             hasMinimumLevel = false,
             hasUseItem = false,
@@ -49,7 +37,6 @@ public class EvolvesHowController extends BaseController {
             hasKnownMoves = false,
             hasKnownMoveType = false,
             hasNeedsRain = false,
-            // other attributes
             hasTurnUpsideDown = false,
             emptyChain = true;
 
@@ -61,7 +48,7 @@ public class EvolvesHowController extends BaseController {
     @GetMapping(value="/evolves-how")
     public ModelAndView evolvesHow(@RequestParam(name="pokemonId") int pokemonId, ModelAndView mav) {
         logger.info("pokemonId: {}", pokemonId);
-        this.pokemonID = pokemonId;
+        this.pokemonId = String.valueOf(pokemonId);
         setupEvolvesHow();
         mav.addObject("pokemonId", pokemonId);
         mav.addObject("pokemonChainId", pokemonChainID);
@@ -167,6 +154,7 @@ public class EvolvesHowController extends BaseController {
         logger.info("evolution_details for: {} = {}", details.get("name"), details);
         this.specificAttributesMap = this.generateDefaultAttributesMap();
         this.specificAttributesMap.put("name", details.get("name"));
+        this.specificAttributesMap.put("id", details.get("id"));
         this.specificAttributesMap.put("gender", null != details.get("gender") ? details.get("gender") : null);
         this.specificAttributesMap.put("isBaby", details.get("is_baby"));
         Map<String,Object> map = ((Map<String, Object>)details.get("held_item"));

@@ -81,6 +81,7 @@ public class BaseController {
         return new TreeMap<>() {{
             put("name", null); // on screen
             put("gender", null);
+            put("id", null);
             put("isBaby", null);
             put("heldItem", null); // on screen
             put("useItem", null); // on screen
@@ -94,6 +95,8 @@ public class BaseController {
             put("needsRain", null); // on screen
             put("timeOfDay", null); // on screen
             put("partySpecies", null);
+            put("partyType", null); // not implemented
+            put("trigger", null); // not implemented
             put("relativePhysicalStats", null);
             put("tradeSpecies", null);
             put("turnUpsideDown", null); // on screen
