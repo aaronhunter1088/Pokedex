@@ -16,6 +16,7 @@ import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
+import java.net.http.HttpResponse;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -66,6 +67,8 @@ public class PokedexController extends BaseController {
         try {
             speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId()));
             pokemon = createPokemon(pokemonResource, speciesData);
+            HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
+            if (response.statusCode() == 404) pokemon.setGifImage(null);
             sprites = new TreeMap<>();
             sprites.put("default", pokemon.getDefaultImage());
             sprites.put("official", pokemon.getOfficialImage());

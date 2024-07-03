@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div id="imageOfPokemon" style="justify-content:center;display:block;">
-                <img id="pkmnImage" src="${defaultImage}" alt="defaultImage">
+                <img id="pkmnImage" src="${defaultImage}" alt="image">
             </div>
             <div id="photoButtonsDiv" style="justify-content:center;text-align:center;display:inline-flex;">
                 <div style="">
@@ -206,6 +206,7 @@
             }
             case 'gif' : {
                 image = "${sprites.get("gif")}";
+                console.log('image: ' + image);
                 if (image === '') {
                     image = "/images/pokeball1.jpg";
                 }

@@ -85,28 +85,28 @@
                         </div>
                         <div id="image">
                             <c:choose>
-                                <c:when test="${defaultImagePresent}">
+                                <c:when test="${pokemon.value.defaultImage != null}">
                                     <c:if test="${!showGifs}">
                                         <img onmouseover="showArtwork(this, '${pokemon.value.officialImage}')" onmouseout="showArtwork(this, '${pokemon.value.defaultImage}');"
                                              src="${pokemon.value.defaultImage}" alt="${pokemon.value.name}-default" style="height:200px;width:200px;">
                                     </c:if>
-                                    <c:if test="${showGifs && gifImagePresent}">
+                                    <c:if test="${showGifs && pokemon.value.gifImage != null}">
                                         <img src="${pokemon.value.gifImage}" alt="${pokemon.value.name}-gif">
                                     </c:if>
-                                    <c:if test="${showGifs && !gifImagePresent}">
-                                        <c:if test="${officialImagePresent}">
+                                    <c:if test="${showGifs && pokemon.value.gifImage == null}">
+                                        <c:if test="${pokemon.value.officialImage != null}">
                                             <img src="${pokemon.value.officialImage}" alt="${pokemon.value.name}-official">
                                         </c:if>
-                                        <c:if test="${!officialImagePresent}">
+                                        <c:if test="${pokemon.value.officialImage == null}">
                                             <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found">
                                         </c:if>
                                     </c:if>
                                 </c:when>
                                 <c:otherwise> <!-- officialImage -->
-                                    <c:if test="${officialImagePresent}">
+                                    <c:if test="${pokemon.value.officialImage != null}">
                                         <img src="${pokemon.value.officialImage}" alt="${pokemon.value.name}-official">
                                     </c:if>
-                                    <c:if test="${!officialImagePresent}">
+                                    <c:if test="${pokemon.value.officialImage == null}">
                                         <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found">
                                     </c:if>
                                 </c:otherwise>

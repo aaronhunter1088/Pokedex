@@ -29,7 +29,7 @@ public class BaseController {
     }
 
     protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId) {
-        logger.info("id: {} chain: {}", pokemonId, pokemonIDToEvolutionChainMap);
+        logger.info("id: {}", pokemonId);
         List<Integer> keys = pokemonIDToEvolutionChainMap.keySet().stream().toList();
         Integer keyToReturn = 0;
         keysLoop:
@@ -42,6 +42,7 @@ public class BaseController {
                 }
             }
         }
+        logger.info("chainKey: {}", keyToReturn);
         return keyToReturn;
     }
 

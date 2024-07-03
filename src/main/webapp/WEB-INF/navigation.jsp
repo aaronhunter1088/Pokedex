@@ -75,7 +75,7 @@
                 <c:choose>
                     <c:when test="${page == 1}">
                         <li class="page-item disabled">
-                            <button class="page-link" onclick="setPageToView(${page-1});">Previous</button>
+                            <button class="page-link">Previous</button>
                         </li>
                     </c:when>
                     <c:when test="${page != 1}">
@@ -95,10 +95,10 @@
                             </c:if>
                             <c:if test="${pageNumber == 8}">
                                 <li class="page-item">
-                                  <button class="page-link" onclick="setPageToView();">...</button>
+                                  <button class="page-link" onclick="setPageToView(${pageNumber+1});">...</button>
                                 </li>
                                 <li class="page-item">
-                                  <button class="page-link" onclick="setPageToView();">${totalPages}</button>
+                                  <button class="page-link" onclick="setPageToView(${totalPages});">${totalPages}</button>
                                 </li>
                             </c:if>
                         </c:forEach>
@@ -158,7 +158,7 @@
                 <c:choose>
                     <c:when test="${page == totalPages}">
                         <li class="page-item disabled">
-                          <button class="page-link" onclick="setPageToView(${page+1});">Next</button>
+                          <button class="page-link">Next</button>
                         </li>
                     </c:when>
                     <c:when test="${page != totalPages}">

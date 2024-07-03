@@ -15,6 +15,7 @@ import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,36 +61,40 @@ public class PokemonListController extends BaseController {
 
     public Map<Integer, com.example.pokedex.entities.Pokemon> getPokemonMap() {
         logger.info("page number is {}", page);
-        logger.info("itemsPerPage: {}", pkmnPerPage);
-        // @ts-ignore this.pkmnPerPage
+        logger.info("pkmnPerPage: {}", pkmnPerPage);
         NamedApiResourceList<Pokemon> pokemonList = pokemonService.getPokemonList(pkmnPerPage, ((page - 1) * pkmnPerPage));
         if (null != pokemonList && !pokemonList.getResults().isEmpty()) {
-            //logger.info("pokemonList size: " + pokemonList.getResults().size());
-            List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.getResults(); // .stream().limit(pkmnPerPage).collect(toList());
-            //logger.info("pokemonList limit size: " + listOfPokemon.size());
+            logger.debug("pokemonList size: " + pokemonList.getResults().size());
+            List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.getResults();
+            logger.debug("pokemonList limit size: " + listOfPokemon.size());
             pokemonMap = new TreeMap<>();
             totalPokemon = pokemonService.getTotalPokemon(null);
-            listOfPokemon.forEach(pkmn -> {
+            listOfPokemon.parallelStream().forEach(pkmn -> {
                 Pokemon pokemonResource = pokemonService.getPokemonByName(pkmn.getName());
                 com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
                 PokemonSprites sprites = pokemon.getSprites();
                 List<PokemonType> types = pokemon.getTypes();
                 String pokemonType = null;
                 if (types.size() > 1) {
-                    //.info("More than 1 pokemonType");
+                    logger.debug("More than 1 pokemonType");
                     pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1)
                             + " & " + types.get(1).getType().getName().substring(0,1).toUpperCase() + types.get(1).getType().getName().substring(1);
                 } else {
-                    //logger.info("One pokemonType");
+                    logger.debug("One pokemonType");
                     pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1);
                 }
                 pokemon.setType(pokemonType);
                 pokemon.setDefaultImage(sprites.getFrontDefault());
-                if (null != pokemon.getDefaultImage()) defaultImagePresent = true;
+                //if (null != pokemon.getDefaultImage()) defaultImagePresent = true;
                 pokemon.setOfficialImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png");
-                if (null != pokemon.getOfficialImage()) officialImagePresent = true;
-                pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
-                if (null != pokemon.getGifImage()) gifImagePresent = true;
+                //if (null != pokemon.getOfficialImage()) officialImagePresent = true;
+                HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
+                if (response.statusCode() == 404) {
+                    pokemon.setGifImage(null);
+                } else {
+                    pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
+                }
+                //if (null != pokemon.getGifImage()) gifImagePresent = true;
                 PokemonSpecies speciesData;
                 try {
                     speciesData = pokemonService.getPokemonSpeciesData(pokemon.getId().toString());

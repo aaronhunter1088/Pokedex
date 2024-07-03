@@ -13,10 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Controller
 public class EvolutionsController extends BaseController {
@@ -83,10 +80,17 @@ public class EvolutionsController extends BaseController {
 
     private void setupEvolutions() {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        setFamilySize();
-        setStages();
-        setAllIDs();
-        createListOfPokemon();
+        if (pokemonFamilyIDs != null) {
+            setFamilySize();
+            setStages();
+            setAllIDs();
+            createListOfPokemon();
+        } else {
+            pokemonFamilySize = 0;
+            stages = null;
+            allIDs = null;
+            pokemonFamily = null;
+        }
     }
 
     private void setFamilySize() {

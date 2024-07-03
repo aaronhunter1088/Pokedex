@@ -677,7 +677,8 @@ public class PokemonService {
             response = HttpClient.newBuilder()
                     .build()
                     .send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("response: {}", response.body());
+            logger.debug("response: {}", response.body());
+            logger.info("callUrl: {} status: {}", url, response.statusCode());
         } catch (Exception e) {
             logger.error("Failed to call endpoint: {}", url);
         }
