@@ -18,7 +18,7 @@ public class EvolvesHowController extends BaseController {
     private static final Logger logger = LogManager.getLogger(EvolvesHowController.class);
 
     Integer pokemonID;
-    Map<Integer, Map<String, Object>> pokemonIdAndAttributesMap = new HashMap<>();
+    Map<Integer, Map<String, Object>> pokemonIdAndAttributesMap;
     Map<String, Object> specificAttributesMap = Collections.emptyMap();
     Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID = 0;
@@ -87,12 +87,13 @@ public class EvolvesHowController extends BaseController {
 
     private void setupEvolvesHow() {
         this.pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
+        this.pokemonIdAndAttributesMap = new HashMap<>();
         this.specificAttributesMap = generateDefaultAttributesMap();
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, String.valueOf(pokemonID));
-        logger.info("chainId: {}", pokemonChainID);
         this.family = this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID);
+        logger.info("family: {}", family);
         this.allIDs = family.stream().flatMap(Collection::stream).toList();
-        logger.info("family: " + allIDs);
+        logger.info("allIDs: {}", allIDs);
         if (pokemonChainID != 0) {
             Map<String, Object> chainResponse = pokemonService.getPokemonChainData(String.valueOf(pokemonChainID));
             logger.info("chainResponse: {}", chainResponse);
@@ -132,10 +133,10 @@ public class EvolvesHowController extends BaseController {
                     evolutionDetails.put("is_baby", chain.get("is_baby"));
                     evolutionDetails.put("id", pkmnId);
                     evolutionDetails.put("name", name);
-                    if (!pokemonIdAndAttributesMap.containsKey(pkmnId)) {
+                    if (!pokemonIdAndAttributesMap.containsKey(Integer.parseInt(pkmnId))) {
                         setAttributesMap(evolutionDetails);
                     } else {
-                        updateAttributesMap(evolutionDetails, pokemonIdAndAttributesMap.get(pkmnId));
+                        updateAttributesMap(evolutionDetails, pokemonIdAndAttributesMap.get(Integer.parseInt(pkmnId)));
                     }
                     getEvolutionDetails(evolvesTo);
                 }
@@ -189,6 +190,7 @@ public class EvolvesHowController extends BaseController {
         this.specificAttributesMap.put("tradeSpecies", details.get("trade_species"));
         this.specificAttributesMap.put("turnUpsideDown", details.get("turn_upside_down"));
 
+        logger.info("attrMap for: {} = {}", details.get("name"), this.specificAttributesMap);
         this.pokemonIdAndAttributesMap.put(Integer.valueOf((String) details.get("id")), this.specificAttributesMap);
     }
 
@@ -241,9 +243,9 @@ public class EvolvesHowController extends BaseController {
                 attributesMap.put("minHappiness", happinesses);
             }
         }
-        if (details.get("time_of_day") != null) {
-            if (attributesMap.get("timeOfDay") == null) {
-                attributesMap.put("timeOfDay", Collections.singletonList(details.get("time_of_day")));
+        if (details.get("time_of_day") != "") {
+            if (attributesMap.get("timeOfDay") == "") {
+                attributesMap.put("timeOfDay", "");
             } else {
                 var timeOfDay = attributesMap.get("timeOfDay");
                 String newTimeOfDay = (String) details.get("time_of_day");
@@ -269,8 +271,13 @@ public class EvolvesHowController extends BaseController {
                 attributesMap.put("needsRain", Collections.singletonList(details.get("needs_overworld_rain")));
             } else {
                 var needsRain = attributesMap.get("needsRain");
-                String newNeedsRain = (String) details.get("needs_overworld_rain");
-                List<String> needsRains = (needsRain instanceof List) ? (List<String>) needsRain : Collections.singletonList(needsRain.toString());
+                Boolean newNeedsRain = (Boolean) details.get("needs_overworld_rain");
+                List<Boolean> needsRains = new ArrayList<>();
+                if (needsRain instanceof List) {
+                    needsRains.addAll((Collection<? extends Boolean>) needsRain);
+                } else {
+                    needsRains.add((Boolean) needsRain);
+                }
                 needsRains.add(newNeedsRain);
                 attributesMap.put("needsRain", needsRains);
             }
@@ -359,8 +366,13 @@ public class EvolvesHowController extends BaseController {
                 attributesMap.put("turnUpsideDown", Collections.singletonList(details.get("turn_upside_down")));
             } else {
                 var turnUpsideDown = attributesMap.get("turnUpsideDown");
-                String newTurnUpsideDown = (String) details.get("turn_upside_down");
-                List<String> turnUpsideDownList = (turnUpsideDown instanceof List) ? (List<String>) turnUpsideDown : Collections.singletonList(turnUpsideDown.toString());
+                Boolean newTurnUpsideDown = (Boolean) details.get("turn_upside_down");
+                List<Boolean> turnUpsideDownList = new ArrayList<>();
+                if (turnUpsideDown instanceof List) {
+                    turnUpsideDownList.addAll((Collection<? extends Boolean>) turnUpsideDown);
+                } else {
+                    turnUpsideDownList.add((Boolean) turnUpsideDown);
+                }
                 turnUpsideDownList.add(newTurnUpsideDown);
                 attributesMap.put("turnUpsideDown", turnUpsideDownList);
             }
@@ -438,7 +450,7 @@ public class EvolvesHowController extends BaseController {
             }
             logger.info("knownMoveType: {}", mapValue.get("knownMoveType"));
 
-            List<Boolean> needsRainValues = Arrays.asList((Boolean)mapValue.get("needsRain"));
+            List<Boolean> needsRainValues = (mapValue.get("needsRain") instanceof List) ? (List<Boolean>) mapValue.get("needsRain") : Arrays.asList((Boolean) mapValue.get("needsRain"));
             if (needsRainValues != null && needsRainValues.size() > 1) {
                 HashSet<Boolean> needsRainSet = new HashSet<>();
                 for(Boolean needsRain : needsRainValues) {
@@ -451,7 +463,7 @@ public class EvolvesHowController extends BaseController {
             }
             logger.info("needsRain: {}", mapValue.get("needsRain"));
 
-            List<Boolean> turnUpsideDownValues = Arrays.asList((Boolean)mapValue.get("turnUpsideDown"));
+            List<Boolean> turnUpsideDownValues = (mapValue.get("turnUpsideDown") instanceof List) ? (List<Boolean>) mapValue.get("turnUpsideDown") : Arrays.asList((Boolean)mapValue.get("turnUpsideDown"));
             if (turnUpsideDownValues != null && turnUpsideDownValues.size() > 1) {
                 HashSet<Boolean> upsideDownSet = new HashSet<>();
                 for(Boolean upsideDown : turnUpsideDownValues) {
@@ -479,8 +491,8 @@ public class EvolvesHowController extends BaseController {
         this.hasBeauty = pokemonAttributesMap.get("minBeauty") != null;
         this.hasKnownMoves = pokemonAttributesMap.get("knownMove") != null;
         this.hasKnownMoveType = pokemonAttributesMap.get("knownMoveType") != null;
-        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && (Boolean)pokemonAttributesMap.get("needsRain") != false;
-        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && (Boolean)pokemonAttributesMap.get("turnUpsideDown") != false;
+        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && !((HashSet<Boolean>)pokemonAttributesMap.get("needsRain")).contains(false);
+        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && !((List<Boolean>)pokemonAttributesMap.get("turnUpsideDown")).contains(false);
     }
 
     private boolean pokemonEvolves() {

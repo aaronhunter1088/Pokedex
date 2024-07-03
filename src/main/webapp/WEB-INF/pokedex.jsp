@@ -113,7 +113,7 @@
                 <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
                 <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
                 <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
-                <button id="evolutionsBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
+                <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
             </div>
             <br>
             <div id="descriptionDiv" style="display:inline-flex;width:300px;justify-content:center;">
@@ -161,6 +161,7 @@
 
         defaultInfoDivs();
         $("#descriptionDiv").show();
+        $("#descriptionBtn").css('font-weight', 'bold');
         if (Number.parseInt('${pokemon.id}') !== 0) {
             setEvolutionsDiv();
             updateEvolutionsDiv();
@@ -242,9 +243,13 @@
 
     function defaultInfoDivs() {
         $("#descriptionDiv").hide();
+        $("#descriptionBtn").css('font-weight', 'normal');
         $("#locationsDiv").hide();
+        $("#locationsBtn").css('font-weight', 'normal');
         $("#movesDiv").hide();
+        $("#movesBtn").css('font-weight', 'normal');
         $("#evolvesHowDiv").hide();
+        $("#evolvesHowBtn").css('font-weight', 'normal');
     }
 
     function showDiv(divName) {
@@ -253,14 +258,17 @@
             case 'description' : {
                 $("#descriptionDiv").show();
                 $("#descriptionDiv").css('display','inline-flex');
+                $("#descriptionBtn").css('font-weight', 'bold');
                 break;
             }
             case 'locations' : {
                 $("#locationsDiv").show();
+                $("#locationsBtn").css('font-weight', 'bold');
                 break;
             }
             case 'moves' : {
                 $("#movesDiv").show();
+                $("#movesBtn").css('font-weight', 'bold');
                 break;
             }
             case 'evolvesHow' : {
@@ -287,6 +295,7 @@
                     }
                 });
                 $("#evolvesHowDiv").show();
+                $("#evolvesHowBtn").css('font-weight', 'bold');
                 break;
             }
             default : {

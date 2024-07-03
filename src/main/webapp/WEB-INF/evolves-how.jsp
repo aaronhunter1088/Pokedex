@@ -50,7 +50,7 @@
                 <c:if test="${hasBeauty}">
                     <h3 id="beauty"><b>Evolves w/ Beauty: </b>${attributesMap.get('minBeauty')}</h3>
                 </c:if> <!-- with beauty -->
-                <c:if test="${hasDayNight}">
+                <c:if test="${hasDayNight != ''}">
                     <h3 id="dayNightTitle" class="listStyle"><b>Evolves during: </b></h3>
                     <c:forEach var="dayNight" items="${attributesMap.get('timeOfDay')}">
                         <h3 id="dayNight" class="listStyle">${dayNight}</h3>
