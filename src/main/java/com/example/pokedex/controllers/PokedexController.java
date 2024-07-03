@@ -74,7 +74,7 @@ public class PokedexController extends BaseController {
             sprites.put("official", pokemon.getOfficialImage());
             sprites.put("shiny", pokemon.getShinyImage());
             sprites.put("gif", pokemon.getGifImage());
-            super.pokemonId = pokemon.getId();
+            super.pokemonId = pokemon.getId().toString();
         } catch (Exception e) {
             logger.error("No species data found using {}", pokemonResource.getId());
         }

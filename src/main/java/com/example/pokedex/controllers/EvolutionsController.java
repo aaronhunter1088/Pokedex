@@ -19,7 +19,7 @@ import java.util.*;
 public class EvolutionsController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(EvolutionsController.class);
-    String pokemonID;
+    //String pokemonID;
     Map<Integer,List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID;
     List<List<Integer>> pokemonFamilyIDs;
@@ -57,7 +57,7 @@ public class EvolutionsController extends BaseController {
     @GetMapping(value="/evolutions/{pokemonId}")
     public ModelAndView getEvolutions(@PathVariable(name="pokemonId") String pokemonId, ModelAndView mav) {
         resetEvolutionParameters();
-        this.pokemonID = pokemonId;
+        this.pokemonId = pokemonId;
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, pokemonId);
         setupEvolutions();
         mav.addObject("pokemonId", pokemonId);
@@ -80,7 +80,8 @@ public class EvolutionsController extends BaseController {
 
     private void setupEvolutions() {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        if (pokemonFamilyIDs != null) {
+        if (pokemonFamilyIDs != null && !pokemonFamilyIDs.isEmpty() && !String.valueOf(pokemonFamilyIDs.get(0).get(0)).equals(pokemonId)) {
+            pokemonFamily = new ArrayList<List<Pokemon>>();
             setFamilySize();
             setStages();
             setAllIDs();
@@ -103,6 +104,7 @@ public class EvolutionsController extends BaseController {
     }
 
     private void setStages() {
+        stages = new ArrayList<>();
         pokemonFamilyIDs.forEach(idList -> {
             stages.add(++stage);
         });
@@ -110,6 +112,7 @@ public class EvolutionsController extends BaseController {
     }
 
     private void setAllIDs() {
+        allIDs = new ArrayList<Integer>();
         pokemonFamilyIDs.forEach(idList -> {
             allIDs.addAll(idList);
         });

@@ -19,7 +19,7 @@ public class BaseController {
 
     private static final Logger logger = LogManager.getLogger(BaseController.class);
 
-    Integer pokemonId = 0;
+    String pokemonId = "";
 
     protected PokemonService pokemonService;
 
