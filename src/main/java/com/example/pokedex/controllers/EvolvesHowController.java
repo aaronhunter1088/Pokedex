@@ -17,7 +17,6 @@ public class EvolvesHowController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(EvolvesHowController.class);
 
-    //Integer pokemonID;
     Map<Integer, Map<String, Object>> pokemonIdAndAttributesMap;
     Map<String, Object> specificAttributesMap = Collections.emptyMap();
     Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap;
@@ -76,7 +75,7 @@ public class EvolvesHowController extends BaseController {
         this.pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
         this.pokemonIdAndAttributesMap = new HashMap<>();
         this.specificAttributesMap = generateDefaultAttributesMap();
-        this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, String.valueOf(pokemonID));
+        this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, String.valueOf(pokemonId));
         this.family = this.pokemonIDToEvolutionChainMap.get(this.pokemonChainID);
         logger.info("family: {}", family);
         this.allIDs = family.stream().flatMap(Collection::stream).toList();
@@ -99,7 +98,7 @@ public class EvolvesHowController extends BaseController {
                 // clean up map, remove unnecessary duplicates
                 cleanupAttributesMap();
                 logger.info("Attributes map cleaned up in Evolves-how");
-                setupBooleans(pokemonIdAndAttributesMap.get(pokemonID));
+                setupBooleans(pokemonIdAndAttributesMap.get(Integer.valueOf(pokemonId)));
                 doesPokemonEvolve = pokemonEvolves();
                 logger.info("does pokemon evolve: {}", doesPokemonEvolve);
             }
@@ -471,7 +470,7 @@ public class EvolvesHowController extends BaseController {
         this.hasMinimumLevel = pokemonAttributesMap.get("minLevel") != null;
         this.hasHeldItem = pokemonAttributesMap.get("heldItem") != null;
         this.hasUseItem = pokemonAttributesMap.get("useItem") != null;
-        this.isABaby = pokemonAttributesMap.get("isBaby") != null && (Boolean)pokemonAttributesMap.get("isBaby") != false;
+        this.isABaby = pokemonAttributesMap.get("isBaby") != null && (Boolean)pokemonAttributesMap.get("isBaby");
         this.hasMinimumHappiness = pokemonAttributesMap.get("minHappiness") != null;
         this.hasDayNight = pokemonAttributesMap.get("timeOfDay") != null;
         this.hasLocations = pokemonAttributesMap.get("location") != null;
@@ -479,8 +478,8 @@ public class EvolvesHowController extends BaseController {
         this.hasBeauty = pokemonAttributesMap.get("minBeauty") != null;
         this.hasKnownMoves = pokemonAttributesMap.get("knownMove") != null;
         this.hasKnownMoveType = pokemonAttributesMap.get("knownMoveType") != null;
-        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && !((HashSet<Boolean>)pokemonAttributesMap.get("needsRain")).contains(false);
-        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && !((List<Boolean>)pokemonAttributesMap.get("turnUpsideDown")).contains(false);
+        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && ((Boolean) pokemonAttributesMap.get("needsRain"));
+        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && !((Boolean)pokemonAttributesMap.get("turnUpsideDown"));
     }
 
     private boolean pokemonEvolves() {
