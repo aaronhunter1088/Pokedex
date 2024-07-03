@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Controller
-public class PokemonListController {
+public class PokemonListController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokemonListController.class);
     Map<Integer, com.example.pokedex.entities.Pokemon> pokemonMap = new TreeMap<>();
@@ -34,13 +34,11 @@ public class PokemonListController {
             gifImagePresent = false,
             showGifs = false;
 
-    PokemonService pokemonService;
-
     @Autowired
     public PokemonListController(PokemonService pokemonService) {
-        this.pokemonService = pokemonService;
-        this.page = pokemonService.getSavedPage();
-        this.pkmnPerPage = pokemonService.getNumberOfPokemonPerPage(); // default is 10
+        super(pokemonService);
+        this.page = this.pokemonService.getSavedPage();
+        this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage(); // default is 10
         this.getPokemonMap();
     }
 

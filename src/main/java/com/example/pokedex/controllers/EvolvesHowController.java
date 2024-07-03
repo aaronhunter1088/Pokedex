@@ -3,7 +3,6 @@ package com.example.pokedex.controllers;
 import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,12 +53,9 @@ public class EvolvesHowController extends BaseController {
             hasTurnUpsideDown = false,
             emptyChain = true;
 
-    PokemonService pokemonService;
-
     @Autowired
     public EvolvesHowController(PokemonService pokemonService) {
         super(pokemonService);
-        this.pokemonService = pokemonService;
     }
 
     @GetMapping(value="/evolves-how")

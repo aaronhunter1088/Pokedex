@@ -1,10 +1,12 @@
 package com.example.pokedex.controllers;
 
+import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.json.JSONParser;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +27,18 @@ import java.util.*;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/pokemon")
-public class PokemonApi {
+public class PokemonApi extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokemonApi.class);
     @Autowired
     private PokeApiClient pokeApiClient;
+    @Value("${skaro.pokeapi.baseUri}")
+    private String pokeApiBaseUrl;
+
+    @Autowired
+    public PokemonApi(PokemonService pokemonService) {
+        super(pokemonService);
+    }
 
     @RequestMapping(value = "/list", method=RequestMethod.GET)
     @ResponseBody

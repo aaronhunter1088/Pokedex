@@ -52,13 +52,9 @@ public class PokedexController extends BaseController {
             styleFlag = false,
             showGifs = false;
 
-    PokemonService pokemonService;
-
     @Autowired
     public PokedexController(PokemonService pokemonService) {
         super(pokemonService);
-        this.pokemonService = pokemonService;
-
     }
 
     @GetMapping(value="/pokedex/{pokemonId}")

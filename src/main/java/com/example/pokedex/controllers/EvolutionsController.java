@@ -45,13 +45,10 @@ public class EvolutionsController extends BaseController {
     Integer attrCounter = 0;
     Integer babyCounter = 0;
 
-    PokemonService pokemonService;
-
     @Autowired
     public EvolutionsController(PokemonService pokemonService) {
         super(pokemonService);
-        this.pokemonService = pokemonService;
-        pokemonIDToEvolutionChainMap = pokemonService.getEvolutionsMap();
+        pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
         specificAttributesMap = generateDefaultAttributesMap();
         pokemonChainID = 0;
         pokemonFamilySize = 0;
