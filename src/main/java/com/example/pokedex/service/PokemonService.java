@@ -13,16 +13,25 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
-import skaro.pokeapi.resource.NamedApiResource;
-import skaro.pokeapi.resource.NamedApiResourceList;
+import skaro.pokeapi.resource.*;
+import skaro.pokeapi.resource.egggroup.EggGroup;
 import skaro.pokeapi.resource.evolutionchain.EvolutionChain;
+import skaro.pokeapi.resource.generation.Generation;
+import skaro.pokeapi.resource.growthrate.GrowthRate;
 import skaro.pokeapi.resource.location.Location;
 import skaro.pokeapi.resource.locationarea.LocationArea;
 import skaro.pokeapi.resource.pokedex.Pokedex;
 import skaro.pokeapi.resource.pokemon.Pokemon;
+import skaro.pokeapi.resource.pokemoncolor.PokemonColor;
+import skaro.pokeapi.resource.pokemonhabitat.PokemonHabitat;
+import skaro.pokeapi.resource.pokemonshape.PokemonShape;
+import skaro.pokeapi.resource.pokemonspecies.Genus;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
+import skaro.pokeapi.resource.pokemonspecies.PokemonSpeciesDexEntry;
+import skaro.pokeapi.resource.pokemonspecies.PokemonSpeciesVariety;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -79,21 +88,9 @@ public class PokemonService {
         try {
             speciesData = pokeApiClient.getResource(PokemonSpecies.class, id).block();
         } catch (Exception e) {
-            Pokemon pokemon = getPokemonByName(id);
-            String speciesUrl = pokemon.getSpecies().getUrl();
-            HttpResponse<String> response;
-            JSONParser jsonParser;
-            try {
-                response = callUrl(speciesUrl);
-                logger.info("response: {}", response.body());
-                jsonParser = new JSONParser(response.body());
-                speciesData = (PokemonSpecies) jsonParser.parse();
-            } catch (Exception e2) {
-                logger.error("Error retrieving response because {}", e2.getMessage());
-            }
+            throw e;
         }
         return speciesData;
-        //return pokeApiClient.getResource(PokemonSpecies.class, id).block();
     }
 
     public List<String> getPokemonLocationEncounters(String url) {
@@ -691,5 +688,38 @@ public class PokemonService {
             logger.error("Failed to call endpoint: {}", url);
         }
         return response;
+    }
+
+    public PokemonSpecies setFromResults(Map<String,Object> results) {
+        PokemonSpecies speciesData = new PokemonSpecies();
+        speciesData.setId(((BigInteger) results.get("id")).intValue());
+        speciesData.setName((String) results.get("name"));
+        speciesData.setOrder(((BigInteger) results.get("order")).intValue());
+        speciesData.setGenderRate(((BigInteger) results.get("gender_rate")).intValue());
+        speciesData.setCaptureRate(((BigInteger) results.get("capture_rate")).intValue());
+        speciesData.setBaseHappiness(((BigInteger) results.get("base_happiness")).intValue());
+        speciesData.setIsBaby((Boolean) results.get("is_baby"));
+        speciesData.setIsLegendary((Boolean) results.get("is_legendary"));
+        speciesData.setIsMythical((Boolean) results.get("is_mythical"));
+        speciesData.setHatchCounter(((BigInteger) results.get("hatch_counter")).intValue());
+        speciesData.setHasGenderDifferences((Boolean) results.get("has_gender_differences"));
+        speciesData.setFormsSwitchable((Boolean) results.get("forms_switchable"));
+        speciesData.setGrowthRate((NamedApiResource<GrowthRate>) results.get("growth_rate"));
+        speciesData.setPokedexNumbers((List<PokemonSpeciesDexEntry>) results.get("pokedex_numbers"));
+        speciesData.setEggGroups((List<NamedApiResource<EggGroup>>) results.get("egg_groups"));
+        speciesData.setColor((NamedApiResource<PokemonColor>) results.get("color"));
+
+//        private NamedApiResource<PokemonShape> shape;
+//        private NamedApiResource<PokemonSpecies> evolvesFromSpecies;
+//        private ApiResource<EvolutionChain> evolutionChain;
+//        private NamedApiResource<PokemonHabitat> habitat;
+//        private NamedApiResource<Generation> generation;
+//        private List<Name> names;
+//        private List<FlavorText> flavorTextEntries;
+//        private List<Description> formDescriptions;
+//        private List<Genus> genera;
+//        private List<PokemonSpeciesVariety> varieties;
+
+        return speciesData;
     }
 }
