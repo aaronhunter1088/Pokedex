@@ -72,7 +72,7 @@
         </div>
     </div>
     <br>
-    <div class="list-grid">
+    <div id="pokemonGrid" class="list-grid">
         <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
             <c:set var="pokemonId" value="${pokemon.value.id}" />
             <div id="pokemon${pokemonId}">
@@ -234,6 +234,7 @@
                     console.log('200 setPageToView');
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     location.reload();
+
                     let ids = ${pokemonIds};
                     for(let i=0; i<ids.length; i++) {
                         let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");

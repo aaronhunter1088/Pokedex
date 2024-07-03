@@ -1,7 +1,9 @@
 # pokedexSpringbootApp
 
 # v0.4
-This Spring boot application begins by listing the Pokemon out in a grid
+This Spring boot application has been upgraded from 2.7.5 to 3.3.1! 
+
+The app begins by listing the Pokemon out in a grid
 pattern, defaulting to 10 pokemon per page. On the homepage, there will
 be a Pokedex image which directs to the search page. Then there is a
 pagination list for all pokemon, a GIF toggle, Jump to Page, and Pokemon

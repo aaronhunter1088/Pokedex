@@ -61,8 +61,12 @@ public class PokemonService {
 
     public Pokemon getPokemonByName(String pokemonIDName) {
         Pokemon pokemon = null;
-        pokemon = pokeApiClient.getResource(Pokemon.class, pokemonIDName).block();
-        if (null != pokemon) logger.info("pokemon: " + pokemon.getId());
+        try {
+            pokemon = pokeApiClient.getResource(Pokemon.class, pokemonIDName).block();
+            if (null != pokemon) logger.info("pokemon.id: {}", pokemon.getId());
+        } catch (Exception e) {
+            logger.error("Pokemon not found using {}. Exception: {}", pokemonIDName, e.getMessage());
+        }
         return pokemon;
     }
 
@@ -71,9 +75,25 @@ public class PokemonService {
     }
 
     public PokemonSpecies getPokemonSpeciesData(String id) {
-        //console.log("service: ", this.Pokedex.getPokemonSpecies(pokemonIDName).then((res: any) => res.body))
-        //return this.Pokedex.getPokemonSpecies(pokemonIDName);
-        return pokeApiClient.getResource(PokemonSpecies.class, id).block();
+        PokemonSpecies speciesData = null;
+        try {
+            speciesData = pokeApiClient.getResource(PokemonSpecies.class, id).block();
+        } catch (Exception e) {
+            Pokemon pokemon = getPokemonByName(id);
+            String speciesUrl = pokemon.getSpecies().getUrl();
+            HttpResponse<String> response;
+            JSONParser jsonParser;
+            try {
+                response = callUrl(speciesUrl);
+                logger.info("response: {}", response.body());
+                jsonParser = new JSONParser(response.body());
+                speciesData = (PokemonSpecies) jsonParser.parse();
+            } catch (Exception e2) {
+                logger.error("Error retrieving response because {}", e2.getMessage());
+            }
+        }
+        return speciesData;
+        //return pokeApiClient.getResource(PokemonSpecies.class, id).block();
     }
 
     public List<String> getPokemonLocationEncounters(String url) {
@@ -654,5 +674,22 @@ public class PokemonService {
             /* End of generation 8 */
             put(480, List.of(List.of(906), List.of(907), List.of(908)));
         }};
+    }
+
+    public HttpResponse<String> callUrl(String url) {
+        HttpResponse<String> response = null;
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(url))
+                    .GET()
+                    .build();
+            response = HttpClient.newBuilder()
+                    .build()
+                    .send(request, HttpResponse.BodyHandlers.ofString());
+            logger.info("response: {}", response.body());
+        } catch (Exception e) {
+            logger.error("Failed to call endpoint: {}", url);
+        }
+        return response;
     }
 }
