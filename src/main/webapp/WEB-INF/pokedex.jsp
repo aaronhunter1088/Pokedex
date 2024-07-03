@@ -40,6 +40,22 @@
             display: inline-block;
             vertical-align: middle;
         }
+        .parent-div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+        .left-div {
+            padding-left: 15px;
+            position: absolute;
+            left: 0;
+        }
+
+        .center-div {
+            text-align: center;
+        }
     </style>
 </head>
 <body style="justify-content:space-evenly;text-align:center;">
@@ -51,13 +67,12 @@
 <div id="pokedex">
     <div class="pokedex-grid">
         <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
-            <div id="backAndName">
-                <div id="backArrow" style="float:left;">
-                    <a href="${pageContext.request.contextPath}/" title="Click here to return to Homepage">
-                        <i class="fas fa-arrow-left" style="color:#000000;width:50px; height:50px;"></i>
-                    </a>
+            <div id="backAndName" class="parent-div">
+                <div id="backArrow" class="left-div">
+                    <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
                 </div>
-                <div id="mainName" style="justify-content:center;padding-top:2%;padding-right:10%;">
+                &emsp;
+                <div id="mainName" class="center-div">
                     <h1 id="infoTitle">${pokemon.name}</h1>
                 </div>
             </div>
