@@ -40,3 +40,4 @@ src/main/.DS_Store
 src/main/resources/.DS_Store
 src/main/webapp/.DS_Store
 src/main/webapp/images/.DS_Store
+logs/
