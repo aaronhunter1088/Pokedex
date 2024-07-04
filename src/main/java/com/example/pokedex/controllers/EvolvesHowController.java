@@ -89,13 +89,10 @@ public class EvolvesHowController extends BaseController {
                 for(Integer id : allIDs) {
                     logger.info("checking map for existence: {}", id);
                     if (!this.pokemonIdAndAttributesMap.containsKey(id)) {
-                        // FIRST, check if there are similar forms. if so, populate missing id with existing map
-                        //this.matchSiblingPokemonWithSiblingAttributeMap(id)
                         logger.info("{} not found! populating with default attrMap", id);
                         this.pokemonIdAndAttributesMap.put(id, this.generateDefaultAttributesMap());
                     }
                 }
-                // clean up map, remove unnecessary duplicates
                 cleanupAttributesMap();
                 logger.info("Attributes map cleaned up in Evolves-how");
                 setupBooleans(pokemonIdAndAttributesMap.get(Integer.valueOf(pokemonId)));
@@ -479,7 +476,7 @@ public class EvolvesHowController extends BaseController {
         this.hasKnownMoves = pokemonAttributesMap.get("knownMove") != null;
         this.hasKnownMoveType = pokemonAttributesMap.get("knownMoveType") != null;
         this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && ((Boolean) pokemonAttributesMap.get("needsRain"));
-        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && !((Boolean)pokemonAttributesMap.get("turnUpsideDown"));
+        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && ((Boolean)pokemonAttributesMap.get("turnUpsideDown"));
     }
 
     private boolean pokemonEvolves() {

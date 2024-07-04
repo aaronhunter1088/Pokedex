@@ -19,39 +19,22 @@ import java.util.*;
 public class EvolutionsController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(EvolutionsController.class);
-    //String pokemonID;
     Map<Integer,List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID;
     List<List<Integer>> pokemonFamilyIDs;
     List<Integer> allIDs;
     List<List<Pokemon>> pokemonFamily;
     List<Integer> pokemonFamilyAltLevels;
-    Map<String,Object> pokemonIdAndAttributesMap;
     Map<String,Object> specificAttributesMap;
-    Map<Integer, Pokemon> pokemonMap;
     Integer pokemonFamilySize;
-    Boolean defaultImagePresent = false,
-            gifImagePresent = false,
-            doesPokemonEvolve = false,
-            isBabyPokemon = false;
-    PokemonSprites sprites;
     List<Integer> stages;
     Integer stage = 0;
     Integer counter = 0;
-    Integer itemCounter = 0;
-    Integer attrCounter = 0;
-    Integer babyCounter = 0;
 
     @Autowired
     public EvolutionsController(PokemonService pokemonService) {
         super(pokemonService);
-        pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
-        specificAttributesMap = generateDefaultAttributesMap();
-        pokemonChainID = 0;
-        pokemonFamilySize = 0;
-        pokemonFamily = new ArrayList<List<Pokemon>>();
-        stages = new ArrayList<Integer>();
-        allIDs = new ArrayList<Integer>();
+        resetEvolutionParameters();
     }
 
     @GetMapping(value="/evolutions/{pokemonId}")
@@ -69,8 +52,11 @@ public class EvolutionsController extends BaseController {
     }
 
     private void resetEvolutionParameters() {
+        pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
+        specificAttributesMap = generateDefaultAttributesMap();
         if (null != pokemonFamily) pokemonFamily.clear();
         this.pokemonFamilySize = 0;
+        this.pokemonChainID = 0;
         if (null != pokemonFamilyAltLevels) pokemonFamilyAltLevels.clear();
         if (null != allIDs) allIDs = new ArrayList<>();
         if (null != stages) stages.clear();
@@ -80,12 +66,12 @@ public class EvolutionsController extends BaseController {
 
     private void setupEvolutions() {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        if (pokemonFamilyIDs != null && !pokemonFamilyIDs.isEmpty() && !String.valueOf(pokemonFamilyIDs.get(0).get(0)).equals(pokemonId)) {
-            pokemonFamily = new ArrayList<List<Pokemon>>();
+        if (pokemonFamilyIDs != null && pokemonFamilyIDs.size() != 1 ) {
             setFamilySize();
             setStages();
             setAllIDs();
-            createListOfPokemon();
+            pokemonFamily = new ArrayList<>();
+            pokemonFamilyIDs.forEach(this::createListOfPokemonForIDList);
         } else {
             pokemonFamilySize = 0;
             stages = null;
@@ -95,11 +81,7 @@ public class EvolutionsController extends BaseController {
     }
 
     private void setFamilySize() {
-        pokemonFamilyIDs.forEach(idList -> {
-            idList.forEach(id -> {
-                pokemonFamilySize += 1;
-            });
-        });
+        pokemonFamilySize = pokemonFamilyIDs.stream().flatMap(Collection::stream).toList().size();
         logger.info("familySize:{}", pokemonFamilySize);
     }
 
@@ -112,16 +94,11 @@ public class EvolutionsController extends BaseController {
     }
 
     private void setAllIDs() {
-        allIDs = new ArrayList<Integer>();
-        pokemonFamilyIDs.forEach(idList -> {
-            allIDs.addAll(idList);
-        });
-        allIDs = allIDs.stream().sorted().toList();
+        allIDs = pokemonFamilyIDs.stream()
+                .flatMap(Collection::stream)
+                .toList().stream()
+                .sorted().toList();
         logger.info("allIDs:{}", allIDs);
-    }
-
-    private void createListOfPokemon() {
-        pokemonFamilyIDs.forEach(this::createListOfPokemonForIDList);
     }
 
     public void createListOfPokemonForIDList(List<Integer> idList) {
@@ -143,9 +120,9 @@ public class EvolutionsController extends BaseController {
             assert speciesData != null;
             Pokemon pokemon = createPokemon(pokemonResponse, speciesData);
             pokemonList.add(pokemon);
+            logger.info("pokemon added to familyList: {} length is {}", pokemon, pokemonList.size());
         }
         pokemonList = pokemonList.stream().sorted().toList();
-        logger.info("adding list to familyList: {} length is {}", pokemonList, pokemonList.size());
         pokemonFamily.add(pokemonList);
     }
 

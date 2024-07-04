@@ -26,9 +26,6 @@ public class PokemonListController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokemonListController.class);
     Map<Integer, com.example.pokedex.entities.Pokemon> pokemonMap = new TreeMap<>();
-    int page = 1;
-    String blankPageNumber = "";
-    int pkmnPerPage; // itemsPerPage
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -38,15 +35,12 @@ public class PokemonListController extends BaseController {
     @Autowired
     public PokemonListController(PokemonService pokemonService) {
         super(pokemonService);
-        this.page = this.pokemonService.getSavedPage();
-        this.pkmnPerPage = this.pokemonService.getNumberOfPokemonPerPage(); // default is 10
-        this.getPokemonMap();
     }
 
     @GetMapping("/")
     public ModelAndView homepage(ModelAndView mav) {
         mav.addObject("pokemonMap", getPokemonMap());
-        mav.addObject("pokemonIds", new ArrayList<>(getPokemonMap().keySet()));
+        mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
         mav.addObject("gifImagePresent", gifImagePresent);
@@ -85,16 +79,13 @@ public class PokemonListController extends BaseController {
                 }
                 pokemon.setType(pokemonType);
                 pokemon.setDefaultImage(sprites.getFrontDefault());
-                //if (null != pokemon.getDefaultImage()) defaultImagePresent = true;
                 pokemon.setOfficialImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png");
-                //if (null != pokemon.getOfficialImage()) officialImagePresent = true;
                 HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
                 if (response.statusCode() == 404) {
                     pokemon.setGifImage(null);
                 } else {
                     pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
                 }
-                //if (null != pokemon.getGifImage()) gifImagePresent = true;
                 PokemonSpecies speciesData;
                 try {
                     speciesData = pokemonService.getPokemonSpeciesData(pokemon.getId().toString());
@@ -106,11 +97,12 @@ public class PokemonListController extends BaseController {
                     }
                 } catch (Exception e) {
                     logger.error("No speciesData found using {}", pokemon.getId());
+                    logger.warn("setting color to white");
+                    pokemon.setColor("white");
                 }
                 pokemonMap.put(pokemon.getId(), pokemon);
             });
         }
-        blankPageNumber = "";
         return pokemonMap;
     }
 
@@ -134,9 +126,7 @@ public class PokemonListController extends BaseController {
             logger.error("Cannot pick a number more than there are pages");
             return;
         }
-        this.page = pageNumber;
-        this.pokemonService.saveCurrentPage(this.page);
-        this.blankPageNumber = "";
+        page = pageNumber;
         logger.info("page updated to {}", page);
         homepage(mav);
     }

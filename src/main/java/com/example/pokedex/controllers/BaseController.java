@@ -20,6 +20,8 @@ public class BaseController {
     private static final Logger logger = LogManager.getLogger(BaseController.class);
 
     String pokemonId = "";
+    int page = 1;
+    int pkmnPerPage = 10;
 
     protected PokemonService pokemonService;
 

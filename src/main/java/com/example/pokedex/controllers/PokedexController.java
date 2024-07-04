@@ -1,5 +1,6 @@
 package com.example.pokedex.controllers;
 
+import com.example.pokedex.entities.Pokemon;
 import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,50 +9,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
-import skaro.pokeapi.resource.FlavorText;
-import skaro.pokeapi.resource.NamedApiResource;
-import skaro.pokeapi.resource.location.Location;
-import skaro.pokeapi.resource.locationarea.LocationArea;
-import skaro.pokeapi.resource.pokemon.PokemonSprites;
-import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.net.http.HttpResponse;
-import java.util.*;
-
-import static java.util.stream.Collectors.toList;
 
 @Controller
 public class PokedexController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokedexController.class);
-    Map<String, String> sprites;
-    String defaultImage;
-    String officialImage;
-    String gifImage;
-    String shinyImage;
-    String pokemonName = "";
-    //Integer pokemonId;
-    Integer pokemonHeight;
-    Integer pokemonWeight;
-    String pokemonColor = "";
-    String pokemonType = "";
-    List<FlavorText> pokemonDescriptions = new ArrayList<>();
-    String pokemonDescription = "";
-    String pokemonLocation; // url
-    List<String> pokemonLocations = new ArrayList<>();
-    List<String> pokemonMoves = new ArrayList<>();
-    boolean
-//            descriptionDiv = true,
-//            locationsDiv = false,
-//            movesDiv = false,
-//            evolutionsDiv = false,
-//    normal = 'normal'
-//    bold = 'bold'
-//    screenWidth: number = 0
-//    screenHeight: number = 0
-            styleFlag = false,
-            showGifs = false;
 
     @Autowired
     public PokedexController(PokemonService pokemonService) {
@@ -60,6 +25,18 @@ public class PokedexController extends BaseController {
 
     @GetMapping(value="/pokedex/{pokemonId}")
     public ModelAndView pokedex(@PathVariable(name="pokemonId") String nameOrId, ModelAndView mav) {
+        Pokemon pokemon = setupPokedex(nameOrId);
+        mav.addObject("pokemonId", super.pokemonId);
+        mav.addObject("defaultImage", pokemon.getDefaultImage());
+        mav.addObject("officialImage", pokemon.getOfficialImage());
+        mav.addObject("gifImage", pokemon.getGifImage());
+        mav.addObject("shinyImage", pokemon.getShinyImage());
+        mav.addObject("pokemon", pokemon);
+        mav.setViewName("pokedex");
+        return mav;
+    }
+
+    public Pokemon setupPokedex(String nameOrId) {
         logger.info("loading pokedex info for {}", nameOrId);
         skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
         PokemonSpecies speciesData;
@@ -69,25 +46,11 @@ public class PokedexController extends BaseController {
             pokemon = createPokemon(pokemonResource, speciesData);
             HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
             if (response.statusCode() == 404) pokemon.setGifImage(null);
-            sprites = new TreeMap<>();
-            sprites.put("default", pokemon.getDefaultImage());
-            sprites.put("official", pokemon.getOfficialImage());
-            sprites.put("shiny", pokemon.getShinyImage());
-            sprites.put("gif", pokemon.getGifImage());
             super.pokemonId = pokemon.getId().toString();
         } catch (Exception e) {
             logger.error("No species data found using {}", pokemonResource.getId());
         }
-
-        mav.addObject("sprites", sprites);
-        mav.addObject("pokemonId", super.pokemonId);
-        mav.addObject("defaultImage", sprites.get("default"));
-        mav.addObject("officialImage", sprites.get("official"));
-        mav.addObject("gifImage", sprites.get("gif"));
-        mav.addObject("shinyImage", sprites.get("shiny"));
-        mav.addObject("pokemon", pokemon);
-        mav.setViewName("pokedex");
-        return mav;
+        return pokemon;
     }
 
 }

@@ -44,9 +44,9 @@ public class PokemonService {
 
     private static final Logger logger = LogManager.getLogger(PokemonService.class);
     private final PokeApiClient pokeApiClient;
-    private int savedPageNumber = 1;
-    private int pokemonID = 0;
-    private int pkmnPerPage = 10; // itemsPerPage
+    //private int savedPageNumber = 1;
+    //private int pokemonID = 0;
+    //private int pkmnPerPage = 10; // itemsPerPage
 
     @Autowired
     private PokemonService(PokeApiClient pokeApiClient) {
@@ -79,9 +79,9 @@ public class PokemonService {
         return pokemon;
     }
 
-    public Pokemon getPokemonSpecificData(String pokemonName) {
-        return getPokemonByName(pokemonName);
-    }
+//    public Pokemon getPokemonSpecificData(String pokemonName) {
+//        return getPokemonByName(pokemonName);
+//    }
 
     public PokemonSpecies getPokemonSpeciesData(String id) throws Exception {
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();
@@ -149,28 +149,28 @@ public class PokemonService {
         return pokeApiClient.getResource(Pokedex.class, Objects.requireNonNullElse(pokedex, "1")).block().getPokemonEntries().size();
     }
 
-    public void saveCurrentPage(int page) {
-        logger.info("saving page: {}", page);
-        this.savedPageNumber = page;
-    }
+//    public void saveCurrentPage(int page) {
+//        logger.info("saving page: {}", page);
+//        this.savedPageNumber = page;
+//    }
 
-    public int getSavedPage() {
-        return this.savedPageNumber;
-    }
+//    public int getSavedPage() {
+//        return this.savedPageNumber;
+//    }
 
-    public void savePokemonID(int pokemonID) {
-        logger.info("saving pokemonID: {}", pokemonID);
-        this.pokemonID = pokemonID;
-    }
+//    public void savePokemonID(int pokemonID) {
+//        logger.info("saving pokemonID: {}", pokemonID);
+//        this.pokemonID = pokemonID;
+//    }
 
-    public void saveNumberOfPokemonPerPage(int pkmnPerPage) {
-        logger.info("saving number of pokemon visible to {}", pkmnPerPage);
-        this.pkmnPerPage = pkmnPerPage;
-    }
+//    public void saveNumberOfPokemonPerPage(int pkmnPerPage) {
+//        logger.info("saving number of pokemon visible to {}", pkmnPerPage);
+//        this.pkmnPerPage = pkmnPerPage;
+//    }
 
-    public int getNumberOfPokemonPerPage() {
-        return this.pkmnPerPage;
-    }
+//    public int getNumberOfPokemonPerPage() {
+//        return this.pkmnPerPage;
+//    }
 
     public Map<Integer, List<List<Integer>>> getEvolutionsMap() {
         return new TreeMap<>() {{
@@ -685,36 +685,37 @@ public class PokemonService {
         return response;
     }
 
-    public PokemonSpecies setFromResults(Map<String,Object> results) {
-        PokemonSpecies speciesData = new PokemonSpecies();
-        speciesData.setId(((BigInteger) results.get("id")).intValue());
-        speciesData.setName((String) results.get("name"));
-        speciesData.setOrder(((BigInteger) results.get("order")).intValue());
-        speciesData.setGenderRate(((BigInteger) results.get("gender_rate")).intValue());
-        speciesData.setCaptureRate(((BigInteger) results.get("capture_rate")).intValue());
-        speciesData.setBaseHappiness(((BigInteger) results.get("base_happiness")).intValue());
-        speciesData.setIsBaby((Boolean) results.get("is_baby"));
-        speciesData.setIsLegendary((Boolean) results.get("is_legendary"));
-        speciesData.setIsMythical((Boolean) results.get("is_mythical"));
-        speciesData.setHatchCounter(((BigInteger) results.get("hatch_counter")).intValue());
-        speciesData.setHasGenderDifferences((Boolean) results.get("has_gender_differences"));
-        speciesData.setFormsSwitchable((Boolean) results.get("forms_switchable"));
-        speciesData.setGrowthRate((NamedApiResource<GrowthRate>) results.get("growth_rate"));
-        speciesData.setPokedexNumbers((List<PokemonSpeciesDexEntry>) results.get("pokedex_numbers"));
-        speciesData.setEggGroups((List<NamedApiResource<EggGroup>>) results.get("egg_groups"));
-        speciesData.setColor((NamedApiResource<PokemonColor>) results.get("color"));
+//    public PokemonSpecies setFromResults(Map<String,Object> results) {
+//        PokemonSpecies speciesData = new PokemonSpecies();
+//        speciesData.setId(((BigInteger) results.get("id")).intValue());
+//        speciesData.setName((String) results.get("name"));
+//        speciesData.setOrder(((BigInteger) results.get("order")).intValue());
+//        speciesData.setGenderRate(((BigInteger) results.get("gender_rate")).intValue());
+//        speciesData.setCaptureRate(((BigInteger) results.get("capture_rate")).intValue());
+//        speciesData.setBaseHappiness(((BigInteger) results.get("base_happiness")).intValue());
+//        speciesData.setIsBaby((Boolean) results.get("is_baby"));
+//        speciesData.setIsLegendary((Boolean) results.get("is_legendary"));
+//        speciesData.setIsMythical((Boolean) results.get("is_mythical"));
+//        speciesData.setHatchCounter(((BigInteger) results.get("hatch_counter")).intValue());
+//        speciesData.setHasGenderDifferences((Boolean) results.get("has_gender_differences"));
+//        speciesData.setFormsSwitchable((Boolean) results.get("forms_switchable"));
+//        speciesData.setGrowthRate((NamedApiResource<GrowthRate>) results.get("growth_rate"));
+//        speciesData.setPokedexNumbers((List<PokemonSpeciesDexEntry>) results.get("pokedex_numbers"));
+//        speciesData.setEggGroups((List<NamedApiResource<EggGroup>>) results.get("egg_groups"));
+//        speciesData.setColor((NamedApiResource<PokemonColor>) results.get("color"));
+//
+////        private NamedApiResource<PokemonShape> shape;
+////        private NamedApiResource<PokemonSpecies> evolvesFromSpecies;
+////        private ApiResource<EvolutionChain> evolutionChain;
+////        private NamedApiResource<PokemonHabitat> habitat;
+////        private NamedApiResource<Generation> generation;
+////        private List<Name> names;
+////        private List<FlavorText> flavorTextEntries;
+////        private List<Description> formDescriptions;
+////        private List<Genus> genera;
+////        private List<PokemonSpeciesVariety> varieties;
+//
+//        return speciesData;
+//    }
 
-//        private NamedApiResource<PokemonShape> shape;
-//        private NamedApiResource<PokemonSpecies> evolvesFromSpecies;
-//        private ApiResource<EvolutionChain> evolutionChain;
-//        private NamedApiResource<PokemonHabitat> habitat;
-//        private NamedApiResource<Generation> generation;
-//        private List<Name> names;
-//        private List<FlavorText> flavorTextEntries;
-//        private List<Description> formDescriptions;
-//        private List<Genus> genera;
-//        private List<PokemonSpeciesVariety> varieties;
-
-        return speciesData;
-    }
 }

@@ -1,6 +1,7 @@
 package com.example.pokedex.entities;
 
 import skaro.pokeapi.resource.FlavorText;
+import skaro.pokeapi.resource.move.Move;
 
 import java.util.Comparator;
 import java.util.List;
@@ -85,11 +86,11 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements C
                 ", gameIndices='" + this.getGameIndices() + '\'' +
                 ", heldItems='" + this.getHeldItems() + '\'' +
                 ", locationAreaEncounters='" + this.getLocationAreaEncounters() + '\'' +
-                ", moves='" + this.getMoves() + '\'' +
+                ", moves='" + this.getPokemonMoves() + '\'' +
                 ", sprites='" + this.getSprites() + '\'' +
                 ", species='" + this.getSpecies() + '\'' +
                 ", stats='" + this.getStats() + '\'' +
-                ", types='" + this.getTypes() + '\'' +
+                ", types='" + this.getType() + '\'' +
                 ", pastTypes='" + this.getPastTypes() + '\'' +
                 ", type='" + type + '\'' +
                 ", defaultImage='" + defaultImage + '\'' +
