@@ -57,18 +57,18 @@
             <span class="slider round"></span>
         </label>
         &nbsp;
-        <label style="margin:10px auto;">Show GIFs</label>
+        <label style="margin:10px auto;width:auto;padding-top:0;">Show GIFs</label>
         &emsp;
         <div id="jumpToPage" style="display:flex;">
             <label for="pageNumber"></label>
             <input id="pageNumber" name="pageNumber" type="text" placeholder="Page #" style="width:auto;"/>
-            <button class="icon" onclick="setPageToView();">Jump to Page</button>
+            <button class="icon" onclick="setPageToView();" title="Jump to Page">Jump to Page</button>
         </div>
         &emsp;
         <div id="showPokemon" style="display:flex;">
             <label for="showPkmnNumber"></label>
             <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:auto;"/>
-            <button class="icon" onclick="setPkmnPerPage();">Show Pokemon</button>
+            <button class="icon" onclick="setPkmnPerPage();" title="Show Pokemon">Show Pokemon</button>
         </div>
     </div>
     <br>

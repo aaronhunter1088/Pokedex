@@ -49,9 +49,9 @@
     </h1>
 
     <h4 style="vertical-align: middle;">
-        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left" style="color: #000000;"></i></a>
+        <a href="${pageContext.request.contextPath}/" title="Go back to list"><i class="fas fa-arrow-left" style="color: #000000;"></i></a>
         <input id="pokemonName" placeholder="Pokemon Name/ID" type="text"/>
-        <img alt="pokeball" onclick="getPokemonFromSearch($('#pokemonName').val())" class="button cursor"
+        <img alt="pokeball" onclick="getPokemonFromSearch($('#pokemonName').val())" class="button cursor" title="Find Pokemon"
              src="${pageContext.request.contextPath}/images/pokeball1.jpg" style="height:30px;width:30px;">
     </h4>
 
