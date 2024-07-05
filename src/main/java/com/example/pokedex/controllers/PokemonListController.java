@@ -47,16 +47,16 @@ public class PokemonListController extends BaseController {
         mav.addObject("showGifs", showGifs);
         mav.addObject("pkmnPerPage", pkmnPerPage);
         mav.addObject("totalPokemon", totalPokemon);
-        mav.addObject("totalPages", (int)Math.ceil((double) totalPokemon /pkmnPerPage));
+        mav.addObject("totalPages", (int)Math.ceil((double) totalPokemon/pkmnPerPage));
         mav.addObject("page", page);
         mav.setViewName("index");
         return mav;
     }
 
     public Map<Integer, com.example.pokedex.entities.Pokemon> getPokemonMap() {
-        logger.info("page number is {}", page);
+        logger.info("page number: {}", page);
         logger.info("pkmnPerPage: {}", pkmnPerPage);
-        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getPokemonList(pkmnPerPage, ((page - 1) * pkmnPerPage));
+        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getPokemonList(pkmnPerPage, ((page-1) * pkmnPerPage));
         if (null != pokemonList && !pokemonList.getResults().isEmpty()) {
             logger.debug("pokemonList size: " + pokemonList.getResults().size());
             List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.getResults();

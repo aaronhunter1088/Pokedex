@@ -61,7 +61,6 @@ public class EvolutionsController extends BaseController {
         if (null != allIDs) allIDs = new ArrayList<>();
         if (null != stages) stages.clear();
         stage = 0;
-        counter = 0;
     }
 
     private void setupEvolutions() {
@@ -87,22 +86,20 @@ public class EvolutionsController extends BaseController {
 
     private void setStages() {
         stages = new ArrayList<>();
-        pokemonFamilyIDs.forEach(idList -> {
-            stages.add(++stage);
-        });
+        pokemonFamilyIDs.forEach(idList -> stages.add(++stage));
         logger.info("stages:{}", stages.size());
     }
 
     private void setAllIDs() {
         allIDs = pokemonFamilyIDs.stream()
                 .flatMap(Collection::stream)
-                .toList().stream()
-                .sorted().toList();
+                .sorted()
+                .toList();
         logger.info("allIDs:{}", allIDs);
     }
 
     public void createListOfPokemonForIDList(List<Integer> idList) {
-        logger.info("IDList: {}, length: {}", idList, idList.size());
+        logger.info("idList: {}, size: {}", idList, idList.size());
         List<Pokemon> pokemonList = new ArrayList<>();
         String previousId = "";
         for (Integer id : idList) {

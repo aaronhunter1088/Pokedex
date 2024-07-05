@@ -3,6 +3,7 @@ package com.example.pokedex.controllers;
 import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.tags.shaded.org.apache.xpath.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -148,26 +149,26 @@ public class EvolvesHowController extends BaseController {
 
     public void setAttributesMap(Map<String, Object> details) {
         logger.info("evolution_details for: {} = {}", details.get("name"), details);
-        this.specificAttributesMap = this.generateDefaultAttributesMap();
+        this.specificAttributesMap = new TreeMap<>();
         this.specificAttributesMap.put("name", details.get("name"));
         this.specificAttributesMap.put("id", details.get("id"));
         this.specificAttributesMap.put("gender", null != details.get("gender") ? details.get("gender") : null);
         this.specificAttributesMap.put("isBaby", details.get("is_baby"));
-        Map<String,Object> map = ((Map<String, Object>)details.get("held_item"));
+        Map<?,?> map = ((Map<?, ?>)details.get("held_item"));
         this.specificAttributesMap.put("heldItem", (null != map) ? map.get("name") : null);
-        map = ((Map<String,Object>)details.get("item"));
+        map = ((Map<?,?>)details.get("item"));
         this.specificAttributesMap.put("useItem", (null != map) ? map.get("name") : null);
         this.specificAttributesMap.put("minHappiness", details.get("min_happiness"));
         this.specificAttributesMap.put("minLevel", details.get("min_level"));
         this.specificAttributesMap.put("timeOfDay", (details.get("time_of_day") != "") ? details.get("time_of_day") : null);
-        map = ((Map<String,Object>)details.get("location"));
+        map = ((Map<?,?>)details.get("location"));
         this.specificAttributesMap.put("location", (null != map) ? map.get("name") : null);
         this.specificAttributesMap.put("needsRain", details.get("needs_overworld_rain"));
         this.specificAttributesMap.put("minAffection", details.get("min_affection"));
         this.specificAttributesMap.put("minBeauty", details.get("min_beauty"));
-        map = ((Map<String,Object>)details.get("known_move"));
+        map = ((Map<?,?>)details.get("known_move"));
         this.specificAttributesMap.put("knownMove", (null != map) ? map.get("name") : null);
-        map = ((Map<String,Object>)details.get("known_move_type"));
+        map = ((Map<?,?>)details.get("known_move_type"));
         this.specificAttributesMap.put("knownMoveType", (null != map) ? map.get("name") : null);
         this.specificAttributesMap.put("partySpecies", details.get("party_species"));
         this.specificAttributesMap.put("relativePhysicalStats", details.get("relative_physical_stats"));
@@ -180,188 +181,56 @@ public class EvolvesHowController extends BaseController {
 
     public void updateAttributesMap(Map<String, Object> details, Map<String, Object> attributesMap) {
         logger.info("evolution_detailsUpdate for: {} {}", attributesMap.get("name"), details);
-        Map<String,Object> map = null;
-        if (details.get("gender") != null) {
-            if (attributesMap.get("gender") == null) {
-                attributesMap.put("gender",details.get("gender"));
-            } else {
-                var gender = attributesMap.get("gender");
-                String newGender = (String) details.get("gender");
-                List<String> genders = (gender instanceof List) ? (List<String>) gender : Collections.singletonList(gender.toString());
-                genders.add(newGender);
-                attributesMap.put("gender", genders);
-            }
-        }
-        if (details.get("held_item") != null) {
-            map = ((Map<String, Object>) details.get("held_item"));
-            if (attributesMap.get("heldItem") == null) {
-                attributesMap.put("heldItem", (map != null) ? Collections.singletonList(map.get("name")) : null);
-            } else {
-                var heldItem = attributesMap.get("heldItem");
-                String newHeldItem = (map != null) ? (String) map.get("name") : "";
-                List<String> heldItems = (heldItem instanceof List) ? (List<String>) heldItem : Collections.singletonList(heldItem.toString());
-                heldItems.add(newHeldItem);
-                attributesMap.put("heldItem", heldItems);
-            }
-        }
-        if (details.get("item") != null) {
-            map = ((Map<String, Object>) details.get("item"));
-            if (attributesMap.get("useItem") == null) {
-                attributesMap.put("useItem", (map != null) ? Collections.singletonList(map.get("name")) : null);
-            } else {
-                var item = attributesMap.get("useItem");
-                String newItem = (map != null) ? (String) map.get("name") : "";
-                List<String> items = (item instanceof List) ? (List<String>) item : Collections.singletonList(item.toString());
-                items.add(newItem);
-                attributesMap.put("useItem", items);
-            }
-        }
-        if (details.get("min_happiness") != null) {
-            if (attributesMap.get("minHappiness") == null) {
-                attributesMap.put("minHappiness", Collections.singletonList(details.get("min_happiness")));
-            } else {
-                var minHappy = attributesMap.get("minHappiness");
-                String newMinHappy = (String) details.get("min_happiness");
-                List<String> happinesses = (minHappy instanceof List) ? (List<String>) minHappy : Collections.singletonList(minHappy.toString());
-                happinesses.add(newMinHappy);
-                attributesMap.put("minHappiness", happinesses);
-            }
-        }
-        if (details.get("time_of_day") != "") {
-            if (attributesMap.get("timeOfDay") == "") {
-                attributesMap.put("timeOfDay", "");
-            } else {
-                var timeOfDay = attributesMap.get("timeOfDay");
-                String newTimeOfDay = (String) details.get("time_of_day");
-                List<String> timeOfDays = (timeOfDay instanceof List) ? (List<String>) timeOfDay : Collections.singletonList(timeOfDay.toString());
-                timeOfDays.add(newTimeOfDay);
-                attributesMap.put("timeOfDay", timeOfDays);
-            }
-        }
-        if (details.get("location") != null) {
-            map = ((Map<String,Object>)details.get("location"));
-            if (attributesMap.get("location") == null) {
-                attributesMap.put("location", (map != null) ? Collections.singletonList(map.get("name")) : null);
-            } else {
-                var location = attributesMap.get("location");
-                String newLocation = (map != null) ? (String) map.get("name") : "";
-                List<String> locations = (location instanceof List) ? (List<String>) location : Collections.singletonList(location.toString());
-                locations.add(newLocation);
-                attributesMap.put("location", locations);
-            }
-        }
-        if (details.get("needs_overworld_rain") != null) {
-            if (attributesMap.get("needsRain") == null) {
-                attributesMap.put("needsRain", Collections.singletonList(details.get("needs_overworld_rain")));
-            } else {
-                var needsRain = attributesMap.get("needsRain");
-                Boolean newNeedsRain = (Boolean) details.get("needs_overworld_rain");
-                List<Boolean> needsRains = new ArrayList<>();
-                if (needsRain instanceof List) {
-                    needsRains.addAll((Collection<? extends Boolean>) needsRain);
+        Map<?,?> detailsMap = null;
+        List<String> checkDetails = Arrays.asList("gender", "held_item", "item", "min_happiness",
+                "time_of_day", "location", "needs_overworld_rain", "min_affection", "min_beauty",
+                "known_move", "known_move_type", "party_species", "relative_physical_stats",
+                "trade_species", "turn_upside_down");
+        for(String detail : checkDetails) {
+            if (details.get(detail) != null) {
+                if (attributesMap.get(convertToCamelCase(detail)) == null) {
+                    if (details.get(detail) instanceof Map) {
+                        attributesMap.put(convertToCamelCase(detail), ((Map<?,?>)details.get(detail)).get("name"));
+                    } else {
+                        attributesMap.put(convertToCamelCase(detail),details.get(detail));
+                    }
                 } else {
-                    needsRains.add((Boolean) needsRain);
+                    var dtl = attributesMap.get(convertToCamelCase(detail));
+                    Object newDetail = details.get(detail);
+                    List<String> updateDetails = new ArrayList<>();
+                    if (dtl instanceof String d) updateDetails.add(d);
+                    else if (dtl instanceof List<?> d) {
+                        @SuppressWarnings("unchecked")
+                        List<String> detailsList = (List<String>)d;
+                        updateDetails.addAll(detailsList);
+                    }
+                    updateDetails.add(String.valueOf(newDetail));
+                    attributesMap.put(convertToCamelCase(detail), updateDetails);
                 }
-                needsRains.add(newNeedsRain);
-                attributesMap.put("needsRain", needsRains);
-            }
-        }
-        if (details.get("min_affection") != null) {
-            if (attributesMap.get("minAffection") == null) {
-                attributesMap.put("minAffection", Collections.singletonList(details.get("min_affection")));
-            } else {
-                var minAffection = attributesMap.get("minAffection");
-                String newMinAffection = (String) details.get("min_affection");
-                List<String> minAffections = (minAffection instanceof List) ? (List<String>) minAffection : Collections.singletonList(minAffection.toString());
-                minAffections.add(newMinAffection);
-                attributesMap.put("minAffection", minAffections);
-            }
-        }
-        if (details.get("min_beauty") != null) {
-            if (attributesMap.get("minBeauty") == null) {
-                attributesMap.put("minBeauty", Collections.singletonList(details.get("min_beauty")));
-            } else {
-                var minBeauty = attributesMap.get("minBeauty");
-                String newMinBeauty = (String) details.get("min_beauty");
-                List<String> minBeauties = (minBeauty instanceof List) ? (List<String>) minBeauty : Collections.singletonList(minBeauty.toString());
-                minBeauties.add(newMinBeauty);
-                attributesMap.put("minBeauty", minBeauties);
-            }
-        }
-        if (details.get("known_move") != null) {
-            map = ((Map<String,Object>)details.get("known_move"));
-            if (attributesMap.get("knownMove") == null) {
-                attributesMap.put("knownMove", (map != null) ? Collections.singletonList(map.get("name")) : null );
-            } else {
-                var knownMove = attributesMap.get("knownMove");
-                String newKnownMove = (map != null) ? (String) map.get("name") : "";
-                List<String> knownMoves = (knownMove instanceof List) ? (List<String>) knownMove : Collections.singletonList(knownMove.toString());
-                knownMoves.add(newKnownMove);
-                attributesMap.put("knownMove", knownMoves);
-            }
-        }
-        if (details.get("known_move_type") != null) {
-            map = ((Map<String,Object>)details.get("known_move"));
-            if (attributesMap.get("knownMoveType") == null) {
-                attributesMap.put("knownMoveType", (map != null) ? Collections.singletonList(map.get("name")) : null);
-            } else {
-                var knownMoveType = attributesMap.get("knownMoveType");
-                String newKnownMoveType = (map != null) ? (String) map.get("name") : "";
-                List<String> knownMoveTypes = (knownMoveType instanceof List) ? (List<String>) knownMoveType : Collections.singletonList(knownMoveType.toString());
-                knownMoveTypes.add(newKnownMoveType);
-                attributesMap.put("knownMoveType", knownMoveTypes);
-            }
-        }
-        if (details.get("party_species") != null) {
-            if (attributesMap.get("partySpecies") == null) {
-                attributesMap.put("partySpecies", Collections.singletonList(details.get("party_species")));
-            } else {
-                var partySpecies = attributesMap.get("partySpecies");
-                String newPartySpecies = (String) details.get("party_species");
-                List<String> partySpeciesList = (partySpecies instanceof List) ? (List<String>) partySpecies : Collections.singletonList(partySpecies.toString());
-                partySpeciesList.add(newPartySpecies);
-                attributesMap.put("partySpecies", partySpeciesList);
-            }
-        }
-        if (details.get("relative_physical_stats") != null) {
-            if (attributesMap.get("relativePhysicalStats") == null) {
-                attributesMap.put("relativePhysicalStats", Collections.singletonList(details.get("relative_physical_stats")));
-            } else {
-                var relPhysicalStat = attributesMap.get("relativePhysicalStats");
-                String newRelPhysicalStat = (String) details.get("relative_physical_stats");
-                List<String> relPhysicalStats = (relPhysicalStat instanceof List) ? (List<String>) relPhysicalStat : Collections.singletonList(relPhysicalStat.toString());
-                relPhysicalStats.add(newRelPhysicalStat);
-                attributesMap.put("relativePhysicalStats", relPhysicalStats);
-            }
-        }
-        if (details.get("trade_species") != null) {
-            if (attributesMap.get("tradeSpecies") == null) {
-                attributesMap.put("tradeSpecies", Collections.singletonList(details.get("trade_species")));
-            } else {
-                var tradeSpecies = attributesMap.get("tradeSpecies");
-                String newTradeSpecies = (String) details.get("trade_species");
-                List<String> tradeSpeciesList = (tradeSpecies instanceof List) ? (List<String>) tradeSpecies : Collections.singletonList(tradeSpecies.toString());
-                tradeSpeciesList.add(newTradeSpecies);
-                attributesMap.put("tradeSpecies", tradeSpeciesList);
-            }
-        }
-        if (details.get("turn_upside_down") != null) {
-            if (attributesMap.get("turnUpsideDown") == null) {
-                attributesMap.put("turnUpsideDown", Collections.singletonList(details.get("turn_upside_down")));
-            } else {
-                var turnUpsideDown = attributesMap.get("turnUpsideDown");
-                Boolean newTurnUpsideDown = (Boolean) details.get("turn_upside_down");
-                List<Boolean> turnUpsideDownList = new ArrayList<>();
-                if (turnUpsideDown instanceof List) {
-                    turnUpsideDownList.addAll((Collection<? extends Boolean>) turnUpsideDown);
-                } else {
-                    turnUpsideDownList.add((Boolean) turnUpsideDown);
-                }
-                turnUpsideDownList.add(newTurnUpsideDown);
-                attributesMap.put("turnUpsideDown", turnUpsideDownList);
             }
         }
         this.pokemonIdAndAttributesMap.put(Integer.parseInt((String) details.get("id")), attributesMap);
+    }
+
+    /**
+     * Used in updateAttributesMap to set the key
+     * @param underscored the api key value
+     * @return camelCase version of the api key value
+     */
+    private String convertToCamelCase(String underscored) {
+        StringBuilder sb = new StringBuilder();
+        if ("needs_overworld_rain".equals(underscored)) sb.append("needsRain");
+        else {
+            String[] strs = underscored.split("_");
+            for (int i=0; i<strs.length; i++) {
+                if (i==0) sb.append(strs[i]);
+                else {
+                    sb.append(strs[i].substring(0,1).toUpperCase());
+                    sb.append(strs[i].substring(1));
+                }
+            }
+        }
+        return sb.toString();
     }
 
     // clean up map, remove unnecessary duplicates
@@ -369,6 +238,7 @@ public class EvolvesHowController extends BaseController {
         logger.info("All attributes maps created: {}", pokemonIdAndAttributesMap.size());
         pokemonIdAndAttributesMap.forEach((key, mapValue) -> {
             logger.info("id {}, map {}", key, mapValue);
+            if (null != mapValue.get("timeOfDay") && mapValue.get("timeOfDay").equals("")) mapValue.put("timeOfDay", null);
             List<BigInteger> happyValues = Arrays.asList((BigInteger)mapValue.get("minHappiness"));
             if (happyValues != null && happyValues.size() > 1) {
                 HashSet<BigInteger> happySet = new HashSet<>();
@@ -434,29 +304,29 @@ public class EvolvesHowController extends BaseController {
             }
             logger.info("knownMoveType: {}", mapValue.get("knownMoveType"));
 
-            List<Boolean> needsRainValues = (mapValue.get("needsRain") instanceof List) ? (List<Boolean>) mapValue.get("needsRain") : Arrays.asList((Boolean) mapValue.get("needsRain"));
-            if (needsRainValues != null && needsRainValues.size() > 1) {
+            List<String> needsRainValues = (mapValue.get("needsRain") instanceof List) ? (List<String>) mapValue.get("needsRain") : Arrays.asList(String.valueOf(mapValue.get("needsRain")));
+            if (needsRainValues != null) {
                 HashSet<Boolean> needsRainSet = new HashSet<>();
-                for(Boolean needsRain : needsRainValues) {
-                    if (!needsRainSet.contains(needsRain)) {
-                        needsRainSet.add(needsRain);
+                for(String needsRain : needsRainValues) {
+                    if (!needsRainSet.contains(Boolean.valueOf(needsRain))) {
+                        needsRainSet.add(Boolean.valueOf(needsRain));
                         logger.debug("adding {} to needsRain set", needsRain);
                     }
                 }
-                mapValue.put("needsRain", needsRainSet);
+                mapValue.put("needsRain", needsRainSet.stream().toList().get(0));
             }
             logger.info("needsRain: {}", mapValue.get("needsRain"));
 
-            List<Boolean> turnUpsideDownValues = (mapValue.get("turnUpsideDown") instanceof List) ? (List<Boolean>) mapValue.get("turnUpsideDown") : Arrays.asList((Boolean)mapValue.get("turnUpsideDown"));
-            if (turnUpsideDownValues != null && turnUpsideDownValues.size() > 1) {
-                HashSet<Boolean> upsideDownSet = new HashSet<>();
-                for(Boolean upsideDown : turnUpsideDownValues) {
-                    if (!upsideDownSet.contains(upsideDown)) {
-                        upsideDownSet.add(upsideDown);
+            List<String> turnUpsideDownValues = (mapValue.get("turnUpsideDown") instanceof List) ? (List<String>) mapValue.get("turnUpsideDown") : Arrays.asList(String.valueOf(mapValue.get("turnUpsideDown")));
+            if (turnUpsideDownValues != null) {
+                Set<Boolean> upsideDownSet = new HashSet<>();
+                for(String upsideDown : turnUpsideDownValues) {
+                    if (!upsideDownSet.contains(Boolean.valueOf(upsideDown))) {
+                        upsideDownSet.add(Boolean.valueOf(upsideDown));
                         logger.debug("adding {} to needsRain set", upsideDown);
                     }
                 }
-                mapValue.put("needsRain", upsideDownSet);
+                mapValue.put("turnUpsideDown", upsideDownSet.stream().toList().get(0));
             }
             logger.info("turnUpsideDown: {}", mapValue.get("turnUpsideDown"));
         });
@@ -475,20 +345,28 @@ public class EvolvesHowController extends BaseController {
         this.hasBeauty = pokemonAttributesMap.get("minBeauty") != null;
         this.hasKnownMoves = pokemonAttributesMap.get("knownMove") != null;
         this.hasKnownMoveType = pokemonAttributesMap.get("knownMoveType") != null;
-        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && ((Boolean) pokemonAttributesMap.get("needsRain"));
-        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && ((Boolean)pokemonAttributesMap.get("turnUpsideDown"));
+        this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && (Boolean)pokemonAttributesMap.get("needsRain");
+        this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && (Boolean)pokemonAttributesMap.get("turnUpsideDown");
     }
 
+    /**
+     * Determines is a Pokemon evolves based on the
+     * properties from this particular Pokemon
+     * @return true or false
+     */
     private boolean pokemonEvolves() {
         return hasMinimumLevel ||
-               isABaby ||
-               hasUseItem ||
                hasHeldItem ||
+               hasUseItem ||
+               isABaby ||
                hasMinimumHappiness ||
-               hasBeauty ||
-               hasMinimumAffection ||
                hasDayNight ||
+               hasLocations ||
+               hasMinimumAffection ||
+               hasBeauty ||
                hasKnownMoves ||
-               hasNeedsRain;
+               hasKnownMoveType ||
+               hasNeedsRain ||
+               hasTurnUpsideDown;
     }
 }

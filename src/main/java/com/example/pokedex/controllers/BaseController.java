@@ -10,6 +10,7 @@ import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -52,7 +53,7 @@ public class BaseController {
         com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
         pokemon.setDefaultImage(null != pokemon.getSprites().getFrontDefault() ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg");
         pokemon.setOfficialImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png");
-        pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
+        setGifImage(pokemon);
         pokemon.setShinyImage(pokemon.getSprites().getFrontShiny());
         pokemon.setColor(speciesData.getColor().getName());
         pokemon.setDescriptions(speciesData.getFlavorTextEntries());
@@ -61,11 +62,11 @@ public class BaseController {
                 .findFirst().get().getFlavorText());
         List<PokemonType> types = pokemon.getTypes();
         if (types.size() > 1) {
-            //logger.info("More than 1 pokemonType");
+            logger.debug("More than 1 pokemonType");
             pokemon.setType(types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1)
                     + " & " + types.get(1).getType().getName().substring(0,1).toUpperCase() + types.get(1).getType().getName().substring(1));
         } else {
-            //logger.info("One pokemonType");
+            logger.debug("One pokemonType");
             pokemon.setType(types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1));
         }
         String pokemonLocation = pokemon.getLocationAreaEncounters();
@@ -77,6 +78,12 @@ public class BaseController {
                 .sorted()
                 .toList());
         return pokemon;
+    }
+
+    private void setGifImage(Pokemon pokemon) {
+        pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
+        HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
+        if (response.statusCode() == 404) pokemon.setGifImage(null);
     }
 
     protected Map<String, Object> generateDefaultAttributesMap() {

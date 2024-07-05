@@ -44,8 +44,6 @@ public class PokedexController extends BaseController {
         try {
             speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId()));
             pokemon = createPokemon(pokemonResource, speciesData);
-            HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
-            if (response.statusCode() == 404) pokemon.setGifImage(null);
             super.pokemonId = pokemon.getId().toString();
         } catch (Exception e) {
             logger.error("No species data found using {}", pokemonResource.getId());
