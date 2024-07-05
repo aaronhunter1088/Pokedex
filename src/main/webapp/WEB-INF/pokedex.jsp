@@ -59,9 +59,10 @@
     </style>
 </head>
 <body style="justify-content:space-evenly;text-align:center;">
-<h1 id="pokedexSearchTitle" class="center">
-    <a href="${pageContext.request.contextPath}/search">
-        <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:auto;height:auto;">
+<h1 id="pokedexSearchTitle" style="vertical-align: middle;">
+    <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+        <span class="center">
+            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
     </a>
 </h1>
 <div id="pokedex">
