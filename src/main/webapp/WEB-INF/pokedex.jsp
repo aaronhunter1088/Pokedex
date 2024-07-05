@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div id="imageOfPokemon" style="justify-content:center;display:block;">
-                <img id="pkmnImage" src="${defaultImage}" alt="image">
+                <img id="pkmnImage" src="${defaultImage}" alt="image" style="width:250px;height:250px;">
             </div>
             <div id="photoButtonsDiv" style="justify-content:center;text-align:center;display:inline-flex;">
                 <div style="">
@@ -99,16 +99,17 @@
                 <h3 id="name">Name: ${pokemon.name}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
                 <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
             </div>
-            <br>
+            <br><br>
             <div id="hAndW" style="display:inline-flex;">
                 <h3 id="heightOfPokemon">Height: ${pokemon.height} m</h3> &nbsp;&nbsp;&nbsp;&nbsp;
                 <h3 id="weightOfPokemon">Weight: ${pokemon.weight} kg</h3>
             </div>
-            <br>
+            <br><br>
             <div id="colorAndType" style="display:inline-flex;">
                 <h3 id="colorOfPokemon">Color: ${pokemon.color}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
                 <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
             </div>
+            <br><br>
             <div style="display:flow;">
                 <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
                 <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>

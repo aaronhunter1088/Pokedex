@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.net.http.HttpResponse;
+import java.util.Random;
 
 @Controller
 public class PokedexController extends BaseController {
@@ -32,6 +33,7 @@ public class PokedexController extends BaseController {
         mav.addObject("gifImage", pokemon.getGifImage());
         mav.addObject("shinyImage", pokemon.getShinyImage());
         mav.addObject("pokemon", pokemon);
+        mav.addObject("randomDescriptionNumber", new Random().nextInt(pokemon.getDescriptions().size()));
         mav.setViewName("pokedex");
         return mav;
     }

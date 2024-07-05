@@ -42,13 +42,13 @@
                     </c:forEach>
                 </c:if> <!-- with held_item -->
                 <c:if test="${hasMinimumHappiness}">
-                    <h3 id="happiness"><b>Evolves w/ Happiness: </b>${attributesMap.get('minHappiness')}</h3>
+                    <h3 id="happiness"><b>Evolves with Happiness: </b>${attributesMap.get('minHappiness')}</h3>
                 </c:if> <!-- with happiness -->
                 <c:if test="${hasMinimumAffection}">
-                    <h3 id="affection"><b>Evolves w/ Affection: </b>${attributesMap.get('minAffection')}</h3>
+                    <h3 id="affection"><b>Evolves with Affection: </b>${attributesMap.get('minAffection')}</h3>
                 </c:if> <!-- with affection -->
                 <c:if test="${hasBeauty}">
-                    <h3 id="beauty"><b>Evolves w/ Beauty: </b>${attributesMap.get('minBeauty')}</h3>
+                    <h3 id="beauty"><b>Evolves with Beauty: </b>${attributesMap.get('minBeauty')}</h3>
                 </c:if> <!-- with beauty -->
                 <c:if test="${hasDayNight}">
                     <h3 id="dayNightTitle" class="listStyle"><b>Evolves during: </b></h3>

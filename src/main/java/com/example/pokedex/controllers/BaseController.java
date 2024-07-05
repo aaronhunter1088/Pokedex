@@ -6,14 +6,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Controller
 public class BaseController {
@@ -49,6 +48,12 @@ public class BaseController {
         return keyToReturn;
     }
 
+    /**
+     * Returns a Pokemon with application specific properties
+     * @param pokemonResource from pokeapi-reactor
+     * @param speciesData from pokeapi-reactor
+     * @return Pokemon object
+     */
     protected Pokemon createPokemon(skaro.pokeapi.resource.pokemon.Pokemon pokemonResource, PokemonSpecies speciesData) {
         com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
         pokemon.setDefaultImage(null != pokemon.getSprites().getFrontDefault() ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg");
@@ -57,9 +62,13 @@ public class BaseController {
         pokemon.setShinyImage(pokemon.getSprites().getFrontShiny());
         pokemon.setColor(speciesData.getColor().getName());
         pokemon.setDescriptions(speciesData.getFlavorTextEntries());
-        pokemon.setDescription(pokemon.getDescriptions().stream()
-                .filter(flavorText -> "en".equals(flavorText.getLanguage().getName()))
-                .findFirst().get().getFlavorText());
+        List<FlavorText> pokemonDescriptions = pokemon.getDescriptions()
+                .stream().filter(entry -> entry.getLanguage().getName().equals("en"))
+                .toList();
+        int randomEntry = new Random().nextInt(pokemonDescriptions.size());
+        String description = pokemonDescriptions.get(randomEntry).getFlavorText().replace("\n", "");
+        pokemon.setDescriptions(pokemonDescriptions);
+        pokemon.setDescription(description);
         List<PokemonType> types = pokemon.getTypes();
         if (types.size() > 1) {
             logger.debug("More than 1 pokemonType");

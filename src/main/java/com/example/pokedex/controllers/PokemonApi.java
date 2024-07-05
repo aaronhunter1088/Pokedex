@@ -52,7 +52,7 @@ public class PokemonApi extends BaseController {
                     .block();
             return ResponseEntity.ok(allPokemon);
         } catch (Exception e) {
-            e.printStackTrace();
+            Arrays.stream(e.getStackTrace()).forEach(logger::error);
             return ResponseEntity.badRequest().body("Could not fetch all pokemon because " + e.getMessage());
         }
     }
@@ -79,9 +79,11 @@ public class PokemonApi extends BaseController {
         logger.info("getPkmnDescription: {}", nameOrId);
         List<FlavorText> pokemonDescriptions;
         try {
-            pokemonDescriptions =  pokeApiClient.getResource(PokemonSpecies.class, nameOrId).blockOptional().get()
+            Optional<PokemonSpecies> pokemonSpecies = pokeApiClient.getResource(PokemonSpecies.class, nameOrId).blockOptional();
+            pokemonDescriptions = pokemonSpecies.map(species -> species
                     .getFlavorTextEntries().stream().filter(entry -> entry.getLanguage().getName().equals("en"))
-                    .toList();
+                    .toList()).orElse(null);
+            assert pokemonDescriptions != null;
             int randomEntry = new Random().nextInt(pokemonDescriptions.size());
             String description = pokemonDescriptions.get(randomEntry).getFlavorText().replace("\n", " ");
             logger.info("description: {}", description);
