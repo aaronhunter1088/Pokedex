@@ -1,6 +1,6 @@
-package com.example.pokedex.controllers;
+package com.pokedex.app.controllers;
 
-import com.example.pokedex.service.PokemonService;
+import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.json.JSONParser;

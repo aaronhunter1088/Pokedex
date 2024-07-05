@@ -1,4 +1,4 @@
-package com.example.pokedex.service;
+package com.pokedex.app.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

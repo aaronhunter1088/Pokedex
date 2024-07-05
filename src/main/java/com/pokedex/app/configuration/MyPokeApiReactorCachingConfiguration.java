@@ -1,4 +1,4 @@
-package com.example.pokedex.configuration;
+package com.pokedex.app.configuration;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.codec.http.HttpObjectAggregator;

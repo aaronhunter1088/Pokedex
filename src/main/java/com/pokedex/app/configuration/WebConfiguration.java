@@ -1,4 +1,4 @@
-package com.example.pokedex.configuration;
+package com.pokedex.app.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;

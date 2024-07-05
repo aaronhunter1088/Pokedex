@@ -8,14 +8,14 @@
         <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
+    <groupId>com.pokedex</groupId>
     <artifactId>Pokedex</artifactId>
     <version>0.0.4-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
-    <description>Springboot Pokédex</description>
+    <description>Springboot Pokédex App</description>
     <properties>
-        <start-class>com.example.pokedex.PokedexApplication</start-class>
+        <start-class>com.pokedex.app.PokedexApplication</start-class>
         <java.version>18</java.version>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>

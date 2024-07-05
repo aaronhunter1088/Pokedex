@@ -1,7 +1,7 @@
-package com.example.pokedex.controllers;
+package com.pokedex.app.controllers;
 
-import com.example.pokedex.entities.Pokemon;
-import com.example.pokedex.service.PokemonService;
+import com.pokedex.app.entities.Pokemon;
+import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.net.http.HttpResponse;
 import java.util.Random;
 
 @Controller
@@ -42,7 +41,7 @@ public class PokedexController extends BaseController {
         logger.info("loading pokedex info for {}", nameOrId);
         skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
         PokemonSpecies speciesData;
-        com.example.pokedex.entities.Pokemon pokemon = null;
+        Pokemon pokemon = null;
         try {
             speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResource.getId()));
             pokemon = createPokemon(pokemonResource, speciesData);

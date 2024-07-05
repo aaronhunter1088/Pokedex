@@ -1,16 +1,14 @@
-package com.example.pokedex.controllers;
+package com.pokedex.app.controllers;
 
-import com.example.pokedex.entities.Pokemon;
-import com.example.pokedex.service.PokemonService;
+import com.pokedex.app.entities.Pokemon;
+import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.util.*;

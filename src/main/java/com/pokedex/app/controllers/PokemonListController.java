@@ -1,6 +1,6 @@
-package com.example.pokedex.controllers;
+package com.pokedex.app.controllers;
 
-import com.example.pokedex.service.PokemonService;
+import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.TreeMap;
 public class PokemonListController extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokemonListController.class);
-    Map<Integer, com.example.pokedex.entities.Pokemon> pokemonMap = new TreeMap<>();
+    Map<Integer, com.pokedex.app.entities.Pokemon> pokemonMap = new TreeMap<>();
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -53,7 +53,7 @@ public class PokemonListController extends BaseController {
         return mav;
     }
 
-    public Map<Integer, com.example.pokedex.entities.Pokemon> getPokemonMap() {
+    public Map<Integer, com.pokedex.app.entities.Pokemon> getPokemonMap() {
         logger.info("page number: {}", page);
         logger.info("pkmnPerPage: {}", pkmnPerPage);
         NamedApiResourceList<Pokemon> pokemonList = pokemonService.getPokemonList(pkmnPerPage, ((page-1) * pkmnPerPage));
@@ -65,7 +65,7 @@ public class PokemonListController extends BaseController {
             totalPokemon = pokemonService.getTotalPokemon(null);
             listOfPokemon.parallelStream().forEach(pkmn -> {
                 Pokemon pokemonResource = pokemonService.getPokemonByName(pkmn.getName());
-                com.example.pokedex.entities.Pokemon pokemon = new com.example.pokedex.entities.Pokemon(pokemonResource);
+                com.pokedex.app.entities.Pokemon pokemon = new com.pokedex.app.entities.Pokemon(pokemonResource);
                 PokemonSprites sprites = pokemon.getSprites();
                 List<PokemonType> types = pokemon.getTypes();
                 String pokemonType = null;

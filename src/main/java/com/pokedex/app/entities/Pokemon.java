@@ -1,9 +1,7 @@
-package com.example.pokedex.entities;
+package com.pokedex.app.entities;
 
 import skaro.pokeapi.resource.FlavorText;
-import skaro.pokeapi.resource.move.Move;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements Comparable<Pokemon> {

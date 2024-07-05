@@ -1,6 +1,6 @@
-package com.example.pokedex.controllers;
+package com.pokedex.app.controllers;
 
-import com.example.pokedex.service.PokemonService;
+import com.pokedex.app.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

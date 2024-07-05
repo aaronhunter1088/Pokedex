@@ -32,9 +32,11 @@ Once a valid name or ID is given, the page will display that Pokemon info.
 
 I have also created a Pull Request for the PokeApi-Reactor code to fix
 an issue I encountered. This was previously identified and documented as an
-issue on the Github account. My PR: https://github.com/SirSkaro/pokeapi-reactor/pull/10
+issue on the Github account. 
+My PR: https://github.com/SirSkaro/pokeapi-reactor/pull/10
 The Issue: https://github.com/SirSkaro/pokeapi-reactor/issues/8
-
+Submitted on: June 28th, 2024
+Merged in on: July 2nd, 2024
 
 # v<=0.3
 This Spring boot application allows you to enter the ID or name of a pokemon
