@@ -42,9 +42,9 @@
 </head>
 <body style="justify-content:space-evenly;text-align:center;">
     <h1 id="title" style="vertical-align: middle;">
-        <a href="${pageContext.request.contextPath}/search">
+        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
-                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
+            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
         </a>
     </h1>
 
