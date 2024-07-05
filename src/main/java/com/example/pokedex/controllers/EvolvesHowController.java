@@ -3,14 +3,12 @@ package com.example.pokedex.controllers;
 import com.example.pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.tags.shaded.org.apache.xpath.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.math.BigInteger;
 import java.util.*;
 
 @Controller
@@ -96,7 +94,7 @@ public class EvolvesHowController extends BaseController {
                 }
                 cleanupAttributesMap();
                 logger.info("Attributes map cleaned up in Evolves-how");
-                setupBooleans(pokemonIdAndAttributesMap.get(Integer.valueOf(pokemonId)));
+                setEvolvesBooleans(pokemonIdAndAttributesMap.get(Integer.valueOf(pokemonId)));
                 doesPokemonEvolve = pokemonEvolves();
                 logger.info("does pokemon evolve: {}", doesPokemonEvolve);
             }
@@ -181,7 +179,6 @@ public class EvolvesHowController extends BaseController {
 
     public void updateAttributesMap(Map<String, Object> details, Map<String, Object> attributesMap) {
         logger.info("evolution_detailsUpdate for: {} {}", attributesMap.get("name"), details);
-        Map<?,?> detailsMap = null;
         List<String> checkDetails = Arrays.asList("gender", "held_item", "item", "min_happiness",
                 "time_of_day", "location", "needs_overworld_rain", "min_affection", "min_beauty",
                 "known_move", "known_move_type", "party_species", "relative_physical_stats",
@@ -236,104 +233,48 @@ public class EvolvesHowController extends BaseController {
     // clean up map, remove unnecessary duplicates
     private void cleanupAttributesMap() {
         logger.info("All attributes maps created: {}", pokemonIdAndAttributesMap.size());
+        List<String> checkDetails = Arrays.asList("timeOfDay", "minHappiness", "minAffection",
+                "minBeauty", "knownMove", "knownMoveType", "needsRain", "turnUpsideDown");
         pokemonIdAndAttributesMap.forEach((key, mapValue) -> {
-            logger.info("id {}, map {}", key, mapValue);
-            if (null != mapValue.get("timeOfDay") && mapValue.get("timeOfDay").equals("")) mapValue.put("timeOfDay", null);
-            List<BigInteger> happyValues = Arrays.asList((BigInteger)mapValue.get("minHappiness"));
-            if (happyValues != null && happyValues.size() > 1) {
-                HashSet<BigInteger> happySet = new HashSet<>();
-                for(BigInteger happy : happyValues) {
-                    if ( null != happy && !happySet.contains(happy)) {
-                        happySet.add(happy);
-                        logger.debug("adding {} to happy set", happy);
-                    }
-                }
-                mapValue.put("minHappiness", happySet);
-            }
-            logger.info("minHappiness: {}", mapValue.get("minHappiness"));
+            logger.info("id {}", key);
+            for(String detail : checkDetails) {
+                if ("timeOfDay".equals(detail)) {
+                    if (null != mapValue.get(detail) && mapValue.get(detail).equals(""))
+                        mapValue.put("timeOfDay", null);
+                } else {
+                    List<?> value = Arrays.asList(mapValue.get(detail));
+                    if ((value.size() > 1)
+                         || ("needsRain".equals(detail) || "turnUpsideDown".equals(detail)) ){
+                        Set<Object> uniqueValues = new HashSet<>();
+                        for(Object v : value) {
+                            if (null != v && !uniqueValues.contains(v)) {
+                                uniqueValues.add(v);
+                                logger.debug("adding {} to uniqueValues", v);
+                            }
+                        }
+                        mapValue.put(detail, uniqueValues.stream().toList());
 
-            List<BigInteger> affectionValues = Arrays.asList((BigInteger)mapValue.get("minAffection"));
-            if (affectionValues != null && affectionValues.size() > 1) {
-                HashSet<BigInteger> minAffectionSet = new HashSet<>();
-                for(BigInteger affection : affectionValues) {
-                    if ( null != affection && !minAffectionSet.contains(affection)) {
-                        minAffectionSet.add(affection);
-                        logger.debug("adding {} to affection set", affection);
                     }
                 }
-                mapValue.put("minAffection", minAffectionSet);
-            }
-            logger.info("minAffection: {}", mapValue.get("minAffection"));
-
-            List<BigInteger> beautyValues = Arrays.asList((BigInteger)mapValue.get("minBeauty"));
-            if (beautyValues != null && beautyValues.size() > 1) {
-                HashSet<BigInteger> minBeautySet = new HashSet<>();
-                for(BigInteger beauty : beautyValues) {
-                    if (null != beauty && !minBeautySet.contains(beauty)) {
-                        minBeautySet.add(beauty);
-                        logger.debug("adding {} to beauty set", beauty);
+                if ("needsRain".equals(detail) || "turnUpsideDown".equals(detail)) {
+                    String bool = (null != mapValue.get(detail)) ?
+                        (!((List)mapValue.get(detail)).isEmpty()) ?
+                                String.valueOf(((List)mapValue.get(detail)).get(0)) :
+                                "false" :
+                        "false";
+                    if ("true".equals(bool)) {
+                        mapValue.put(detail, true);
+                    } else {
+                        mapValue.put(detail, false);
                     }
                 }
-                mapValue.put("minBeauty", minBeautySet);
+                logger.info("{}: {}", detail, mapValue.get(detail));
             }
-            logger.info("minBeauty: {}", mapValue.get("minBeauty"));
-
-            List<String> knownMovesValues = Arrays.asList((String)mapValue.get("knownMove"));
-            if (knownMovesValues != null && knownMovesValues.size() > 1) {
-                HashSet<String> knownMovesSet = new HashSet<>();
-                for(String move : knownMovesValues) {
-                    if (null != move && !knownMovesSet.contains(move)) {
-                        knownMovesSet.add(move);
-                        logger.debug("adding {} to knownMoves set", move);
-                    }
-                }
-                mapValue.put("knownMove", knownMovesSet);
-            }
-            logger.info("knownMove: {}", mapValue.get("knownMove"));
-
-            List<String> knownMovesTypeValues = Arrays.asList((String)mapValue.get("knownMoveType"));
-            if (knownMovesTypeValues != null && knownMovesTypeValues.size() > 1) {
-                HashSet<String> knownMovesTypeSet = new HashSet<>();
-                for(String moveType : knownMovesTypeValues) {
-                    if (null != moveType && !knownMovesTypeSet.contains(moveType)) {
-                        knownMovesTypeSet.add(moveType);
-                        logger.debug("adding {} to knownMovesType set", moveType);
-                    }
-                }
-                mapValue.put("knownMoveType", knownMovesTypeSet);
-            }
-            logger.info("knownMoveType: {}", mapValue.get("knownMoveType"));
-
-            List<String> needsRainValues = (mapValue.get("needsRain") instanceof List) ? (List<String>) mapValue.get("needsRain") : Arrays.asList(String.valueOf(mapValue.get("needsRain")));
-            if (needsRainValues != null) {
-                HashSet<Boolean> needsRainSet = new HashSet<>();
-                for(String needsRain : needsRainValues) {
-                    if (!needsRainSet.contains(Boolean.valueOf(needsRain))) {
-                        needsRainSet.add(Boolean.valueOf(needsRain));
-                        logger.debug("adding {} to needsRain set", needsRain);
-                    }
-                }
-                mapValue.put("needsRain", needsRainSet.stream().toList().get(0));
-            }
-            logger.info("needsRain: {}", mapValue.get("needsRain"));
-
-            List<String> turnUpsideDownValues = (mapValue.get("turnUpsideDown") instanceof List) ? (List<String>) mapValue.get("turnUpsideDown") : Arrays.asList(String.valueOf(mapValue.get("turnUpsideDown")));
-            if (turnUpsideDownValues != null) {
-                Set<Boolean> upsideDownSet = new HashSet<>();
-                for(String upsideDown : turnUpsideDownValues) {
-                    if (!upsideDownSet.contains(Boolean.valueOf(upsideDown))) {
-                        upsideDownSet.add(Boolean.valueOf(upsideDown));
-                        logger.debug("adding {} to needsRain set", upsideDown);
-                    }
-                }
-                mapValue.put("turnUpsideDown", upsideDownSet.stream().toList().get(0));
-            }
-            logger.info("turnUpsideDown: {}", mapValue.get("turnUpsideDown"));
         });
         logger.info("attribute map cleaned up");
     }
 
-    private void setupBooleans(Map<String,Object> pokemonAttributesMap) {
+    private void setEvolvesBooleans(Map<String,Object> pokemonAttributesMap) {
         this.hasMinimumLevel = pokemonAttributesMap.get("minLevel") != null;
         this.hasHeldItem = pokemonAttributesMap.get("heldItem") != null;
         this.hasUseItem = pokemonAttributesMap.get("useItem") != null;
@@ -369,4 +310,5 @@ public class EvolvesHowController extends BaseController {
                hasNeedsRain ||
                hasTurnUpsideDown;
     }
+
 }
