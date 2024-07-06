@@ -1,4 +1,4 @@
-package com.pokedex.app.api.encounter;
+package com.pokedex.app.api;
 
 import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.contesttype.ContestType;
 import skaro.pokeapi.resource.encountercondition.EncounterCondition;
 import skaro.pokeapi.resource.encounterconditionvalue.EncounterConditionValue;
 import skaro.pokeapi.resource.encountermethod.EncounterMethod;

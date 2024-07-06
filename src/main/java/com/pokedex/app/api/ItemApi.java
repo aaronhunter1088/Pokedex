@@ -1,4 +1,4 @@
-package com.pokedex.app.api.item;
+package com.pokedex.app.api;
 
 import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
@@ -10,14 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.berry.Berry;
 import skaro.pokeapi.resource.item.Item;
 import skaro.pokeapi.resource.itemattribute.ItemAttribute;
 import skaro.pokeapi.resource.itemcategory.ItemCategory;
 import skaro.pokeapi.resource.itemflingeffect.ItemFlingEffect;
 import skaro.pokeapi.resource.itempocket.ItemPocket;
-
-import java.net.http.HttpResponse;
 
 @RestController
 @CrossOrigin(origins = "*")

@@ -1,4 +1,4 @@
-package com.pokedex.app.api.evolution;
+package com.pokedex.app.api;
 
 import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
