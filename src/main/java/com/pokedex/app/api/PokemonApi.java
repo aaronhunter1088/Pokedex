@@ -31,14 +31,14 @@ import java.util.*;
 public class PokemonApi extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(PokemonApi.class);
-    @Autowired
-    private PokeApiClient pokeApiClient;
+    private final PokeApiClient pokeApiClient;
     @Value("${skaro.pokeapi.baseUri}")
     private String pokeApiBaseUrl;
 
     @Autowired
-    public PokemonApi(PokemonService pokemonService) {
+    public PokemonApi(PokemonService pokemonService, PokeApiClient client) {
         super(pokemonService);
+        pokeApiClient = client;
     }
 
     @RequestMapping(value = "/list", method=RequestMethod.GET)
