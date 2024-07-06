@@ -9,13 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
-import skaro.pokeapi.resource.NamedApiResource;
-import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.location.Location;
-import skaro.pokeapi.resource.machine.Machine;
 
 import java.net.http.HttpResponse;
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
