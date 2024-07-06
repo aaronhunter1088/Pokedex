@@ -1,4 +1,4 @@
-package com.pokedex.app.api.berries;
+package com.pokedex.app.api.berry;
 
 import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
@@ -16,13 +16,13 @@ import skaro.pokeapi.resource.berryflavor.BerryFlavor;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/berry")
-public class BerriesApi extends BaseController {
+public class BerryApi extends BaseController {
 
-    private static final Logger logger = LogManager.getLogger(BerriesApi.class);
+    private static final Logger logger = LogManager.getLogger(BerryApi.class);
     private final PokeApiClient pokeApiClient;
 
     @Autowired
-    public BerriesApi(PokemonService pokemonService, PokeApiClient client) {
+    public BerryApi(PokemonService pokemonService, PokeApiClient client) {
         super(pokemonService);
         pokeApiClient = client;
     }
