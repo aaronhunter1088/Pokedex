@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.berry.Berry;
-import skaro.pokeapi.resource.contesteffect.ContestEffect;
 import skaro.pokeapi.resource.contesttype.ContestType;
 
 import java.net.URI;
@@ -24,11 +22,10 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/contest")
-public class ContestApi extends BaseController  {
+public class ContestApi extends BaseController {
 
     private static final Logger logger = LogManager.getLogger(ContestApi.class);
-    @Autowired
-    private PokeApiClient pokeApiClient;
+    private final PokeApiClient pokeApiClient;
     @Value("${skaro.pokeapi.baseUri}")
     private String pokeApiBaseUrl;
 
@@ -39,7 +36,7 @@ public class ContestApi extends BaseController  {
     }
 
     // ContestType
-    @GetMapping(value="/list")
+    @GetMapping(value="/list-contest-type")
     @ResponseBody
     public ResponseEntity<?> getAllContests() {
         logger.info("getAllContests");
