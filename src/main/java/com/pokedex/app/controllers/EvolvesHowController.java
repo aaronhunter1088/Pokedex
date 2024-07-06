@@ -103,15 +103,15 @@ public class EvolvesHowController extends BaseController {
 
     private void getEvolutionDetails(Map<String, Object> chain) {
         logger.info("chain: {}", chain);
-        String name = (String) ((Map<String,Object>)chain.get("species")).get("name");
-        String pkmnId = ((String) ((Map<String,Object>)chain.get("species")).get("url")).split("/")[6];
-        Map<String, Object> evolutionDetails;
+        String name = (String) ((Map<?,?>)chain.get("species")).get("name");
+        String pkmnId = ((String) ((Map<?,?>)chain.get("species")).get("url")).split("/")[6];
+        Map<String,Object> evolutionDetails;
         logger.info("name: {}, id: {}", name, pkmnId);
-        for (int i=0; i<((List<Object>)chain.get("evolves_to")).size(); i++) {
-            Map<String,Object> evolvesTo = (Map<String,Object>) ((List<Object>) chain.get("evolves_to")).get(i);
+        for (int i=0; i<((List<?>)chain.get("evolves_to")).size(); i++) {
+            Map<String,Object> evolvesTo = (Map<String,Object>) ((List<?>) chain.get("evolves_to")).get(i);
             try {
-                for (int j = 0; j < ((List<Object>) evolvesTo.get("evolution_details")).size(); j++) {
-                    evolutionDetails = (Map<String, Object>) ((List<Object>) evolvesTo.get("evolution_details")).get(j);
+                for (int j = 0; j < ((List<?>) evolvesTo.get("evolution_details")).size(); j++) {
+                    evolutionDetails = (Map<String,Object>) ((List<?>) evolvesTo.get("evolution_details")).get(j);
                     evolutionDetails.put("is_baby", chain.get("is_baby"));
                     evolutionDetails.put("id", pkmnId);
                     evolutionDetails.put("name", name);
