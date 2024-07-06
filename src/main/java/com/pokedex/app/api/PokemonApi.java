@@ -1,5 +1,6 @@
-package com.pokedex.app.controllers;
+package com.pokedex.app.api;
 
+import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
