@@ -4,22 +4,16 @@ import com.pokedex.app.controllers.BaseController;
 import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
-import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.berry.Berry;
-import skaro.pokeapi.resource.evolutionchain.EvolutionChain;
 
-import javax.ws.rs.PathParam;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*")
