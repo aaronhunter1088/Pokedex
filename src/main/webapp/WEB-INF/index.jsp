@@ -5,43 +5,11 @@
 <head>
     <title>Pokedex Springboot</title>
     <jsp:include page="headCommon.jsp"/>
-    <style>
-        html {
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
-        }
-        body {
-            display: block;
-            margin: 8px;
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
-        }
-        .button {
-            font-weight: bold;
-        }
-        .cursor {
-            cursor:pointer;
-        }
-        .center {
-            padding: 70px 0;
-            text-align: center;
-            vertical-align: middle;
-        }
-        h1 {
-            text-align: center;
-            line-height: 1.5;
-            display: inline-block;
-            vertical-align: middle;
-        }
-    </style>
+    <style></style>
 </head>
 
 <body style="justify-content:space-evenly;text-align:center;">
-    <h1 id="title" style="vertical-align: middle;">
+    <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
         <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
@@ -115,7 +83,7 @@
                         <div id="info" style="display:inline-block;">
                             <h3 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.height} m</h3><br>
                             <h3 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weight} kg</h3><br>
-                            <h3 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.color}</h3><br>
+                            <h3 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h3><br>
                             <h3 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h3><br>
                         </div>
                     </div>

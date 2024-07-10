@@ -69,6 +69,11 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements C
     public List<String> getPokemonMoves() { return moves; }
     public void setPokemonMoves(List<String> moves) { this.moves = moves; }
 
+    public String getCapitalizedColor() {
+        return this.getColor().substring(0,1).toUpperCase()
+             + this.getColor().substring(1);
+    }
+
     @Override
     public String toString() {
         return "Pokemon{" +

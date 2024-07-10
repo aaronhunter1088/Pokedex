@@ -32,18 +32,18 @@
                                                 <h3 id="${pokemon.id}-id">ID: ${pokemon.id}</h3>
                                             </div>
                                             <div id="${pokemon.id}-img">
-                                                <img style=""
+                                                <img style="width:200px;height:200px;"
                                                      src="${pokemon.defaultImage}" alt="${pokemon.name}-default">
                                             </div>
                                             <h3 id="${pokemon.id}-height">Height: ${pokemon.height} m</h3>
                                             <h3 id="${pokemon.id}-weight">Weight: ${pokemon.weight} kg</h3>
-                                            <h3 id="${pokemon.id}-color">Color: ${pokemon.color}</h3>
+                                            <h3 id="${pokemon.id}-color">Color: ${pokemon.capitalizedColor}</h3>
                                             <h3 id="${pokemon.id}-type">Type: ${pokemon.type}</h3>
                                         </div>
                                     </a>
                                     <c:if test="${!status.last}">
                                         <div style="padding-top:25px; text-align:center; justify-content:center;">
-                                            <img style="width:25px; height:25px;" alt="pokeball"
+                                            <img style="width:25px;height:25px;" alt="pokeball"
                                                  src="${pageContext.request.contextPath}/images/pokeball1.jpg">
                                         </div>
                                     </c:if> <!-- pokeball divider -->

@@ -4,44 +4,10 @@
     <title>Search</title>
     <jsp:include page="headCommon.jsp"/>
     <style>
-        html {
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
-        }
-        body {
-            display: block;
-            margin: 8px;
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
-            justify-content:space-evenly;
-            text-align: center;
-        }
-        .button {
-            font-weight: bold;
-        }
-        .cursor {
-            cursor:pointer;
-        }
-        .center {
-            padding: 70px 0;
-            text-align: center;
-            vertical-align: middle;
-        }
-        h1 {
-            /*padding: 70px 0;*/
-            text-align: center;
-            line-height: 1.5;
-            display: inline-block;
-            vertical-align: middle;
-        }
     </style>
 </head>
 <body style="justify-content:space-evenly;text-align:center;">
-    <h1 id="title" style="vertical-align: middle;">
+    <h1 id="searchImgReloadPage" style="vertical-align:middle;">
         <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
@@ -49,7 +15,7 @@
     </h1>
 
     <h4 style="vertical-align: middle;">
-        <a href="${pageContext.request.contextPath}/" title="Go back to list"><i class="fas fa-arrow-left" style="color: #000000;"></i></a>
+        <a href="${pageContext.request.contextPath}/" title="Go back to list"><i class="fas fa-arrow-left" style="color:#000000;"></i></a>
         <input id="pokemonName" placeholder="Pokemon Name/ID" type="text"/>
         <img alt="pokeball" onclick="getPokemonFromSearch($('#pokemonName').val())" class="button cursor" title="Find Pokemon"
              src="${pageContext.request.contextPath}/images/pokeball1.jpg" style="height:30px;width:30px;">
@@ -86,7 +52,7 @@
                 200: function(data) {
                     $("#pokedex").html(data.responseText);
                     $("#pokedex").show();
-                    $("#pokedexSearchTitle").hide();
+                    $("#pokedexSearchImgSearchLink").hide();
                 },
                 404: function() {
                     console.log('Failed');

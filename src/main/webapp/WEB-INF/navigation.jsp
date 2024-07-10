@@ -4,69 +4,8 @@
 <html lang="en">
     <head>
         <title>Navigation</title>
-        <style>
-        html {
-          background-position: center center;
-          background-repeat:  no-repeat;
-          background-attachment: fixed;
-          background-size:  cover;
-        }
-        body {
-          display: block;
-          margin: 8px;
-          background-position: center center;
-          background-repeat:  no-repeat;
-          background-attachment: fixed;
-          background-size:  cover;
-        }
-        .button {
-          font-weight: bold;
-        }
-        .cursor {
-          cursor:pointer;
-        }
-        .center {
-          padding: 70px 0;
-          text-align: center;
-          vertical-align: middle;
-        }
-        h1 {
-          /*padding: 70px 0;*/
-          text-align: center;
-          line-height: 1.5;
-          display: inline-block;
-          vertical-align: middle;
-        }
-        /* Style the tab */
-        .tab {
-          overflow: hidden;
-          border: 1px solid #ccc;
-          background-color: #f1f1f1;
-        }
-        /* Style the buttons that are used to open the tab content */
-        .tab button {
-          background-color: inherit;
-          float: left;
-          border: none;
-          outline: none;
-          cursor: pointer;
-          padding: 14px 16px;
-          transition: 0.3s;
-        }
-        .pokedexStyle {
-          display: flow;
-          text-align: center;
-          vertical-align: middle;
-        }
-        @media only screen and (max-width: 300px) {
-          .pokedexStyle {
-            display: inline-flex;
-            text-align: center;
-            vertical-align: middle;
-            width: 100px;
-          }
-        }
-      </style>
+        <jsp:include page="headCommon.jsp"/>
+        <style></style>
     </head>
     <body>
         <nav aria-label="Pokedex navigation">

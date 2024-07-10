@@ -6,39 +6,21 @@
     <title>Pokemon Info</title>
     <jsp:include page="headCommon.jsp"/>
     <style>
-        html {
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
+        /* Style the tab */
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
         }
-        body {
-            display: block;
-            margin: 8px;
-            background-position: center center;
-            background-repeat:  no-repeat;
-            background-attachment: fixed;
-            background-size:  cover;
-            justify-content:space-evenly;
-            text-align: center;
-        }
-        .button {
-            font-weight: bold;
-        }
-        .cursor {
-            cursor:pointer;
-        }
-        .center {
-            padding: 10px 0;
-            text-align: center;
-            vertical-align: middle;
-        }
-        h1 {
-            /*padding: 70px 0;*/
-            text-align: center;
-            line-height: 1.5;
-            display: inline-block;
-            vertical-align: middle;
+        /* Style the buttons that are used to open the tab content */
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
         }
         .parent-div {
             display: flex;
@@ -52,101 +34,99 @@
             position: absolute;
             left: 0;
         }
-
         .center-div {
             text-align: center;
         }
     </style>
 </head>
 <body style="justify-content:space-evenly;text-align:center;">
-<h1 id="pokedexSearchTitle" style="vertical-align: middle;">
-    <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
-        <span class="center">
+    <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
+        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+            <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedexImage.jpg" style="width:100%;"></span>
-    </a>
-</h1>
-<div id="pokedex">
-    <div class="pokedex-grid">
-        <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
-            <div id="backAndName" class="parent-div">
-                <div id="backArrow" class="left-div">
-                    <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
+        </a>
+    </h1>
+    <div id="pokedex">
+        <div class="pokedex-grid">
+            <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
+                <div id="backAndName" class="parent-div">
+                    <div id="backArrow" class="left-div">
+                        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
+                    </div>
+                    &emsp;
+                    <div id="mainName" class="center-div">
+                        <h1 id="infoTitle">${pokemon.name}</h1>
+                    </div>
                 </div>
-                &emsp;
-                <div id="mainName" class="center-div">
-                    <h1 id="infoTitle">${pokemon.name}</h1>
+                <div id="imageOfPokemon" style="justify-content:center;display:block;">
+                    <img id="pkmnImage" src="${defaultImage}" alt="image" style="width:250px;height:250px;">
+                </div>
+                <div id="photoButtonsDiv" style="justify-content:center;text-align:center;display:inline-flex;">
+                    <div style="">
+                        <button id="defaultImgBtn" class="tab" onclick="showImage('default');">Show Default</button>
+                    </div>
+                    <div style="">
+                        <button id="officialImgBtn" class="tab" onclick="showImage('official');">Show Official</button>
+                    </div>
+                    <div style="">
+                        <button id="shinyImgBtn" class="tab" onclick="showImage('shiny');">Show Shiny</button>
+                    </div>
+                    <div style="">
+                        <button id="gifImgBtn" class="tab" onclick="showImage('gif');">Show Gif</button>
+                    </div>
                 </div>
             </div>
-            <div id="imageOfPokemon" style="justify-content:center;display:block;">
-                <img id="pkmnImage" src="${defaultImage}" alt="image" style="width:250px;height:250px;">
-            </div>
-            <div id="photoButtonsDiv" style="justify-content:center;text-align:center;display:inline-flex;">
-                <div style="">
-                    <button id="defaultImgBtn" class="tab" onclick="showImage('default');">Show Default</button>
+            <div id="info" class="box" style="padding-top:10px;background-color:${pokemon.color};">
+                <div id="nameAndID" style="display:inline-flex;">
+                    <h3 id="name">Name: ${pokemon.name}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
                 </div>
-                <div style="">
-                    <button id="officialImgBtn" class="tab" onclick="showImage('official');">Show Official</button>
+                <br><br>
+                <div id="hAndW" style="display:inline-flex;">
+                    <h3 id="heightOfPokemon">Height: ${pokemon.height} m</h3> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <h3 id="weightOfPokemon">Weight: ${pokemon.weight} kg</h3>
                 </div>
-                <div style="">
-                    <button id="shinyImgBtn" class="tab" onclick="showImage('shiny');">Show Shiny</button>
+                <br><br>
+                <div id="colorAndType" style="display:inline-flex;">
+                    <h3 id="colorOfPokemon">Color: ${pokemon.capitalizedColor}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
                 </div>
-                <div style="">
-                    <button id="gifImgBtn" class="tab" onclick="showImage('gif');">Show Gif</button>
+                <br><br>
+                <div style="display:flow;">
+                    <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
+                    <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
+                    <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
+                    <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
                 </div>
-            </div>
-        </div>
-        <div id="info" class="box" style="padding-top:10px;background-color:${pokemon.color};">
-            <div id="nameAndID" style="display:inline-flex;">
-                <h3 id="name">Name: ${pokemon.name}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
-            </div>
-            <br><br>
-            <div id="hAndW" style="display:inline-flex;">
-                <h3 id="heightOfPokemon">Height: ${pokemon.height} m</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                <h3 id="weightOfPokemon">Weight: ${pokemon.weight} kg</h3>
-            </div>
-            <br><br>
-            <div id="colorAndType" style="display:inline-flex;">
-                <h3 id="colorOfPokemon">Color: ${pokemon.color}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
-            </div>
-            <br><br>
-            <div style="display:flow;">
-                <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
-                <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
-                <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
-                <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
-            </div>
-            <br>
-            <div id="descriptionDiv" style="display:inline-flex;width:300px;justify-content:center;">
-                <h3 id="description">${pokemon.description}</h3>
-            </div>
-            <div id="locationsDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
-                <c:choose>
-                    <c:when test="${pokemon.locations.size() == 0}">
-                        <h3 id="locations" class="listStyle">No known locations</h3>
-                    </c:when>
-                    <c:when test="${pokemon.locations.size() > 0}">
-                        <c:forEach var="location" items="${pokemon.locations}">
-                            <h3 id="locations" class="listStyle">${location}</h3>
-                        </c:forEach>
-                    </c:when>
-                </c:choose>
-            </div>
-            <div id="movesDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
-                <c:forEach var="move" items="${pokemon.pokemonMoves}">
-                    <h3 id="moves" class="listStyle">${move}</h3>
-                </c:forEach>
-            </div>
-            <div id="evolvesHowDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
-                <jsp:include page="evolves-how.jsp" />
+                <br>
+                <div id="descriptionDiv" style="display:inline-flex;width:300px;justify-content:center;">
+                    <h3 id="description">${pokemon.description}</h3>
+                </div>
+                <div id="locationsDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
+                    <c:choose>
+                        <c:when test="${pokemon.locations.size() == 0}">
+                            <h3 id="locations" class="listStyle">No known locations</h3>
+                        </c:when>
+                        <c:when test="${pokemon.locations.size() > 0}">
+                            <c:forEach var="location" items="${pokemon.locations}">
+                                <h3 id="locations" class="listStyle">${location}</h3>
+                            </c:forEach>
+                        </c:when>
+                    </c:choose>
+                </div>
+                <div id="movesDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
+                    <c:forEach var="move" items="${pokemon.pokemonMoves}">
+                        <h3 id="moves" class="listStyle">${move}</h3>
+                    </c:forEach>
+                </div>
+                <div id="evolvesHowDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
+                    <jsp:include page="evolves-how.jsp" />
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="evolutions">
-</div>
+    <div id="evolutions"></div>
 
 </body>
 

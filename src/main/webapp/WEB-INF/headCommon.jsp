@@ -33,5 +33,44 @@
     <link href="${pageContext.request.contextPath}/resources/css/evolutions.css"
           type="text/css" rel="stylesheet">
     <!-- Add more common links and scripts here -->
+
+
+    <!-- Common styling -->
+    <style>
+        html {
+            background-position: center center;
+            background-repeat:  no-repeat;
+            background-attachment: fixed;
+            background-size:  cover;
+        }
+        body {
+            display: block;
+            margin: 8px;
+            background-position: center center;
+            background-repeat:  no-repeat;
+            background-attachment: fixed;
+            background-size:  cover;
+            justify-content:space-evenly;
+            text-align: center;
+        }
+        .button {
+            font-weight: bold;
+        }
+        .cursor {
+            cursor:pointer;
+        }
+        .center {
+            padding: 70px 0;
+            text-align: center;
+            vertical-align: middle;
+        }
+        h1 {
+            /*padding: 70px 0;*/
+            text-align: center;
+            line-height: 1.5;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 </html>
