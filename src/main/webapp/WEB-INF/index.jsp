@@ -59,7 +59,7 @@
                                              src="${pokemon.value.defaultImage}" alt="${pokemon.value.name}-default" style="height:200px;width:200px;">
                                     </c:if>
                                     <c:if test="${showGifs && pokemon.value.gifImage != null}">
-                                        <img src="${pokemon.value.gifImage}" alt="${pokemon.value.name}-gif">
+                                        <img src="${pokemon.value.gifImage}" alt="${pokemon.value.name}-gif" style="height:200px;width:200px;">
                                     </c:if>
                                     <c:if test="${showGifs && pokemon.value.gifImage == null}">
                                         <c:if test="${pokemon.value.officialImage != null}">
