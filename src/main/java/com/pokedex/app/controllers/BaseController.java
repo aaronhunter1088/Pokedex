@@ -21,6 +21,7 @@ public class BaseController {
 
     String pokemonId = "";
     int page = 1;
+    int lastPageSearched = 1;
     int pkmnPerPage = 10;
 
     protected PokemonService pokemonService;

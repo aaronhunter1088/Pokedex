@@ -38,6 +38,21 @@
             <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:auto;"/>
             <button class="icon" onclick="setPkmnPerPage();" title="Show Pokemon">Show Pokemon</button>
         </div>
+        &emsp;
+        <div id="typeList" style="display:flex;">
+            <label for="typeDropdown"></label>
+            <select id="typeDropdown" title="Type" class="icon" onchange="method(this);">
+                <option value="none" selected>None</option>
+                <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
+                    <c:if test="${chosenType.equals(type)}">
+                        <option value="${type}" selected>${type}</option>
+                    </c:if>
+                    <c:if test="${!chosenType.equals(type)}">
+                        <option value="${type}">${type}</option>
+                    </c:if>
+                </c:forEach>
+            </select>
+        </div>
     </div>
     <br>
     <div id="pokemonGrid" class="list-grid">
@@ -251,6 +266,45 @@
                 }
             }
         });
+    }
+
+    function method(selectObject) {
+        let select = $("#typeDropdown");
+        let type = selectObject.value;
+        $.ajax({
+            type: "GET",
+            url: "getPokemonByType",
+            data: {
+                chosenType: type
+            },
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    console.log('200 chosenType');
+                    //console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    location.reload();
+
+                    let ids = ${pokemonIds};
+                    for(let i=0; i<ids.length; i++) {
+                        let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");
+                        let currentColor = pokemonBox.style.backgroundColor;
+                        pokemonBox.style.backgroundColor = changeColor(currentColor);
+                    }
+                },
+                400: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                },
+                404: function() {
+                    console.log('Resource not found');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
+        console.log(type);
     }
 
 </script>

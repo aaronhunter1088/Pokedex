@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Controller
 public class PokemonListController extends BaseController {
@@ -31,6 +32,7 @@ public class PokemonListController extends BaseController {
             officialImagePresent = false,
             gifImagePresent = false,
             showGifs = false;
+    String chosenType;
 
     @Autowired
     public PokemonListController(PokemonService pokemonService) {
@@ -39,7 +41,9 @@ public class PokemonListController extends BaseController {
 
     @GetMapping("/")
     public ModelAndView homepage(ModelAndView mav) {
+        lastPageSearched = page;
         mav.addObject("pokemonMap", getPokemonMap());
+        this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
@@ -49,8 +53,50 @@ public class PokemonListController extends BaseController {
         mav.addObject("totalPokemon", totalPokemon);
         mav.addObject("totalPages", (int)Math.ceil((double) totalPokemon/pkmnPerPage));
         mav.addObject("page", page);
+        mav.addObject("uniqueTypes", getUniqueTypes());
+        mav.addObject("chosenType", chosenType);
         mav.setViewName("index");
         return mav;
+    }
+
+    @GetMapping("/toggleGifs")
+    @ResponseBody
+    public Boolean toggleGifs() {
+        logger.info("showGifs: {}", !showGifs);
+        showGifs = !showGifs;
+        return showGifs;
+    }
+
+    @GetMapping(value="/page")
+    @ResponseBody
+    public void page(@RequestParam(name="pageNumber", required=false, defaultValue="10") int pageNumber, ModelAndView mav) {
+        logger.info("pagination, page to view: {}", pageNumber);
+        if (pageNumber < 0) {
+            logger.error("Page number cannot be negative");
+            return;
+        }
+        else if (pageNumber > Math.round((float) totalPokemon /pkmnPerPage)) {
+            logger.error("Cannot pick a number more than there are pages");
+            return;
+        }
+        page = pageNumber;
+        if (lastPageSearched != page) page = lastPageSearched;
+        logger.info("page updated to {}", page);
+        homepage(mav);
+    }
+
+    @GetMapping("/pkmnPerPage")
+    @ResponseBody
+    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name="pkmnPerPage", required=false, defaultValue="10") int pkmnPerPage) {
+        if (pkmnPerPage <= 0) {
+            return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
+        }
+        else {
+            if (pkmnPerPage > 50) logger.info(pkmnPerPage + " is too high. Defaulting to 50");
+            this.pkmnPerPage = pkmnPerPage;
+        }
+        logger.info("pkmnPerPage updated to: {}", pkmnPerPage);
+        return ResponseEntity.ok().body("PkmnPerPage set");
     }
 
     public Map<Integer, com.pokedex.app.entities.Pokemon> getPokemonMap() {
@@ -61,7 +107,6 @@ public class PokemonListController extends BaseController {
             logger.debug("pokemonList size: " + pokemonList.getResults().size());
             List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.getResults();
             logger.debug("pokemonList limit size: " + listOfPokemon.size());
-            pokemonMap = new TreeMap<>();
             totalPokemon = pokemonService.getTotalPokemon(null);
             listOfPokemon.parallelStream().forEach(pkmn -> {
                 Pokemon pokemonResource = pokemonService.getPokemonByName(pkmn.getName());
@@ -76,6 +121,13 @@ public class PokemonListController extends BaseController {
                 } else {
                     logger.debug("One pokemonType");
                     pokemonType = types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1);
+                }
+                boolean specificTypeToFind = false;
+                for (PokemonType type : types) {
+                    if ( (null != chosenType) && chosenType.equals(type.getType().getName())) {
+                        specificTypeToFind = true;
+                        break;
+                    }
                 }
                 pokemon.setType(pokemonType);
                 pokemon.setDefaultImage(sprites.getFrontDefault());
@@ -100,49 +152,33 @@ public class PokemonListController extends BaseController {
                     logger.warn("setting color to white");
                     pokemon.setColor("white");
                 }
-                pokemonMap.put(pokemon.getId(), pokemon);
+                if (!("".equals(chosenType)) && specificTypeToFind) {
+                    pokemonMap.put(pokemon.getId(), pokemon);
+                } else if (null == chosenType) {
+                    pokemonMap.put(pokemon.getId(), pokemon);
+                }
             });
         }
-        return pokemonMap;
+        if (pokemonMap.size() >= pkmnPerPage) {
+            return pokemonMap;
+        } else {
+            this.page = this.page+1;
+            logger.info("pokemonMap size: {}", pokemonMap.size());
+            return getPokemonMap();
+        }
     }
 
-    @GetMapping("/toggleGifs")
-    @ResponseBody
-    public Boolean toggleGifs() {
-        logger.info("showGifs: {}", !showGifs);
-        showGifs = !showGifs;
-        return showGifs;
+    public List<String> getUniqueTypes() {
+        return pokemonService.getAllTypes();
     }
 
-    @GetMapping(value="/page")
+    @GetMapping(value="/getPokemonByType")
     @ResponseBody
-    public void page(@RequestParam(name="pageNumber", required=false, defaultValue="10") int pageNumber, ModelAndView mav) {
-        logger.info("pagination, page to view: {}", pageNumber);
-        if (pageNumber < 0) {
-            logger.error("Page number cannot be negative");
-            return;
-        }
-        else if (pageNumber > Math.round((float) totalPokemon /pkmnPerPage)) {
-            logger.error("Cannot pick a number more than there are pages");
-            return;
-        }
-        page = pageNumber;
-        logger.info("page updated to {}", page);
+    public ResponseEntity<String> getPokemonByType(@RequestParam(name="chosenType", required=false, defaultValue="") String chosenType, ModelAndView mav) {
+        this.chosenType = !"none".equals(chosenType) ? chosenType : null;
+        this.pokemonMap.clear();
         homepage(mav);
+        logger.info("lastPageSearched: {}", lastPageSearched);
+        return ResponseEntity.ok().body("chosenType set");
     }
-
-    @GetMapping("/pkmnPerPage")
-    @ResponseBody
-    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name="pkmnPerPage", required=false, defaultValue="10") int pkmnPerPage) {
-        if (pkmnPerPage <= 0) {
-            return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
-        }
-        else {
-            if (pkmnPerPage > 50) logger.info(pkmnPerPage + " is too high. Defaulting to 50");
-            this.pkmnPerPage = pkmnPerPage;
-        }
-        logger.info("pkmnPerPage updated to: {}", pkmnPerPage);
-        return ResponseEntity.ok().body("PkmnPerPage set");
-    }
-
 }

@@ -5,12 +5,16 @@ import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.*;
 import skaro.pokeapi.resource.pokedex.Pokedex;
 import skaro.pokeapi.resource.pokemon.Pokemon;
+import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.io.IOException;
@@ -26,6 +30,8 @@ public class PokemonService {
 
     private static final Logger logger = LogManager.getLogger(PokemonService.class);
     private final PokeApiClient pokeApiClient;
+    @Value("${skaro.pokeapi.baseUri}")
+    private String pokeApiBaseUrl;
 
     @Autowired
     private PokemonService(PokeApiClient pokeApiClient) {
@@ -628,6 +634,30 @@ public class PokemonService {
             logger.error("Failed to call endpoint: {}", url);
         }
         return response;
+    }
+
+    public List<String> getAllTypes() {
+        List<String> types = new ArrayList<>();
+        HttpResponse<String> typeResults = callUrl(pokeApiBaseUrl+"type");
+        if (typeResults.statusCode() == 200) {
+            JSONParser parser = new JSONParser(typeResults.body());
+            LinkedHashMap<String,Object> results = null;
+            try {
+                results = (LinkedHashMap<String,Object>) parser.parse();
+                List<String> finalTypes = types;
+                ((List) results.get("results")).stream()
+                        .forEach(map -> {
+                            LinkedHashMap<String,Object> result = (LinkedHashMap<String,Object>) map;
+                            finalTypes.add((String)result.get("name"));
+                        });
+                types = finalTypes.stream().sorted().toList();
+            } catch (ParseException e) {
+                logger.error("getAllTypes results failed bc {}", e.getMessage());
+            }
+            return types;
+        }
+        else if (typeResults.statusCode() == 400) return new ArrayList<>();
+        else return new ArrayList<>();
     }
 
 }

@@ -8,21 +8,28 @@
         <version>3.3.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.pokedex</groupId>
+    <groupId>com.example</groupId>
     <artifactId>Pokedex</artifactId>
     <version>0.0.4-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
+
     <properties>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <outputDirectory>${basedir}/dist</outputDirectory>
         <start-class>com.pokedex.app.PokedexApplication</start-class>
-        <java.version>18</java.version>
-        <maven.compiler.source>18</maven.compiler.source>
-        <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <log4j.version>2.17.1</log4j.version>
+
+        <log4j.version>2.24.1</log4j.version>
+        <maven.assembly.version>3.6.0</maven.assembly.version>
+        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <maven.jar.version>3.3.0</maven.jar.version>
+        <maven.properties.version>1.0-alpha-2</maven.properties.version>
+        <maven.surefire.version>3.2.1</maven.surefire.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -109,6 +116,18 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/**</include>
+                    <!--<include>**/sounds/*.mp3</include>-->
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -117,7 +136,135 @@
                     <executable>true</executable>
                 </configuration>
             </plugin>
+
+            <!-- Compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <release>18</release>
+                    <compilerArgs>
+                        <!--<arg>#doubledash#enable-preview</arg>-->
+                        <arg>-verbose</arg>
+                        <arg>-Xlint:all,-options,-path</arg>
+                    </compilerArgs>
+                    <!-- for surefire plugin -->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Test-compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+            </plugin>
+            <!-- Generate resources -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <outputFile>${basedir}/src/main/resources/pom.properties</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Binds to Package phase, but will not run... -->
+            <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory
+                 Run Command: mvn install -DskipTests -DskipITs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>${finalName}</finalName>
+                    <outputDirectory>${outputDirectory}</outputDirectory>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.example.clock.Main</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <Creation-Time>${build.time}</Creation-Time>
+                            <mainClass>com.example.clock.Main</mainClass>
+                        </manifestEntries>
+                    </archive>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <!-- Assembly:Single creates runnable jar with dependencies
+                 Run Command: mvn clean package -Dmaven.test.skip=true -->
+            <plugin>
+                <!-- don't need group id since org.apache.maven.plugins is assumed -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven.assembly.version}</version>
+                <executions>
+                    <execution>
+                        <id>build-beeper</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>true</appendAssemblyId> <!-- If false, jar-with-dependencies is not appended to jar name -->
+                            <!-- archive required to create executable jar -->
+                            <archive>
+                                <index>true</index>
+                                <manifest>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>com.example.clock.Main</mainClass>
+                                </manifest>
+                                <manifestEntries>
+                                    <Creation-Time>${maven.build.timestamp}</Creation-Time>
+                                    <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
+                                </manifestEntries>
+                            </archive>
+                            <finalName>${finalName}</finalName>
+                            <outputDirectory>${outputDirectory}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
     </build>
+
 
 </project>
