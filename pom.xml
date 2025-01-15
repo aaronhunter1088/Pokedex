@@ -249,7 +249,7 @@
                                 <manifest>
                                     <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>com.example.clock.Main</mainClass>
+                                    <mainClass>${start-class}</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <Creation-Time>${maven.build.timestamp}</Creation-Time>
