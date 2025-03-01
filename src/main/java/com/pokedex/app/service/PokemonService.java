@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.query.PageQuery;
@@ -618,8 +619,8 @@ public class PokemonService {
         }};
     }
 
-    public HttpResponse<String> callUrl(String url) {
-        HttpResponse<String> response = null;
+    public <T> HttpResponse<T> callUrl(String url) {
+        HttpResponse<T> response = null;
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
@@ -627,7 +628,7 @@ public class PokemonService {
                     .build();
             response = HttpClient.newBuilder()
                     .build()
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+                    .send(request, (HttpResponse.BodyHandler<T>) HttpResponse.BodyHandlers.ofString());
             logger.debug("response: {}", response.body());
             logger.info("callUrl: {} status: {}", url, response.statusCode());
         } catch (Exception e) {
@@ -658,6 +659,25 @@ public class PokemonService {
         }
         else if (typeResults.statusCode() == 400) return new ArrayList<>();
         else return new ArrayList<>();
+    }
+
+    // TODO: Look at.
+    public List<String> getPokemonNamesThatEvolveFromTrading()
+    {
+        String triggerUrl = pokeApiBaseUrl+"evolution-trigger/2/";
+        HttpResponse<String> triggerResponse = callUrl(triggerUrl);
+        JSONParser parser = new JSONParser(triggerResponse.body());
+        LinkedHashMap<String,Object> triggerMap = null;
+        List<String> pkmnNames = new ArrayList<>();
+        try {
+            triggerMap = (LinkedHashMap<String,Object>) parser.parse();
+            pkmnNames = ((List)triggerMap.get("pokemon_species")).stream()
+                    .map(m -> ((LinkedHashMap<String,Object>)m).get("name").toString())
+                    .toList();
+        } catch (ParseException e) {
+            logger.error("getPokemonNamesThatEvolveFromTrading results failed bc {}", e.getMessage());
+        }
+        return pkmnNames;
     }
 
 }

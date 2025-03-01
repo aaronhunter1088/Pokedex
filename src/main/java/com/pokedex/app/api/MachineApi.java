@@ -46,7 +46,7 @@ public class MachineApi extends BaseController {
     @GetMapping(value="/machine/{id}")
     public ResponseEntity<?> getMachine(@PathVariable(value="id") String id) {
         logger.info("getLocation {}", id);
-        HttpResponse<String> response = (HttpResponse<String>) pokemonService.callUrl(pokeApiBaseUrl+"/machine/"+id);
+        HttpResponse<String> response = pokemonService.callUrl(pokeApiBaseUrl+"/machine/"+id);
         if (response.statusCode() == 200) {
             return ResponseEntity.ok(response.body());
         } else if (response.statusCode() == 400) {
