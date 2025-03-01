@@ -3,12 +3,17 @@ package com.pokedex.app.controllers;
 import com.pokedex.app.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
+import java.net.http.HttpResponse;
 import java.util.*;
 
 @Controller
@@ -22,6 +27,7 @@ public class EvolvesHowController extends BaseController {
     Integer pokemonChainID = 0;
     List<Integer> allIDs = new ArrayList<>();
     List<List<Integer>> family = new ArrayList<>();
+    List<String> evolvesByTrade = new ArrayList<>();
     boolean doesPokemonEvolve = false,
             hasMinimumLevel = false,
             hasUseItem = false,
@@ -35,6 +41,7 @@ public class EvolvesHowController extends BaseController {
             hasKnownMoves = false,
             hasKnownMoveType = false,
             hasNeedsRain = false,
+            hasTradeSpecies = false,
             hasTurnUpsideDown = false,
             emptyChain = true;
 
@@ -66,6 +73,7 @@ public class EvolvesHowController extends BaseController {
         mav.addObject("hasKnownMoveType", hasKnownMoveType);
         mav.addObject("hasNeedsRain", hasNeedsRain);
         mav.addObject("hasTurnUpsideDown", hasTurnUpsideDown);
+        mav.addObject("hasTradeSpecies", hasTradeSpecies);
         mav.setViewName("evolves-how");
         return mav;
     }
@@ -84,7 +92,7 @@ public class EvolvesHowController extends BaseController {
             logger.info("chainResponse: {}", chainResponse);
             if (!chainResponse.isEmpty()) {
                 emptyChain = false;
-                getEvolutionDetails((LinkedHashMap<String, Object>) chainResponse.get("chain"));
+                getEvolutionDetails((Map<String, Object>) chainResponse.get("chain"));
                 for(Integer id : allIDs) {
                     logger.info("checking map for existence: {}", id);
                     if (!this.pokemonIdAndAttributesMap.containsKey(id)) {
@@ -171,8 +179,16 @@ public class EvolvesHowController extends BaseController {
         this.specificAttributesMap.put("partySpecies", details.get("party_species"));
         this.specificAttributesMap.put("relativePhysicalStats", details.get("relative_physical_stats"));
         this.specificAttributesMap.put("tradeSpecies", details.get("trade_species"));
+        this.specificAttributesMap.put("trigger", details.get("trigger"));
         this.specificAttributesMap.put("turnUpsideDown", details.get("turn_upside_down"));
 
+        // logic to determine if this pokemon evolves by trading: get trigger. check name. if equal to trade, this pokemon evolves by trading
+        // trigger is a map: name:"string", url:"base/evolution-trigger/#/"
+        Map<String, Object> triggerMap = (Map<String, Object>) this.specificAttributesMap.get("trigger");
+        String triggerUrl = triggerMap != null? triggerMap.get("name").toString() : ""; // get("url")
+        if ("trade".equals(triggerUrl)) {
+            this.specificAttributesMap.put("tradeSpecies", true);
+        }
         logger.info("attrMap for: {} = {}", details.get("name"), this.specificAttributesMap);
         this.pokemonIdAndAttributesMap.put(Integer.valueOf((String) details.get("id")), this.specificAttributesMap);
     }
@@ -182,7 +198,7 @@ public class EvolvesHowController extends BaseController {
         List<String> checkDetails = Arrays.asList("gender", "held_item", "item", "min_happiness",
                 "time_of_day", "location", "needs_overworld_rain", "min_affection", "min_beauty",
                 "known_move", "known_move_type", "party_species", "relative_physical_stats",
-                "trade_species", "turn_upside_down");
+                "trade_species", "turn_upside_down", "trigger");
         for(String detail : checkDetails) {
             if (details.get(detail) != null) {
                 if (attributesMap.get(convertToCamelCase(detail)) == null) {
@@ -288,6 +304,7 @@ public class EvolvesHowController extends BaseController {
         this.hasKnownMoveType = pokemonAttributesMap.get("knownMoveType") != null;
         this.hasNeedsRain = pokemonAttributesMap.get("needsRain") != null && (Boolean)pokemonAttributesMap.get("needsRain");
         this.hasTurnUpsideDown = pokemonAttributesMap.get("turnUpsideDown") != null && (Boolean)pokemonAttributesMap.get("turnUpsideDown");
+        this.hasTradeSpecies = pokemonAttributesMap.get("tradeSpecies") != null && (Boolean)pokemonAttributesMap.get("tradeSpecies");
     }
 
     /**
@@ -308,7 +325,8 @@ public class EvolvesHowController extends BaseController {
                hasKnownMoves ||
                hasKnownMoveType ||
                hasNeedsRain ||
-               hasTurnUpsideDown;
+               hasTurnUpsideDown ||
+               hasTradeSpecies;
     }
 
 }

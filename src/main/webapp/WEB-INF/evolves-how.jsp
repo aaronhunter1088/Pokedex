@@ -80,6 +80,9 @@
                     <c:if test="${hasTurnUpsideDown}">
                         <h3 id="turnUpsideDownTitle" class="listStyle"><b>Evolves by turning Upside Down: ${attributesMap.get('turnUpsideDown')}</b></h3>
                     </c:if> <!-- with turn upside down -->
+                    <c:if test="${hasTradeSpecies}">
+                        <h3 id="tradeSpeciesTitle" class="listStyle"><b>Evolves by Trading</b></h3>
+                    </c:if> <!-- with trade species -->
                 </c:when>
                 <c:when test="${!doesPokemonEvolve}">
                     <h3 id="levelOfPokemon">Final Form</h3>
