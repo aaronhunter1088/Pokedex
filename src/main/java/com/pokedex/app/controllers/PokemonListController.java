@@ -42,8 +42,9 @@ public class PokemonListController extends BaseController {
     @GetMapping("/")
     public ModelAndView homepage(ModelAndView mav) {
         lastPageSearched = page;
+        pokemonMap.clear();
         mav.addObject("pokemonMap", getPokemonMap());
-        this.page = lastPageSearched;
+        //this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
@@ -80,8 +81,8 @@ public class PokemonListController extends BaseController {
             return;
         }
         page = pageNumber;
-        if (lastPageSearched != page) page = lastPageSearched;
-        logger.info("page updated to {}", page);
+        //if (lastPageSearched != page) page = lastPageSearched;
+        //logger.info("page updated to {}", page);
         homepage(mav);
     }
 

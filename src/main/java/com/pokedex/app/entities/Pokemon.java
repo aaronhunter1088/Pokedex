@@ -4,7 +4,7 @@ import skaro.pokeapi.resource.FlavorText;
 
 import java.util.List;
 
-public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements Comparable<Pokemon> {
+public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon {
 
     String type;
     String defaultImage;
@@ -23,7 +23,7 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements C
         setName(pokemonResource.getName().substring(0,1).toUpperCase()+pokemonResource.getName().substring(1));
         setBaseExperience(pokemonResource.getBaseExperience());
         setHeight(pokemonResource.getHeight());
-        setIsDefault(pokemonResource.getIsDefault());
+        setDefault(pokemonResource.getDefault());
         setOrder(pokemonResource.getOrder());
         setWeight(pokemonResource.getWeight());
         setAbilities(pokemonResource.getAbilities());
@@ -81,7 +81,7 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements C
                 ", name='" + this.getName() + '\'' +
                 ", baseExperience='" + this.getBaseExperience() + '\'' +
                 ", height='" + this.getHeight() + '\'' +
-                ", isDefault='" + this.getIsDefault() + '\'' +
+                ", isDefault='" + this.getDefault() + '\'' +
                 ", order='" + this.getOrder() + '\'' +
                 ", weight='" + this.getWeight() + '\'' +
                 ", abilities='" + this.getAbilities() + '\'' +
@@ -103,14 +103,4 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon implements C
                 '}';
     }
 
-    @Override
-    public int compareTo(Pokemon p) {
-        if (this == p){
-            return 0;
-        }
-        if (p != null ){
-            return this.getId().compareTo(p.getId());
-        }
-        return 0;
-    }
 }
