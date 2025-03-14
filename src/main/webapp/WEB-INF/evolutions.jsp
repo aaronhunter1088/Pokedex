@@ -35,8 +35,8 @@
                                                 <img style="width:200px;height:200px;"
                                                      src="${pokemon.defaultImage}" alt="${pokemon.name}-default">
                                             </div>
-                                            <h3 id="${pokemon.id}-height">Height: ${pokemon.height} m</h3>
-                                            <h3 id="${pokemon.id}-weight">Weight: ${pokemon.weight} kg</h3>
+                                            <h3 id="${pokemon.id}-height">Height: ${pokemon.heightInInches} in</h3>
+                                            <h3 id="${pokemon.id}-weight">Weight: ${pokemon.weightInPounds} lbs</h3>
                                             <h3 id="${pokemon.id}-color">Color: ${pokemon.capitalizedColor}</h3>
                                             <h3 id="${pokemon.id}-type">Type: ${pokemon.type}</h3>
                                         </div>

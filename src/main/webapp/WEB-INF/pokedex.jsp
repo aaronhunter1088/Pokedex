@@ -83,8 +83,8 @@
                 </div>
                 <br><br>
                 <div id="hAndW" style="display:inline-flex;">
-                    <h3 id="heightOfPokemon">Height: ${pokemon.height} m</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                    <h3 id="weightOfPokemon">Weight: ${pokemon.weight} kg</h3>
+                    <h3 id="heightOfPokemon">Height: ${pokemon.heightInInches} in</h3> &nbsp;&nbsp;&nbsp;&nbsp;
+                    <h3 id="weightOfPokemon">Weight: ${pokemon.weightInPounds} lbs</h3>
                 </div>
                 <br><br>
                 <div id="colorAndType" style="display:inline-flex;">

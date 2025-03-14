@@ -23,7 +23,7 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon {
         setName(pokemonResource.getName().substring(0,1).toUpperCase()+pokemonResource.getName().substring(1));
         setBaseExperience(pokemonResource.getBaseExperience());
         setHeight(pokemonResource.getHeight());
-        setDefault(pokemonResource.getDefault());
+        setDefault(pokemonResource.isDefault());
         setOrder(pokemonResource.getOrder());
         setWeight(pokemonResource.getWeight());
         setAbilities(pokemonResource.getAbilities());
@@ -74,6 +74,14 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon {
              + this.getColor().substring(1);
     }
 
+    public String getHeightInInches() {
+        return String.format("%.0f", this.getHeight() * 3.93701);
+    }
+
+    public String getWeightInPounds() {
+        return String.format("%.0f", this.getWeight() * 0.220462);
+    }
+
     @Override
     public String toString() {
         return "Pokemon{" +
@@ -81,7 +89,7 @@ public class Pokemon extends skaro.pokeapi.resource.pokemon.Pokemon {
                 ", name='" + this.getName() + '\'' +
                 ", baseExperience='" + this.getBaseExperience() + '\'' +
                 ", height='" + this.getHeight() + '\'' +
-                ", isDefault='" + this.getDefault() + '\'' +
+                ", isDefault='" + this.isDefault() + '\'' +
                 ", order='" + this.getOrder() + '\'' +
                 ", weight='" + this.getWeight() + '\'' +
                 ", abilities='" + this.getAbilities() + '\'' +

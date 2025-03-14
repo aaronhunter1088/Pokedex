@@ -96,8 +96,8 @@
                             </c:choose>
                         </div>
                         <div id="info" style="display:inline-block;">
-                            <h3 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.height} m</h3><br>
-                            <h3 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weight} kg</h3><br>
+                            <h3 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.heightInInches} in</h3><br>
+                            <h3 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weightInPounds} lbs</h3><br>
                             <h3 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h3><br>
                             <h3 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h3><br>
                         </div>

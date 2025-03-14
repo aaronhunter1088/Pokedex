@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <log4j.version>2.24.1</log4j.version>
+        <poke.api.version>1.0.8</poke.api.version>
         <maven.assembly.version>3.6.0</maven.assembly.version>
         <maven.compiler.version>3.11.0</maven.compiler.version>
         <maven.jar.version>3.3.0</maven.jar.version>
@@ -69,7 +70,7 @@
         <dependency>
             <groupId>skaro.pokeapi</groupId>
             <artifactId>pokeapi-reactor</artifactId>
-            <version>1.0.8</version>
+            <version>${poke.api.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
         <dependency>
@@ -211,14 +212,14 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.example.clock.Main</mainClass>
+                            <mainClass>${start-class}</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Implementation-Version>${project.version}</Implementation-Version>
                             <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
                             <!--suppress UnresolvedMavenProperty -->
                             <Creation-Time>${build.time}</Creation-Time>
-                            <mainClass>com.example.clock.Main</mainClass>
+                            <mainClass>${start-class}</mainClass>
                         </manifestEntries>
                     </archive>
                     <includes>
@@ -234,7 +235,7 @@
                 <version>${maven.assembly.version}</version>
                 <executions>
                     <execution>
-                        <id>build-beeper</id>
+                        <id>build-pokedex</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

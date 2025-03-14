@@ -143,7 +143,7 @@ public class PokemonListController extends BaseController {
                 try {
                     speciesData = pokemonService.getPokemonSpeciesData(pokemon.getId().toString());
                     if (null != speciesData) {
-                        logger.info("speciesData: {}", speciesData);
+                        logger.debug("speciesData: {}", speciesData);
                         if (null != speciesData.getColor()) {
                             pokemon.setColor(speciesData.getColor().getName());
                         }
