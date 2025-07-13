@@ -2,15 +2,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.skvllprodvctions</groupId>
+        <artifactId>parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>com.example</groupId>
+
     <artifactId>Pokedex</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
@@ -19,64 +19,97 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <outputDirectory>${basedir}/dist</outputDirectory>
         <start-class>com.pokedex.app.PokedexApplication</start-class>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <log4j.version>2.24.1</log4j.version>
-        <poke.api.version>1.0.8</poke.api.version>
-        <maven.assembly.version>3.6.0</maven.assembly.version>
-        <maven.compiler.version>3.11.0</maven.compiler.version>
-        <maven.jar.version>3.3.0</maven.jar.version>
-        <maven.properties.version>1.0-alpha-2</maven.properties.version>
-        <maven.surefire.version>3.2.1</maven.surefire.version>
-        <maven.compiler.source>18</maven.compiler.source>
-        <maven.compiler.target>18</maven.compiler.target>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- spring boot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- spring boot starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- spring boot starter web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-spring-boot</artifactId>
-        </dependency>
+        <!-- spring boot starter devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
-            <version>${project.parent.version}</version>
+            <scope>runtime</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
+        <!-- spring boot properties migrator: useful when upgrading between major SB versions
+             scans config files, logs warnings, suggests new names. remove after migration is complete -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-properties-migrator</artifactId>
+            <version>${spring.boot.version}</version>
             <scope>runtime</scope>
+        </dependency>
+        <!-- pokeapi-reactor -->
+        <!-- log4j2 -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.7</version>
         </dependency>
 
         <dependency>
             <groupId>skaro.pokeapi</groupId>
             <artifactId>pokeapi-reactor</artifactId>
-            <version>${poke.api.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+            <version>4.0.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <dependency>
@@ -84,6 +117,7 @@
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
         </dependency>
+        <!-- tomcat embedded jasper: required for JSP support -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
@@ -94,8 +128,9 @@
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.2</version>
         </dependency>
+        <!-- jsp jstl: required if your Spring Boot application uses JSPs with JSTL tags -->
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
@@ -114,7 +149,6 @@
             <version>1.2.5</version>
             <scope>runtime</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -128,13 +162,24 @@
                     <!--<include>**/sounds/*.mp3</include>-->
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/webapp</directory>
+                <includes>
+                    <include>**/**</include>
+                </includes>
+            </resource>
         </resources>
 
         <plugins>
+            <!-- Easiest way to create a runnable SB jar
+                 Creates a self-contained jar at mvn package
+                 Will create 'Pokedex-<version>.war'
+                 Copy the war into dist when it's ready -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>${start-class}</mainClass>
                     <executable>true</executable>
                 </configuration>
             </plugin>
@@ -143,19 +188,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.version}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <release>18</release>
+                    <release>${java.version}</release>
                     <compilerArgs>
-                        <!--<arg>#doubledash#enable-preview</arg>-->
                         <arg>-verbose</arg>
                         <arg>-Xlint:all,-options,-path</arg>
                     </compilerArgs>
                     <!-- for surefire plugin -->
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -169,13 +219,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.version}</version>
             </plugin>
             <!-- Generate resources -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
-                <version>1.0-alpha-2</version>
                 <executions>
                     <execution>
                         <phase>generate-resources</phase>
@@ -191,82 +239,93 @@
             <!-- Binds to Package phase, but will not run... -->
             <!-- When creating a jar, update MANIFEST.MF file and place JAR in specified outputDirectory
                  Run Command: mvn install -DskipTests -DskipITs -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven.jar.version}</version>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>${finalName}</finalName>
-                    <outputDirectory>${outputDirectory}</outputDirectory>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>${start-class}</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <Creation-Time>${build.time}</Creation-Time>
-                            <mainClass>${start-class}</mainClass>
-                        </manifestEntries>
-                    </archive>
-                    <includes>
-                        <include>**/*</include>
-                    </includes>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-jar-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>default-jar</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>jar</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <classifier>plain</classifier>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <outputDirectory>${outputDirectory}</outputDirectory>-->
+<!--                    <archive>-->
+<!--                        <index>true</index>-->
+<!--                        <manifest>-->
+<!--                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+<!--                            <addClasspath>true</addClasspath>-->
+<!--                            <mainClass>${start-class}</mainClass>-->
+<!--                        </manifest>-->
+<!--                        <manifestEntries>-->
+<!--                            <Implementation-Version>${project.version}</Implementation-Version>-->
+<!--                            <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>-->
+<!--                            &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
+<!--                            <Creation-Time>${build.time}</Creation-Time>-->
+<!--                            <mainClass>${start-class}</mainClass>-->
+<!--                        </manifestEntries>-->
+<!--                    </archive>-->
+<!--                    <includes>-->
+<!--                        <include>**/*</include>-->
+<!--                    </includes>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
+            <!-- War plugin -->
+<!--            <plugin>-->
+<!--                <artifactId>maven-war-plugin</artifactId>-->
+<!--                <version>3.4.0</version>-->
+<!--                <configuration>-->
+<!--                    <attachClasses>true</attachClasses>-->
+<!--                    <webXml>${basedir}/src/main/webapp/WEB-INF/web.xml</webXml>-->
+<!--                    <warSourceDirectory>src/main/webapp</warSourceDirectory>-->
+<!--                    <outputDirectory>${outputDirectory}</outputDirectory>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+
             <!-- Assembly:Single creates runnable jar with dependencies
                  Run Command: mvn clean package -Dmaven.test.skip=true -->
-            <plugin>
-                <!-- don't need group id since org.apache.maven.plugins is assumed -->
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>${maven.assembly.version}</version>
-                <executions>
-                    <execution>
-                        <id>build-pokedex</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                            <appendAssemblyId>true</appendAssemblyId> <!-- If false, jar-with-dependencies is not appended to jar name -->
-                            <!-- archive required to create executable jar -->
-                            <archive>
-                                <index>true</index>
-                                <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                    <addClasspath>true</addClasspath>
-                                    <mainClass>${start-class}</mainClass>
-                                </manifest>
-                                <manifestEntries>
-                                    <Creation-Time>${maven.build.timestamp}</Creation-Time>
-                                    <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>
-                                </manifestEntries>
-                            </archive>
-                            <finalName>${finalName}</finalName>
-                            <outputDirectory>${outputDirectory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+
+<!--                &lt;!&ndash; don't need group id since org.apache.maven.plugins is assumed &ndash;&gt;-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>build-pokedex</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>single</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <descriptorRefs>-->
+<!--                                <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                            </descriptorRefs>-->
+<!--                            <appendAssemblyId>true</appendAssemblyId> &lt;!&ndash; If false, jar-with-dependencies is not appended to jar name &ndash;&gt;-->
+<!--                            &lt;!&ndash; archive required to create executable jar &ndash;&gt;-->
+<!--                            <archive>-->
+<!--                                <index>true</index>-->
+<!--                                <manifest>-->
+<!--                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+<!--                                    <addClasspath>true</addClasspath>-->
+<!--                                    <mainClass>${start-class}</mainClass>-->
+<!--                                </manifest>-->
+<!--                                <manifestEntries>-->
+<!--                                    <Creation-Time>${maven.build.timestamp}</Creation-Time>-->
+<!--                                    <Creation-Time-Format>yyyy-MM-dd HH:mm:ss</Creation-Time-Format>-->
+<!--                                </manifestEntries>-->
+<!--                            </archive>-->
+<!--                            <finalName>${finalName}</finalName>-->
+<!--                            <outputDirectory>${outputDirectory}</outputDirectory>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
-
     </build>
-
-
 </project>
