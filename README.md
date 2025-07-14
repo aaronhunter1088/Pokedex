@@ -1,5 +1,9 @@
 # pokedexSpringbootApp
 
+# v0.5
+This version introduced the usage of the Parent Pom. This pom manages
+all the versions used within the project.
+
 # v0.4
 This Spring boot application has been upgraded from 2.7.5 to 3.3.1! 
 

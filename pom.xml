@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>Pokedex</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.5</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
