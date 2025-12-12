@@ -1,4 +1,10 @@
-# pokedexSpringbootApp
+# Pokedex - A Spring Boot App
+<img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
+
+# v0.6
+Upgraded several major dependencies. Update Parent version reference to 1.0.0,
+updated Spring Boot from 3.3.1 to 4.0.0, and Jackson from 2.x to 3.x. Updated
+file paths to simplify the structure.
 
 # v0.5
 This version introduced the usage of the Parent Pom. This pom manages
