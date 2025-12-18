@@ -27,11 +27,11 @@ public class BaseController {
     protected PokemonService pokemonService;
 
     @Autowired
-    public BaseController(PokemonService pokemonService) {
-        this.pokemonService = pokemonService;
-    }
+    public BaseController(PokemonService pokemonService)
+    { this.pokemonService = pokemonService; }
 
-    protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId) {
+    protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId)
+    {
         logger.info("id: {}", pokemonId);
         List<Integer> keys = pokemonIDToEvolutionChainMap.keySet().stream().toList();
         Integer keyToReturn = 0;
@@ -55,7 +55,8 @@ public class BaseController {
      * @param speciesData from pokeapi-reactor
      * @return Pokemon object
      */
-    protected Pokemon createPokemon(skaro.pokeapi.resource.pokemon.Pokemon pokemonResource, PokemonSpecies speciesData) {
+    protected Pokemon createPokemon(skaro.pokeapi.resource.pokemon.Pokemon pokemonResource, PokemonSpecies speciesData)
+    {
         Pokemon pokemon = new Pokemon(pokemonResource);
         pokemon.setDefaultImage(null != pokemon.getSprites().getFrontDefault() ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg");
         pokemon.setOfficialImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png");
@@ -90,13 +91,15 @@ public class BaseController {
         return pokemon;
     }
 
-    private void setGifImage(Pokemon pokemon) {
+    private void setGifImage(Pokemon pokemon)
+    {
         pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
         HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
         if (response.statusCode() == 404) pokemon.setGifImage(null);
     }
 
-    protected Map<String, Object> generateDefaultAttributesMap() {
+    protected Map<String, Object> generateDefaultAttributesMap()
+    {
         return new TreeMap<>() {{
             put("name", null); // on screen
             put("gender", null);

@@ -10,7 +10,8 @@ import org.springframework.web.util.pattern.PathPatternParser;
 public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    public void configurePathMatch(PathMatchConfigurer configurer)
+    {
         //configurer.setUseTrailingSlashMatch(true);
     }
 

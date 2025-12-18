@@ -20,15 +20,15 @@ import java.time.Duration;
 @Configuration
 @Import(PokeApiReactorCachingConfiguration.class)
 @EnableCaching
-public class MyPokeApiReactorCachingConfiguration {
-
+public class MyPokeApiReactorCachingConfiguration
+{
     @Bean
-    public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager();
-    }
+    public CacheManager cacheManager()
+    { return new ConcurrentMapCacheManager(); }
     
     @Bean
-    public ConnectionProvider connectionProvider() {
+    public ConnectionProvider connectionProvider()
+    {
         return ConnectionProvider.builder("Auto refresh & no connection limit")
                 .maxIdleTime(Duration.ofSeconds(10))
                 .maxConnections(500)
@@ -37,7 +37,8 @@ public class MyPokeApiReactorCachingConfiguration {
     }
 
     @Bean
-    public HttpClient httpClient(ConnectionProvider connectionProvider) {
+    public HttpClient httpClient(ConnectionProvider connectionProvider)
+    {
         return HttpClient.create(connectionProvider)
                 .compress(true)
                 .resolver(DefaultAddressResolverGroup.INSTANCE)
@@ -49,7 +50,8 @@ public class MyPokeApiReactorCachingConfiguration {
     }
 
     @Bean
-    public WebClient.Builder webClientBuilder(HttpClient httpClient) {
+    public WebClient.Builder webClientBuilder(HttpClient httpClient)
+    {
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .codecs(clientCodecConfigurer ->
