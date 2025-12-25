@@ -51,11 +51,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- spring boot starter web services -->
+        <!-- spring boot starter webservices -->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-web-services</artifactId>-->
+<!--            <artifactId>spring-boot-starter-webservices</artifactId>-->
 <!--        </dependency>-->
+        <!-- spring-boot-starter-actuator -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>
         <!-- spring boot starter devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -84,16 +89,16 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.7</version>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.20.1</version>
-        </dependency>
-
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-databind</artifactId>-->
+<!--            <version>2.20.1</version>-->
+<!--        </dependency>-->
+        <!-- pokeapi-reactor -->
         <dependency>
             <groupId>skaro.pokeapi</groupId>
             <artifactId>pokeapi-reactor</artifactId>
-            <version>1.0.9</version>
+<!--            <version>1.0.9</version>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
         <dependency>
@@ -212,6 +217,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <outputDirectory>${outputDirectory}</outputDirectory>
+                </configuration>
             </plugin>
             <!-- Compile found in parent -->
             <!-- Test-compile found in parent -->
@@ -222,7 +230,7 @@
                      Found in parent -->
             <!-- Attach sources
                      Found in parent -->
-            <!-- JaCoCo configuration for code analysis
+            <!-- JaCoCo config for code analysis
                      Found in parent -->
         </plugins>
     </build>
