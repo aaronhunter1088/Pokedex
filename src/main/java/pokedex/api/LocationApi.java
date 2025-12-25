@@ -5,7 +5,6 @@ import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -18,23 +17,22 @@ import skaro.pokeapi.resource.region.Region;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/location")
-public class LocationApi extends BaseController {
-
+public class LocationApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(LocationApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
     @Autowired
-    public LocationApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    LocationApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // Locations
-    @GetMapping(value="/list")
+    @GetMapping(value="")
     @ResponseBody
-    public ResponseEntity<?> getLocations() {
+    public ResponseEntity<?> getLocations()
+    {
         logger.info("getLocations");
         try {
             NamedApiResourceList<Location> locations = pokeApiClient.getResource(Location.class).block();
@@ -45,8 +43,9 @@ public class LocationApi extends BaseController {
         }
     }
 
-    @GetMapping(value="/location/{id}")
-    public ResponseEntity<?> getLocation(@PathVariable(value="id") String id) {
+    @GetMapping(value="/{id}")
+    public ResponseEntity<?> getLocation(@PathVariable String id)
+    {
         logger.info("getLocation {}", id);
         try {
             Location location = pokeApiClient.getResource(Location.class, id).block();
@@ -60,7 +59,8 @@ public class LocationApi extends BaseController {
     // Location Areas
     @GetMapping(value="/list-location-area")
     @ResponseBody
-    public ResponseEntity<?> getLocationAreas() {
+    public ResponseEntity<?> getLocationAreas()
+    {
         logger.info("getLocationAreas");
         try {
             NamedApiResourceList<LocationArea> locationAreas = pokeApiClient.getResource(LocationArea.class).block();
@@ -72,7 +72,8 @@ public class LocationApi extends BaseController {
     }
 
     @GetMapping(value="/location-area/{id}")
-    public ResponseEntity<?> getLocationArea(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getLocationArea(@PathVariable String id)
+    {
         logger.info("getLocationArea {}", id);
         try {
             LocationArea locationArea = pokeApiClient.getResource(LocationArea.class, id).block();
@@ -86,7 +87,8 @@ public class LocationApi extends BaseController {
     // Pal Park Areas
     @GetMapping(value="/list-pal-park-area")
     @ResponseBody
-    public ResponseEntity<?> getPalParkAreas() {
+    public ResponseEntity<?> getPalParkAreas()
+    {
         logger.info("getPalParkAreas");
         try {
             NamedApiResourceList<PalParkArea> palParkAreas = pokeApiClient.getResource(PalParkArea.class).block();
@@ -98,7 +100,8 @@ public class LocationApi extends BaseController {
     }
 
     @GetMapping(value="/pal-park-area/{id}")
-    public ResponseEntity<?> getPalParkArea(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getPalParkArea(@PathVariable String id)
+    {
         logger.info("getPalParkArea {}", id);
         try {
             PalParkArea palParkArea = pokeApiClient.getResource(PalParkArea.class, id).block();
@@ -112,7 +115,8 @@ public class LocationApi extends BaseController {
     // Regions
     @GetMapping(value="/list-region")
     @ResponseBody
-    public ResponseEntity<?> getRegions() {
+    public ResponseEntity<?> getRegions()
+    {
         logger.info("getRegions");
         try {
             NamedApiResourceList<Region> regions = pokeApiClient.getResource(Region.class).block();
@@ -124,7 +128,8 @@ public class LocationApi extends BaseController {
     }
 
     @GetMapping(value="/region/{id}")
-    public ResponseEntity<?> getRegion(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getRegion(@PathVariable String id)
+    {
         logger.info("getRegion {}", id);
         try {
             Region region = pokeApiClient.getResource(Region.class, id).block();

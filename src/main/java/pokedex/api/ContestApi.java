@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -22,24 +21,23 @@ import java.util.Map;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/contest")
-public class ContestApi extends BaseController {
-
-    private static final Logger logger = LogManager.getLogger(ContestApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
+public class ContestApi extends BaseController
+{
+    /* Logging instance */
+    private static final Logger LOGGER = LogManager.getLogger(ContestApi.class);
 
     @Autowired
-    public ContestApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    ContestApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // ContestType
     @GetMapping(value="/list-contest-type")
     @ResponseBody
-    public ResponseEntity<?> getAllContests() {
-        logger.info("getAllContests");
+    public ResponseEntity<?> getAllContests()
+    {
+        LOGGER.info("getAllContests");
         try {
             NamedApiResourceList<ContestType> contests = pokeApiClient.getResource(skaro.pokeapi.resource.contesttype.ContestType.class).block();
             if (null != contests) return ResponseEntity.ok(contests);
@@ -50,8 +48,9 @@ public class ContestApi extends BaseController {
     }
 
     @GetMapping(value="/type/{id}")
-    public ResponseEntity<?> getContestType(@PathVariable(value="id") String id) {
-        logger.info("getContestType {}", id);
+    public ResponseEntity<?> getContestType(@PathVariable String id)
+    {
+        LOGGER.info("getContestType {}", id);
         try {
             ContestType contestType = pokeApiClient.getResource(ContestType.class, id).block();
             if (null != contestType) return ResponseEntity.ok(contestType);
@@ -64,8 +63,9 @@ public class ContestApi extends BaseController {
     // ContestEffect
     @GetMapping(value="/list-contest-effects")
     @ResponseBody
-    public ResponseEntity<?> getAllContestEffect() {
-        logger.info("getAllContestEffects");
+    public ResponseEntity<?> getAllContestEffect()
+    {
+        LOGGER.info("getAllContestEffects");
         HttpResponse<String> response;
         JSONParser jsonParser;
         try {
@@ -76,7 +76,7 @@ public class ContestApi extends BaseController {
             response = HttpClient.newBuilder()
                         .build()
                         .send(request,  HttpResponse.BodyHandlers.ofString());
-            logger.debug("response: {}", response.body());
+            LOGGER.debug("response: {}", response.body());
             jsonParser = new JSONParser(response.body());
             Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
             if (null != results && !results.isEmpty()) return ResponseEntity.ok(results);
@@ -88,8 +88,9 @@ public class ContestApi extends BaseController {
 
     @GetMapping(value="/contest-effect/{id}")
     @ResponseBody
-    public ResponseEntity<?> getContestEffect(@PathVariable(value="id") String id) {
-        logger.info("getContestEffect with {}", id);
+    public ResponseEntity<?> getContestEffect(@PathVariable String id)
+    {
+        LOGGER.info("getContestEffect with {}", id);
         HttpResponse<String> response;
         JSONParser jsonParser;
         try {
@@ -100,7 +101,7 @@ public class ContestApi extends BaseController {
             response = HttpClient.newBuilder()
                     .build()
                     .send(request,  HttpResponse.BodyHandlers.ofString());
-            logger.info("response: {}", response.body());
+            LOGGER.info("response: {}", response.body());
             jsonParser = new JSONParser(response.body());
             Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
             if (null != results && !results.isEmpty()) return ResponseEntity.ok(results);
@@ -113,8 +114,9 @@ public class ContestApi extends BaseController {
     // SuperContestEffects
     @GetMapping(value="/list-super-contest-effects")
     @ResponseBody
-    public ResponseEntity<?> getAllSuperContestEffect() {
-        logger.info("getAllSuperContestEffects");
+    public ResponseEntity<?> getAllSuperContestEffect()
+    {
+        LOGGER.info("getAllSuperContestEffects");
         HttpResponse<String> response;
         JSONParser jsonParser;
         try {
@@ -125,7 +127,7 @@ public class ContestApi extends BaseController {
             response = HttpClient.newBuilder()
                     .build()
                     .send(request,  HttpResponse.BodyHandlers.ofString());
-            logger.debug("response: {}", response.body());
+            LOGGER.debug("response: {}", response.body());
             jsonParser = new JSONParser(response.body());
             Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
             if (null != results && !results.isEmpty()) return ResponseEntity.ok(results);
@@ -137,8 +139,9 @@ public class ContestApi extends BaseController {
 
     @GetMapping(value="/super-contest-effect/{id}")
     @ResponseBody
-    public ResponseEntity<?> getSuperContestEffect(@PathVariable(value="id") String id) {
-        logger.info("getSuperContestEffect with {}", id);
+    public ResponseEntity<?> getSuperContestEffect(@PathVariable String id)
+    {
+        LOGGER.info("getSuperContestEffect with {}", id);
         HttpResponse<String> response;
         JSONParser jsonParser;
         try {
@@ -149,7 +152,7 @@ public class ContestApi extends BaseController {
             response = HttpClient.newBuilder()
                     .build()
                     .send(request,  HttpResponse.BodyHandlers.ofString());
-            logger.info("response: {}", response.body());
+            LOGGER.info("response: {}", response.body());
             jsonParser = new JSONParser(response.body());
             Map<String, Object> results = (Map<String, Object>) jsonParser.parse();
             if (null != results && !results.isEmpty()) return ResponseEntity.ok(results);

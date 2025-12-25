@@ -5,7 +5,6 @@ import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -21,23 +20,22 @@ import skaro.pokeapi.resource.movetarget.MoveTarget;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/move")
-public class MovesApi extends BaseController {
-
+public class MovesApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(MovesApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
     @Autowired
-    public MovesApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    MovesApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // Moves
-    @GetMapping(value="/list")
+    @GetMapping(value="")
     @ResponseBody
-    public ResponseEntity<?> getMoves() {
+    public ResponseEntity<?> getMoves()
+    {
         logger.info("getMoves");
         try {
             NamedApiResourceList<Move> moves = pokeApiClient.getResource(Move.class).block();
@@ -48,8 +46,9 @@ public class MovesApi extends BaseController {
         }
     }
 
-    @GetMapping(value="/move/{id}")
-    public ResponseEntity<?> getMove(@PathVariable(value="id") String id) {
+    @GetMapping(value="/{id}")
+    public ResponseEntity<?> getMove(@PathVariable String id)
+    {
         logger.info("getMove {}", id);
         try {
             Move move = pokeApiClient.getResource(Move.class, id).block();
@@ -63,7 +62,8 @@ public class MovesApi extends BaseController {
     // Move Ailment
     @GetMapping(value="/list-move-ailment")
     @ResponseBody
-    public ResponseEntity<?> getMoveAilments() {
+    public ResponseEntity<?> getMoveAilments()
+    {
         logger.info("getMoveAilments");
         try {
             NamedApiResourceList<MoveAilment> moveAilments = pokeApiClient.getResource(MoveAilment.class).block();
@@ -75,7 +75,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/move-ailment/{id}")
-    public ResponseEntity<?> getMoveAilment(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getMoveAilment(@PathVariable String id)
+    {
         logger.info("getMoveAilment {}", id);
         try {
             MoveAilment moveAilment = pokeApiClient.getResource(MoveAilment.class, id).block();
@@ -89,7 +90,8 @@ public class MovesApi extends BaseController {
     // Battle Styles
     @GetMapping(value="/list-move-battle-style")
     @ResponseBody
-    public ResponseEntity<?> getMoveBattleStyles() {
+    public ResponseEntity<?> getMoveBattleStyles()
+    {
         logger.info("getMoveMoveBattleStyles");
         try {
             NamedApiResourceList<MoveBattleStyle> moveAilments = pokeApiClient.getResource(MoveBattleStyle.class).block();
@@ -101,7 +103,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/move-battle-style/{id}")
-    public ResponseEntity<?> getMoveBattleStyle(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getMoveBattleStyle(@PathVariable String id)
+    {
         logger.info("getMoveBattleStyle {}", id);
         try {
             MoveBattleStyle battleStyle = pokeApiClient.getResource(MoveBattleStyle.class, id).block();
@@ -115,7 +118,8 @@ public class MovesApi extends BaseController {
     // Categories
     @GetMapping(value="/list-category")
     @ResponseBody
-    public ResponseEntity<?> getCategories() {
+    public ResponseEntity<?> getCategories()
+    {
         logger.info("getCategories");
         try {
             NamedApiResourceList<MoveCategory> moveCategories = pokeApiClient.getResource(MoveCategory.class).block();
@@ -127,7 +131,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/move-category/{id}")
-    public ResponseEntity<?> getCategory(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getCategory(@PathVariable String id)
+    {
         logger.info("getMoveBattleStyle {}", id);
         try {
             MoveCategory moveCategory = pokeApiClient.getResource(MoveCategory.class, id).block();
@@ -141,7 +146,8 @@ public class MovesApi extends BaseController {
     // Damage Classes
     @GetMapping(value="/list-damage-class")
     @ResponseBody
-    public ResponseEntity<?> getDamageClasses() {
+    public ResponseEntity<?> getDamageClasses()
+    {
         logger.info("getDamageClasses");
         try {
             NamedApiResourceList<MoveDamageClass> moveDamages = pokeApiClient.getResource(MoveDamageClass.class).block();
@@ -153,7 +159,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/damage-class/{id}")
-    public ResponseEntity<?> getDamageClass(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getDamageClass(@PathVariable String id)
+    {
         logger.info("getMoveDamageClass {}", id);
         try {
             MoveDamageClass moveDamageClass = pokeApiClient.getResource(MoveDamageClass.class, id).block();
@@ -167,7 +174,8 @@ public class MovesApi extends BaseController {
     // Learn Moves
     @GetMapping(value="/list-learn-move")
     @ResponseBody
-    public ResponseEntity<?> getLearnMoves() {
+    public ResponseEntity<?> getLearnMoves()
+    {
         logger.info("getLearnMoves");
         try {
             NamedApiResourceList<MoveLearnMethod> learnMoves = pokeApiClient.getResource(MoveLearnMethod.class).block();
@@ -179,7 +187,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/learn-move/{id}")
-    public ResponseEntity<?> getMoveLearnMethod(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getMoveLearnMethod(@PathVariable String id)
+    {
         logger.info("getMoveLearnMethod {}", id);
         try {
             MoveLearnMethod moveLearnMethod = pokeApiClient.getResource(MoveLearnMethod.class, id).block();
@@ -193,7 +202,8 @@ public class MovesApi extends BaseController {
     // Targets
     @GetMapping(value="/list-move-target")
     @ResponseBody
-    public ResponseEntity<?> getMoveTargets() {
+    public ResponseEntity<?> getMoveTargets()
+    {
         logger.info("getTargets");
         try {
             NamedApiResourceList<MoveTarget> learnMoves = pokeApiClient.getResource(MoveTarget.class).block();
@@ -205,7 +215,8 @@ public class MovesApi extends BaseController {
     }
 
     @GetMapping(value="/move-target/{id}")
-    public ResponseEntity<?> getMoveTarget(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getMoveTarget(@PathVariable String id)
+    {
         logger.info("getMoveTarget {}", id);
         try {
             MoveTarget moveTarget = pokeApiClient.getResource(MoveTarget.class, id).block();

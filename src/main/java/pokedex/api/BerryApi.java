@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
+import skaro.pokeapi.query.PageQuery;
 import skaro.pokeapi.resource.NamedApiResourceList;
 import skaro.pokeapi.resource.berry.Berry;
 import skaro.pokeapi.resource.berryfirmness.BerryFirmness;
@@ -16,21 +17,22 @@ import skaro.pokeapi.resource.berryflavor.BerryFlavor;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/berry")
-public class BerryApi extends BaseController {
-
-    private static final Logger logger = LogManager.getLogger(BerryApi.class);
-    private final PokeApiClient pokeApiClient;
+public class BerryApi extends BaseController
+{
+    /* Logging instance */
+    private static final Logger LOGGER = LogManager.getLogger(BerryApi.class);
 
     @Autowired
-    public BerryApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    BerryApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
-    @GetMapping(value="/list")
+    @GetMapping(value="")
     @ResponseBody
-    public ResponseEntity<?> getAllBerries() {
-        logger.info("getAllBerries");
+    public ResponseEntity<?> getAllBerries()
+    {
+        LOGGER.info("getAllBerries");
         try {
             NamedApiResourceList<Berry> berries = pokeApiClient.getResource(Berry.class).block();
             if (null != berries) return ResponseEntity.ok(berries);
@@ -41,8 +43,9 @@ public class BerryApi extends BaseController {
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<?> getBerry(@PathVariable(value="id") String id) {
-        logger.info("getBerry {}", id);
+    public ResponseEntity<?> getBerry(@PathVariable String id)
+    {
+        LOGGER.info("getBerry {}", id);
         try {
             Berry berry = pokeApiClient.getResource(Berry.class, id).block();
             if (null != berry) return ResponseEntity.ok(berry);
@@ -52,9 +55,25 @@ public class BerryApi extends BaseController {
         }
     }
 
-    @GetMapping(value="/berry-firmness/{id}")
-    public ResponseEntity<?> getBerryFirmness(@PathVariable(value="id") String id) {
-        logger.info("getBerryFirmness: {}", id);
+    @GetMapping("/berry-firmness")
+    @ResponseBody
+    ResponseEntity<?> getBerryFirmness(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                       @RequestParam(value = "offset", required = false, defaultValue = "0") int offset)
+    {
+        LOGGER.info("getBerryFirmness");
+        try {
+            NamedApiResourceList<BerryFirmness> berryFirmnesses = pokeApiClient.getResource(BerryFirmness.class, new PageQuery(limit, offset)).block();
+            if (null != berryFirmnesses) return ResponseEntity.ok(berryFirmnesses);
+            else return ResponseEntity.badRequest().body("Could not access berry-firmness endpoint");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/berry-firmness/{id}")
+    ResponseEntity<?> getBerryFirmness(@PathVariable String id)
+    {
+        LOGGER.info("getBerryFirmness: {}", id);
         try {
             BerryFirmness berryFirmness = pokeApiClient.getResource(BerryFirmness.class, id).block();
             if (null != berryFirmness) return ResponseEntity.ok(berryFirmness);
@@ -64,9 +83,25 @@ public class BerryApi extends BaseController {
         }
     }
 
-    @GetMapping(value="/berry-flavor/{id}")
-    public ResponseEntity<?> getBerryFlavor(@PathVariable(value="id") String id) {
-        logger.info("getBerryFlavor: {}", id);
+    @GetMapping("/berry-flavor")
+    @ResponseBody
+    ResponseEntity<?> getBerryFlavors(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                      @RequestParam(value = "offset", required = false, defaultValue = "0") int offset)
+    {
+        LOGGER.info("getBerryFlavors");
+        try {
+            NamedApiResourceList<BerryFlavor> berryFlavors = pokeApiClient.getResource(BerryFlavor.class, new PageQuery(limit, offset)).block();
+            if (null != berryFlavors) return ResponseEntity.ok(berryFlavors);
+            else return ResponseEntity.badRequest().body("Could not access berry-flavor endpoint");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/berry-flavor/{id}")
+    ResponseEntity<?> getBerryFlavor(@PathVariable String id)
+    {
+        LOGGER.info("getBerryFlavor: {}", id);
         try {
             BerryFlavor berryFlavor = pokeApiClient.getResource(BerryFlavor.class, id).block();
             if (null != berryFlavor) return ResponseEntity.ok(berryFlavor);

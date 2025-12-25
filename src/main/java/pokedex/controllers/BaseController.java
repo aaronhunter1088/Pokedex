@@ -1,22 +1,27 @@
 package pokedex.controllers;
 
-import pokedex.entities.Pokemon;
+import org.springframework.beans.factory.annotation.Value;
 import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
+import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.net.http.HttpResponse;
 import java.util.*;
 
-@Controller
-public class BaseController {
+import static pokedex.utilities.Constants.GIF_IMAGE_URL;
+import static pokedex.utilities.Constants.OFFICIAL_IMAGE_URL;
 
+@Controller
+public class BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(BaseController.class);
 
     String pokemonId = "";
@@ -24,11 +29,17 @@ public class BaseController {
     int lastPageSearched = 1;
     int pkmnPerPage = 10;
 
-    protected PokemonService pokemonService;
+    protected final PokemonService pokemonService;
+    protected final PokeApiClient pokeApiClient;
+    @Value("${skaro.pokeapi.baseUri}")
+    protected String pokeApiBaseUrl;
 
     @Autowired
-    public BaseController(PokemonService pokemonService)
-    { this.pokemonService = pokemonService; }
+    public BaseController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        this.pokemonService = pokemonService;
+        this.pokeApiClient = pokeApiClient;
+    }
 
     protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId)
     {
@@ -51,51 +62,76 @@ public class BaseController {
 
     /**
      * Returns a Pokemon with application specific properties
-     * @param pokemonResource from pokeapi-reactor
+     * @param pokemon from pokeapi-reactor
      * @param speciesData from pokeapi-reactor
      * @return Pokemon object
      */
-    protected Pokemon createPokemon(skaro.pokeapi.resource.pokemon.Pokemon pokemonResource, PokemonSpecies speciesData)
+    protected Pokemon createPokemon(Pokemon pokemon, PokemonSpecies speciesData)
     {
-        Pokemon pokemon = new Pokemon(pokemonResource);
-        pokemon.setDefaultImage(null != pokemon.getSprites().getFrontDefault() ? pokemon.getSprites().getFrontDefault() : "/images/pokeball1.jpg");
-        pokemon.setOfficialImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+pokemon.getId()+".png");
-        setGifImage(pokemon);
-        pokemon.setShinyImage(pokemon.getSprites().getFrontShiny());
-        pokemon.setColor(speciesData.getColor().getName());
-        pokemon.setDescriptions(speciesData.getFlavorTextEntries());
-        List<FlavorText> pokemonDescriptions = pokemon.getDescriptions()
-                .stream().filter(entry -> entry.getLanguage().getName().equals("en"))
-                .toList();
-        int randomEntry = new Random().nextInt(pokemonDescriptions.size());
-        String description = pokemonDescriptions.get(randomEntry).getFlavorText().replace("\n", "");
-        pokemon.setDescriptions(pokemonDescriptions);
-        pokemon.setDescription(description);
-        List<PokemonType> types = pokemon.getTypes();
+        String defaultImage = null != pokemon.sprites().getFrontDefault() ? pokemon.sprites().getFrontDefault() : "/images/pokeball1.jpg";
+        String officialImage = OFFICIAL_IMAGE_URL(pokemon.getId());
+        String gifImage = GIF_IMAGE_URL(pokemon.id());
+        String shinyImage = pokemon.sprites().getFrontShiny();
+        String color = speciesData.getColor().name();
+        List<FlavorText> flavorTexts = speciesData.getFlavorTextEntries();
+        List<FlavorText> pokemonDescriptions = pokemon.descriptions() != null ?
+                pokemon.descriptions().stream().filter(entry -> entry.getLanguage().name().equals("en"))
+                .toList() : new ArrayList<>();
+        String description = !pokemonDescriptions.isEmpty() ?
+                pokemonDescriptions.get(new Random().nextInt(pokemonDescriptions.size())).getFlavorText().replace("\n", "")
+                : "No description available.";
+        //pokemon.setDescriptions(pokemonDescriptions);
+        //pokemon.setDescription(description);
+        List<PokemonType> types = pokemon.types();
+        String typeString = "";
         if (types.size() > 1) {
             logger.debug("More than 1 pokemonType");
-            pokemon.setType(types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1)
-                    + " & " + types.get(1).getType().getName().substring(0,1).toUpperCase() + types.get(1).getType().getName().substring(1));
+            typeString = types.get(0).getType().name().substring(0,1).toUpperCase() + types.get(0).getType().name().substring(1)
+                    + " & " + types.get(1).getType().name().substring(0,1).toUpperCase() + types.get(1).getType().name().substring(1);
         } else {
             logger.debug("One pokemonType");
-            pokemon.setType(types.get(0).getType().getName().substring(0,1).toUpperCase() + types.get(0).getType().getName().substring(1));
+            typeString = types.get(0).getType().name().substring(0,1).toUpperCase() + types.get(0).getType().name().substring(1);
         }
-        String pokemonLocation = pokemon.getLocationAreaEncounters();
-        pokemon.setLocations(pokemonService.getPokemonLocationEncounters(pokemonLocation));
+        String pokemonLocation = pokemon.locationAreaEncounters();
+        List<String> locationEncounters = pokemonService.getPokemonLocationEncounters(pokemonLocation);
 
-        pokemon.setPokemonMoves(pokemon.getMoves().stream()
+        List<String> moves = pokemon.moves().stream()
                 .map(skaro.pokeapi.resource.pokemon.PokemonMove::getMove)
-                .map(NamedApiResource::getName)
+                .map(NamedApiResource::name)
                 .sorted()
-                .toList());
+                .toList();
+        pokemon = Pokemon.from(pokemon, Map.of(
+                "defaultImage", defaultImage,
+                "officialImage", officialImage,
+                "gifImage", gifImage,
+                "shinyImage", shinyImage,
+                "color", color,
+                "flavorTexts", flavorTexts,
+                "descriptions", pokemonDescriptions,
+                "description", description,
+                "type", typeString,
+                "locationAreaEncounters", locationEncounters
+        ));
+        pokemon = Pokemon.from(pokemon, Map.of(
+                "moveNames", moves
+        ));
         return pokemon;
     }
 
-    private void setGifImage(Pokemon pokemon)
+    /**
+     * Fetch the pokemon resource
+     * @param nameOrId String the name or id of a Pokemon
+     * @return the Pokemon or null
+     */
+    public Pokemon retrievePokemon(String nameOrId)
     {
-        pokemon.setGifImage("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.getId()+".gif");
-        HttpResponse<String> response = pokemonService.callUrl(pokemon.getGifImage());
-        if (response.statusCode() == 404) pokemon.setGifImage(null);
+        logger.info("retrievePokemon");
+        try {
+            return pokeApiClient.getResource(Pokemon.class, nameOrId).block();
+        } catch (Exception e) {
+            logger.error("Could not find pokemon with value: {}", nameOrId);
+            return null;
+        }
     }
 
     protected Map<String, Object> generateDefaultAttributesMap()

@@ -36,17 +36,15 @@ import java.util.*;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/pokemon")
-public class PokemonApi extends BaseController {
-
+public class PokemonApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(PokemonApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
     @Autowired
-    public PokemonApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    public PokemonApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // Abilities
@@ -63,7 +61,8 @@ public class PokemonApi extends BaseController {
     }
 
     @GetMapping(value="/ability/{id}")
-    public ResponseEntity<?> getAbility(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getAbility(@PathVariable(value="id") String id)
+    {
         logger.info("getAbility {}", id);
         try {
             HttpResponse<String> ability = pokemonService.callUrl(pokeApiBaseUrl+"ability/"+id);
@@ -88,7 +87,8 @@ public class PokemonApi extends BaseController {
     }
 
     @GetMapping(value="/characteristic/{id}")
-    public ResponseEntity<?> getCharacteristic(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getCharacteristic(@PathVariable(value="id") String id)
+    {
         logger.info("getCharacteristic {}", id);
         try {
             HttpResponse<String> characteristic = pokemonService.callUrl(pokeApiBaseUrl+"characteristic/"+id);
@@ -117,7 +117,8 @@ public class PokemonApi extends BaseController {
     }
 
     @GetMapping(value="/egg-group/{id}")
-    public ResponseEntity<?> getEggGroup(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getEggGroup(@PathVariable(value="id") String id)
+    {
         logger.info("getEggGroup {}", id);
         try {
             EggGroup eggGroup = pokeApiClient.getResource(EggGroup.class, id).block();
@@ -242,7 +243,8 @@ public class PokemonApi extends BaseController {
     @RequestMapping(value = "/list-pokemon", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getAllPokemon(@RequestParam(value="limit", required=false, defaultValue="10") int limit,
-                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset) {
+                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset)
+    {
         logger.info("getAllPokemon limit:{} offset:{}", limit, offset);
         NamedApiResourceList<Pokemon> allPokemon;
         try {
@@ -309,7 +311,7 @@ public class PokemonApi extends BaseController {
         try {
             speciesInfo = pokeApiClient.getResource(PokemonSpecies.class, nameOrId).block();
             if (speciesInfo != null) {
-                String colorOfPokemon = speciesInfo.getColor().getName();
+                String colorOfPokemon = speciesInfo.getColor().name();
                 logger.info("color: {}", colorOfPokemon);
                 return ResponseEntity.ok(colorOfPokemon);
             }
@@ -440,11 +442,11 @@ public class PokemonApi extends BaseController {
             else {
                 Pokemon pokemonResource = (Pokemon) getPokemon(nameOrId).getBody();
                 assert pokemonResource != null;
-                NamedApiResource<PokemonSpecies> speciesResource = pokemonResource.getSpecies();
+                NamedApiResource<PokemonSpecies> speciesResource = pokemonResource.species();
                 if (null == speciesResource) {
                     return ResponseEntity.noContent().build();
                 }
-                HttpResponse<String> response = pokemonService.callUrl(speciesResource.getUrl());
+                HttpResponse<String> response = pokemonService.callUrl(speciesResource.url());
                 if (response.statusCode() == 200) return ResponseEntity.ok(response.body());
                 else return ResponseEntity.badRequest().body("Could not find PokemonSpecies with: " + nameOrId);
             }
@@ -514,7 +516,7 @@ public class PokemonApi extends BaseController {
         try {
             Optional<PokemonSpecies> pokemonSpecies = pokeApiClient.getResource(PokemonSpecies.class, nameOrId).blockOptional();
             pokemonDescriptions = pokemonSpecies.map(species -> species
-                    .getFlavorTextEntries().stream().filter(entry -> entry.getLanguage().getName().equals("en"))
+                    .getFlavorTextEntries().stream().filter(entry -> entry.getLanguage().name().equals("en"))
                     .toList()).orElse(null);
             assert pokemonDescriptions != null;
             int randomEntry = new Random().nextInt(pokemonDescriptions.size());
@@ -555,7 +557,7 @@ public class PokemonApi extends BaseController {
             return ResponseEntity.badRequest()
                     .body("Could not find pokemon with value:" + nameOrId);
         }
-        String encountersString = pokemon.getLocationAreaEncounters();
+        String encountersString = pokemon.locationAreaEncounters();
         HttpResponse<String> response;
         List<String> namesOfAreas = new ArrayList<>();
         JSONParser jsonParser;
@@ -584,11 +586,6 @@ public class PokemonApi extends BaseController {
         return new ResponseEntity<>(array.toJSONString(), HttpStatus.OK);
     }
 
-
-
-
-
-
     @RequestMapping(value= "/{nameOrId}/evolutionChain", method=RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Object> getEvolutionChain(@PathVariable("nameOrId") String nameOrId)
@@ -596,7 +593,7 @@ public class PokemonApi extends BaseController {
         PokemonSpecies speciesData = (PokemonSpecies) getSpeciesData(nameOrId).getBody();
         try {
             assert speciesData != null;
-            String chainUrl = speciesData.getEvolutionChain().getUrl();
+            String chainUrl = speciesData.getEvolutionChain().url();
             logger.info("chainUrl: " + chainUrl);
             HttpResponse<String> response = pokemonService.callUrl(chainUrl);
             if (response.statusCode() == 200) return ResponseEntity.ok(response.body());
@@ -607,18 +604,4 @@ public class PokemonApi extends BaseController {
         }
     }
 
-    /**
-     * Fetch the pokemon resource
-     * @param nameOrId String the name or id of a Pokemon
-     * @return the Pokemon or null
-     */
-    public Pokemon retrievePokemon(String nameOrId) {
-        logger.info("retrievePokemon");
-        try {
-            return pokeApiClient.getResource(Pokemon.class, nameOrId).block();
-        } catch (Exception e) {
-            logger.error("Could not find pokemon with value: {}", nameOrId);
-            return null;
-        }
-    }
 }

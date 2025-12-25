@@ -5,7 +5,6 @@ import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -18,24 +17,23 @@ import java.net.http.HttpResponse;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/evolution")
-public class EvolutionApi extends BaseController {
-
+public class EvolutionApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(EvolutionApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
     @Autowired
-    public EvolutionApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    EvolutionApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // Evolution Chains
     @GetMapping(value="/list-evolution-chain")
     @ResponseBody
     public ResponseEntity<?> getEvolutionChains(@RequestParam(value="limit", required=false, defaultValue="10") int limit,
-                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset)  {
+                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset)
+    {
         logger.info("getEvolutionChains");
         HttpResponse<String> response;
         try {
@@ -56,7 +54,8 @@ public class EvolutionApi extends BaseController {
 
     @GetMapping(value="/evolution-chain/{id}")
     @ResponseBody
-    public ResponseEntity<?> getEvolutionChain(@PathVariable("id") int id)  {
+    public ResponseEntity<?> getEvolutionChain(@PathVariable int id)
+    {
         logger.info("getEvolutionChain {}", id);
         HttpResponse<String> response;
         try {
@@ -79,7 +78,8 @@ public class EvolutionApi extends BaseController {
     @GetMapping(value="/list-evolution-trigger")
     @ResponseBody
     public ResponseEntity<?> getEvolutionTriggers(@RequestParam(value="limit", required=false, defaultValue="10") int limit,
-                                                @RequestParam(value="offset", required=false, defaultValue="0") int offset)  {
+                                                  @RequestParam(value="offset", required=false, defaultValue="0") int offset)
+    {
         logger.info("getEvolutionTriggers");
         HttpResponse<String> response;
         try {
@@ -100,7 +100,8 @@ public class EvolutionApi extends BaseController {
 
     @GetMapping(value="/evolution-trigger/{id}")
     @ResponseBody
-    public ResponseEntity<?> getEvolutionTrigger(@PathVariable("id") int id)  {
+    public ResponseEntity<?> getEvolutionTrigger(@PathVariable int id)
+    {
         logger.info("getEvolutionTrigger {}", id);
         HttpResponse<String> response = pokemonService.callUrl(pokeApiBaseUrl+"/evolution-trigger/"+id);
         if (response.statusCode() == 200) {

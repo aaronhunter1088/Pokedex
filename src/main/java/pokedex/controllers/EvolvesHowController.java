@@ -8,12 +8,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import skaro.pokeapi.client.PokeApiClient;
 
 import java.util.*;
 
 @Controller
-public class EvolvesHowController extends BaseController {
-
+public class EvolvesHowController extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(EvolvesHowController.class);
 
     Map<Integer, Map<String, Object>> pokemonIdAndAttributesMap;
@@ -41,12 +43,14 @@ public class EvolvesHowController extends BaseController {
             emptyChain = true;
 
     @Autowired
-    public EvolvesHowController(PokemonService pokemonService) {
-        super(pokemonService);
+    public EvolvesHowController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     @GetMapping(value="/evolves-how")
-    public ModelAndView evolvesHow(@RequestParam(name="pokemonId") int pokemonId, ModelAndView mav) {
+    public ModelAndView evolvesHow(@RequestParam(name="pokemonId") int pokemonId, ModelAndView mav)
+    {
         logger.info("pokemonId: {}", pokemonId);
         this.pokemonId = String.valueOf(pokemonId);
         setupEvolvesHow();
@@ -73,7 +77,8 @@ public class EvolvesHowController extends BaseController {
         return mav;
     }
 
-    private void setupEvolvesHow() {
+    private void setupEvolvesHow()
+    {
         this.pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
         this.pokemonIdAndAttributesMap = new HashMap<>();
         this.specificAttributesMap = generateDefaultAttributesMap();
@@ -104,7 +109,8 @@ public class EvolvesHowController extends BaseController {
         }
     }
 
-    private void getEvolutionDetails(Map<String, Object> chain) {
+    private void getEvolutionDetails(Map<String, Object> chain)
+    {
         logger.info("chain: {}", chain);
         String name = (String) ((Map<?,?>)chain.get("species")).get("name");
         String pkmnId = ((String) ((Map<?,?>)chain.get("species")).get("url")).split("/")[6];
@@ -148,7 +154,8 @@ public class EvolvesHowController extends BaseController {
         }
     }
 
-    public void setAttributesMap(Map<String, Object> details) {
+    public void setAttributesMap(Map<String, Object> details)
+    {
         logger.info("evolution_details for: {} = {}", details.get("name"), details);
         this.specificAttributesMap = new TreeMap<>();
         this.specificAttributesMap.put("name", details.get("name"));
@@ -188,7 +195,8 @@ public class EvolvesHowController extends BaseController {
         this.pokemonIdAndAttributesMap.put(Integer.valueOf((String) details.get("id")), this.specificAttributesMap);
     }
 
-    public void updateAttributesMap(Map<String, Object> details, Map<String, Object> attributesMap) {
+    public void updateAttributesMap(Map<String, Object> details, Map<String, Object> attributesMap)
+    {
         logger.info("evolution_detailsUpdate for: {} {}", attributesMap.get("name"), details);
         List<String> checkDetails = Arrays.asList("gender", "held_item", "item", "min_happiness",
                 "time_of_day", "location", "needs_overworld_rain", "min_affection", "min_beauty",
@@ -225,7 +233,8 @@ public class EvolvesHowController extends BaseController {
      * @param underscored the api key value
      * @return camelCase version of the api key value
      */
-    private String convertToCamelCase(String underscored) {
+    private String convertToCamelCase(String underscored)
+    {
         StringBuilder sb = new StringBuilder();
         if ("needs_overworld_rain".equals(underscored)) sb.append("needsRain");
         else {
@@ -242,7 +251,8 @@ public class EvolvesHowController extends BaseController {
     }
 
     // clean up map, remove unnecessary duplicates
-    private void cleanupAttributesMap() {
+    private void cleanupAttributesMap()
+    {
         logger.info("All attributes maps created: {}", pokemonIdAndAttributesMap.size());
         List<String> checkDetails = Arrays.asList("timeOfDay", "minHappiness", "minAffection",
                 "minBeauty", "knownMove", "knownMoveType", "needsRain", "turnUpsideDown");
@@ -285,7 +295,8 @@ public class EvolvesHowController extends BaseController {
         logger.info("attribute map cleaned up");
     }
 
-    private void setEvolvesBooleans(Map<String,Object> pokemonAttributesMap) {
+    private void setEvolvesBooleans(Map<String,Object> pokemonAttributesMap)
+    {
         this.hasMinimumLevel = pokemonAttributesMap.get("minLevel") != null;
         this.hasHeldItem = pokemonAttributesMap.get("heldItem") != null;
         this.hasUseItem = pokemonAttributesMap.get("useItem") != null;
@@ -307,7 +318,8 @@ public class EvolvesHowController extends BaseController {
      * properties from this particular Pokemon
      * @return true or false
      */
-    private boolean pokemonEvolves() {
+    private boolean pokemonEvolves()
+    {
         return hasMinimumLevel ||
                hasHeldItem ||
                hasUseItem ||

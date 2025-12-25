@@ -5,7 +5,6 @@ import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import skaro.pokeapi.client.PokeApiClient;
@@ -17,23 +16,21 @@ import skaro.pokeapi.resource.encountermethod.EncounterMethod;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/encounter")
-public class EncounterApi extends BaseController {
-
+public class EncounterApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(EncounterApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
-    // Encounter Method
     @Autowired
-    public EncounterApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    EncounterApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     @GetMapping(value="/list-encounter-method")
     @ResponseBody
-    public ResponseEntity<?> getEncounterMethods() {
+    public ResponseEntity<?> getEncounterMethods()
+    {
         logger.info("getEncounterMethods");
         try {
             NamedApiResourceList<EncounterMethod> encounters = pokeApiClient.getResource(skaro.pokeapi.resource.encountermethod.EncounterMethod.class).block();
@@ -45,7 +42,8 @@ public class EncounterApi extends BaseController {
     }
 
     @GetMapping(value="/encounter-method/{id}")
-    public ResponseEntity<?> getEncounterMethod(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getEncounterMethod(@PathVariable String id)
+    {
         logger.info("getEncounterMethod {}", id);
         try {
             EncounterMethod encounterMethod = pokeApiClient.getResource(EncounterMethod.class, id).block();
@@ -71,7 +69,8 @@ public class EncounterApi extends BaseController {
     }
 
     @GetMapping(value="/condition/{id}")
-    public ResponseEntity<?> getCondition(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getCondition(@PathVariable String id)
+    {
         logger.info("getCondition {}", id);
         try {
             EncounterCondition encounterCondition = pokeApiClient.getResource(EncounterCondition.class, id).block();
@@ -97,7 +96,8 @@ public class EncounterApi extends BaseController {
     }
 
     @GetMapping(value="/condition-value/{id}")
-    public ResponseEntity<?> getConditionValue(@PathVariable(value="id") String id) {
+    public ResponseEntity<?> getConditionValue(@PathVariable String id)
+    {
         logger.info("getConditionValue {}", id);
         try {
             EncounterConditionValue conditionValue = pokeApiClient.getResource(EncounterConditionValue.class, id).block();

@@ -15,23 +15,22 @@ import java.net.http.HttpResponse;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/machine")
-public class MachineApi extends BaseController {
-
+public class MachineApi extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(MachineApi.class);
-    private final PokeApiClient pokeApiClient;
-    @Value("${skaro.pokeapi.baseUri}")
-    private String pokeApiBaseUrl;
 
     @Autowired
-    public MachineApi(PokemonService pokemonService, PokeApiClient client) {
-        super(pokemonService);
-        pokeApiClient = client;
+    public MachineApi(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
     }
 
     // Machines
-    @GetMapping(value="/list")
+    @GetMapping(value="")
     @ResponseBody
-    public ResponseEntity<?> getMachines() {
+    public ResponseEntity<?> getMachines()
+    {
         logger.info("getMachines");
         HttpResponse<String> response = pokemonService.callUrl(pokeApiBaseUrl+"/machine/");
         if (response.statusCode() == 200) {
@@ -43,8 +42,9 @@ public class MachineApi extends BaseController {
         }
     }
 
-    @GetMapping(value="/machine/{id}")
-    public ResponseEntity<?> getMachine(@PathVariable(value="id") String id) {
+    @GetMapping(value="/{id}")
+    public ResponseEntity<?> getMachine(@PathVariable String id)
+    {
         logger.info("getLocation {}", id);
         HttpResponse<String> response = pokemonService.callUrl(pokeApiBaseUrl+"/machine/"+id);
         if (response.statusCode() == 200) {

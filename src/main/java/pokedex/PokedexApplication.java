@@ -11,13 +11,15 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @SpringBootApplication
 public class PokedexApplication extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         SpringApplication.run(PokedexApplication.class, args);
     }
 
     @NonNull
     @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder)
+    {
         return builder.sources(PokedexApplication.class);
     }
 

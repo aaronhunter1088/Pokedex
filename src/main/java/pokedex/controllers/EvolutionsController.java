@@ -1,6 +1,5 @@
 package pokedex.controllers;
 
-import pokedex.entities.Pokemon;
 import pokedex.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,13 +8,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
+import skaro.pokeapi.client.PokeApiClient;
+import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.util.*;
 
 @Controller
-public class EvolutionsController extends BaseController {
-
+public class EvolutionsController extends BaseController
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(EvolutionsController.class);
     Map<Integer,List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID;
@@ -30,13 +32,15 @@ public class EvolutionsController extends BaseController {
     Integer counter = 0;
 
     @Autowired
-    public EvolutionsController(PokemonService pokemonService) {
-        super(pokemonService);
+    public EvolutionsController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    {
+        super(pokemonService, pokeApiClient);
         resetEvolutionParameters();
     }
 
     @GetMapping(value="/evolutions/{pokemonId}")
-    public ModelAndView getEvolutions(@PathVariable(name="pokemonId") String pokemonId, ModelAndView mav) {
+    public ModelAndView getEvolutions(@PathVariable(name="pokemonId") String pokemonId, ModelAndView mav)
+    {
         resetEvolutionParameters();
         this.pokemonId = pokemonId;
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, pokemonId);
@@ -49,7 +53,8 @@ public class EvolutionsController extends BaseController {
         return mav;
     }
 
-    private void resetEvolutionParameters() {
+    private void resetEvolutionParameters()
+    {
         pokemonIDToEvolutionChainMap = this.pokemonService.getEvolutionsMap();
         specificAttributesMap = generateDefaultAttributesMap();
         if (null != pokemonFamily) pokemonFamily.clear();
@@ -61,7 +66,8 @@ public class EvolutionsController extends BaseController {
         stage = 0;
     }
 
-    private void setupEvolutions() {
+    private void setupEvolutions()
+    {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
         if (pokemonFamilyIDs != null && pokemonFamilyIDs.size() != 1 ) {
             setFamilySize();
@@ -77,18 +83,21 @@ public class EvolutionsController extends BaseController {
         }
     }
 
-    private void setFamilySize() {
+    private void setFamilySize()
+    {
         pokemonFamilySize = pokemonFamilyIDs.stream().flatMap(Collection::stream).toList().size();
         logger.info("familySize:{}", pokemonFamilySize);
     }
 
-    private void setStages() {
+    private void setStages()
+    {
         stages = new ArrayList<>();
         pokemonFamilyIDs.forEach(idList -> stages.add(++stage));
         logger.info("stages:{}", stages.size());
     }
 
-    private void setAllIDs() {
+    private void setAllIDs()
+    {
         allIDs = pokemonFamilyIDs.stream()
                 .flatMap(Collection::stream)
                 .sorted()
@@ -96,7 +105,8 @@ public class EvolutionsController extends BaseController {
         logger.info("allIDs:{}", allIDs);
     }
 
-    public void createListOfPokemonForIDList(List<Integer> idList) {
+    public void createListOfPokemonForIDList(List<Integer> idList)
+    {
         logger.info("idList: {}, size: {}", idList, idList.size());
         List<Pokemon> pokemonList = new ArrayList<>();
         String previousId = "";

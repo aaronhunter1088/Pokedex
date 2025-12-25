@@ -23,8 +23,9 @@ import java.net.http.HttpResponse;
 import java.util.*;
 
 @Service(value="PokemonService")
-public class PokemonService {
-
+public class PokemonService
+{
+    /* Logging instance */
     private static final Logger logger = LogManager.getLogger(PokemonService.class);
     private final PokeApiClient pokeApiClient;
     @Value("${skaro.pokeapi.baseUri}")
@@ -35,7 +36,8 @@ public class PokemonService {
         this.pokeApiClient = pokeApiClient;
     }
 
-    public NamedApiResourceList<Pokemon> getPokemonList(int _limit, int offset) {
+    public NamedApiResourceList<Pokemon> getPokemonList(int _limit, int offset)
+    {
         if (_limit > 0) {
             PageQuery query = new PageQuery(_limit, offset);
             NamedApiResourceList<Pokemon> results = pokeApiClient.getResource(Pokemon.class, query).block();
@@ -45,7 +47,8 @@ public class PokemonService {
         }
     }
 
-    public Pokemon getPokemonByName(String pokemonIDName) {
+    public Pokemon getPokemonByName(String pokemonIDName)
+    {
         Pokemon pokemon = null;
         try {
             pokemon = pokeApiClient.getResource(Pokemon.class, pokemonIDName).block();
@@ -56,11 +59,13 @@ public class PokemonService {
         return pokemon;
     }
 
-    public PokemonSpecies getPokemonSpeciesData(String id) {
+    public PokemonSpecies getPokemonSpeciesData(String id)
+    {
         return pokeApiClient.getResource(PokemonSpecies.class, id).block();
     }
 
-    public List<String> getPokemonLocationEncounters(String url) {
+    public List<String> getPokemonLocationEncounters(String url)
+    {
         HttpResponse<String> response;
         JSONParser jsonParser;
         List<String> areas = new ArrayList<>();
@@ -95,7 +100,8 @@ public class PokemonService {
         return areas;
     }
 
-    public Map<String, Object> getPokemonChainData(String pokemonChainId) {
+    public Map<String, Object> getPokemonChainData(String pokemonChainId)
+    {
         String chainUrl = "https://pokeapi.co/api/v2/evolution-chain/"+pokemonChainId+'/';
         HttpResponse<String> response;
         JSONParser jsonParser;
@@ -116,11 +122,13 @@ public class PokemonService {
         }
     }
 
-    public int getTotalPokemon(String pokedex) {
+    public int getTotalPokemon(String pokedex)
+    {
         return pokeApiClient.getResource(Pokedex.class, Objects.requireNonNullElse(pokedex, "1")).block().getPokemonEntries().size();
     }
 
-    public Map<Integer, List<List<Integer>>> getEvolutionsMap() {
+    public Map<Integer, List<List<Integer>>> getEvolutionsMap()
+    {
         return new TreeMap<>() {{
             put(1, List.of(List.of(1), List.of(2), List.of(3, 10033, 10195))); // bulbasaur, ivysaur, venusaur, venusaur-mega, venusaur-gmax
             put(2, List.of(List.of(4), List.of(5), List.of(6, 10034, 10035, 10196))); // squirtle, wartortle, blastoise, blastoise-mega, blastoise-gmax
@@ -615,7 +623,8 @@ public class PokemonService {
         }};
     }
 
-    public <T> HttpResponse<T> callUrl(String url) {
+    public <T> HttpResponse<T> callUrl(String url)
+    {
         HttpResponse<T> response = null;
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -633,7 +642,8 @@ public class PokemonService {
         return response;
     }
 
-    public List<String> getAllTypes() {
+    public List<String> getAllTypes()
+    {
         List<String> types = new ArrayList<>();
         HttpResponse<String> typeResults = callUrl(pokeApiBaseUrl+"type");
         if (typeResults.statusCode() == 200) {

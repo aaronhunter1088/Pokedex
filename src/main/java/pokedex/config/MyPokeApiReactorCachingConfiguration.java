@@ -1,4 +1,4 @@
-package pokedex.configuration;
+package pokedex.config;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.codec.http.HttpObjectAggregator;
@@ -9,8 +9,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import skaro.pokeapi.PokeApiReactorCachingConfiguration;
@@ -49,12 +47,12 @@ public class MyPokeApiReactorCachingConfiguration
                                         connection.addHandlerLast(new HttpObjectAggregator(10485760)))); // Set max message size
     }
 
-    @Bean
-    public WebClient.Builder webClientBuilder(HttpClient httpClient)
-    {
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .codecs(clientCodecConfigurer ->
-                        clientCodecConfigurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)); // Set max in-memory size
-    }
+//    @Bean
+//    public WebClient.Builder webClientBuilder(HttpClient httpClient)
+//    {
+//        return WebClient.builder()
+//                .clientConnector(new ReactorClientHttpConnector(httpClient))
+//                .codecs(clientCodecConfigurer ->
+//                        clientCodecConfigurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)); // Set max in-memory size
+//    }
 }
