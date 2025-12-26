@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @EnableConfigurationProperties
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"pokedex", "pokedexapi"})
 public class PokedexApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args)

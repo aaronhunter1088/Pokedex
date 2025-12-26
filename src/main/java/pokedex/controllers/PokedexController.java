@@ -1,6 +1,7 @@
 package pokedex.controllers;
 
-import pokedex.service.PokemonService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class PokedexController extends BaseController
     private static final Logger logger = LogManager.getLogger(PokedexController.class);
 
     @Autowired
-    public PokedexController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public PokedexController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
+                             PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
     }
@@ -45,7 +47,7 @@ public class PokedexController extends BaseController
     public Pokemon setupPokedex(String nameOrId)
     {
         logger.info("loading pokedex info for {}", nameOrId);
-        skaro.pokeapi.resource.pokemon.Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
+        Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
         PokemonSpecies speciesData;
         Pokemon pokemon = null;
         try {

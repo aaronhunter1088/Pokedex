@@ -1,6 +1,7 @@
 package pokedex.controllers;
 
-import pokedex.service.PokemonService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static pokedex.utilities.Constants.*;
+import static pokedexapi.utilities.Constants.*;
 
 @Controller
 public class PokemonListController extends BaseController
@@ -38,7 +39,8 @@ public class PokemonListController extends BaseController
     String chosenType;
 
     @Autowired
-    public PokemonListController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public PokemonListController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
+                                 PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
     }
@@ -111,7 +113,7 @@ public class PokemonListController extends BaseController
     {
         logger.info("page number: {}", page);
         logger.info("pkmnPerPage: {}", pkmnPerPage);
-        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getPokemonList(pkmnPerPage, ((page-1) * pkmnPerPage));
+        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(pkmnPerPage, ((page-1) * pkmnPerPage));
         if (null != pokemonList && !pokemonList.results().isEmpty()) {
             logger.debug("pokemonList size: " + pokemonList.results().size());
             List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.results();
@@ -141,7 +143,7 @@ public class PokemonListController extends BaseController
                 //pokemon.setType(pokemonType);
                 //pokemon.setDefaultImage(sprites.getFrontDefault());
                 //pokemon.setOfficialImage(OFFICIAL_IMAGE_URL(pokemon.id()));
-                HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.id()+".gif");
+                //HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.id()+".gif");
 //                if (response.statusCode() == 404) {
 //                    pokemon.setGifImage(null);
 //                } else {
@@ -186,7 +188,15 @@ public class PokemonListController extends BaseController
 
     public List<String> getUniqueTypes()
     {
-        return pokemonService.getAllTypes();
+        try
+        {
+            return pokemonService.getAllTypes();
+        }
+        catch (Exception e)
+        {
+            logger.error("Error retrieving unique types: {}", e.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     @GetMapping(value="/getPokemonByType")

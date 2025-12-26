@@ -1,6 +1,9 @@
 package pokedex.controllers;
 
-import pokedex.service.PokemonService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import pokedex.service.PokemonSpringBootService;
+import pokedexapi.service.PokemonApiService;
+import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +21,7 @@ import java.util.*;
 public class EvolutionsController extends BaseController
 {
     /* Logging instance */
-    private static final Logger logger = LogManager.getLogger(EvolutionsController.class);
+    private static final Logger LOGGER = LogManager.getLogger(EvolutionsController.class);
     Map<Integer,List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID;
     List<List<Integer>> pokemonFamilyIDs;
@@ -32,7 +35,8 @@ public class EvolutionsController extends BaseController
     Integer counter = 0;
 
     @Autowired
-    public EvolutionsController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public EvolutionsController(@Qualifier("PokemonSpringBootService") PokemonSpringBootService pokemonService,
+                                PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
         resetEvolutionParameters();
@@ -86,14 +90,14 @@ public class EvolutionsController extends BaseController
     private void setFamilySize()
     {
         pokemonFamilySize = pokemonFamilyIDs.stream().flatMap(Collection::stream).toList().size();
-        logger.info("familySize:{}", pokemonFamilySize);
+        LOGGER.info("familySize:{}", pokemonFamilySize);
     }
 
     private void setStages()
     {
         stages = new ArrayList<>();
         pokemonFamilyIDs.forEach(idList -> stages.add(++stage));
-        logger.info("stages:{}", stages.size());
+        LOGGER.info("stages:{}", stages.size());
     }
 
     private void setAllIDs()
@@ -102,30 +106,30 @@ public class EvolutionsController extends BaseController
                 .flatMap(Collection::stream)
                 .sorted()
                 .toList();
-        logger.info("allIDs:{}", allIDs);
+        LOGGER.info("allIDs:{}", allIDs);
     }
 
     public void createListOfPokemonForIDList(List<Integer> idList)
     {
-        logger.info("idList: {}, size: {}", idList, idList.size());
+        LOGGER.info("idList: {}, size: {}", idList, idList.size());
         List<Pokemon> pokemonList = new ArrayList<>();
         String previousId = "";
         for (Integer id : idList) {
-            logger.info("id:{}", id);
-            skaro.pokeapi.resource.pokemon.Pokemon pokemonResponse = pokemonService.getPokemonByName(String.valueOf(id));
+            LOGGER.info("id:{}", id);
+            Pokemon pokemonResponse = pokemonService.getPokemonByName(String.valueOf(id));
             PokemonSpecies speciesData = null;
             try {
                 speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResponse.getId()));
                 if (null != speciesData) previousId = String.valueOf(id);
             } catch (Exception e) {
-                logger.warn("No species data found for {}. Using previousId {}", pokemonResponse.getId(), previousId);
+                LOGGER.warn("No species data found for {}. Using previousId {}", pokemonResponse.getId(), previousId);
                 try { speciesData = pokemonService.getPokemonSpeciesData(previousId); }
-                catch (Exception e2) { logger.error("No species data found using previousId {}", previousId); }
+                catch (Exception e2) { LOGGER.error("No species data found using previousId {}", previousId); }
             }
             assert speciesData != null;
             Pokemon pokemon = createPokemon(pokemonResponse, speciesData);
             pokemonList.add(pokemon);
-            logger.info("pokemon added to familyList: {} length is {}", pokemon, pokemonList.size());
+            LOGGER.info("pokemon added to familyList: {} length is {}", pokemon, pokemonList.size());
         }
         pokemonList = pokemonList.stream().sorted().toList();
         pokemonFamily.add(pokemonList);

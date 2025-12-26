@@ -10,21 +10,56 @@
     </parent>
 
     <artifactId>Pokedex</artifactId>
-    <version>0.6</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
 
     <properties>
         <finalName>${project.artifactId}-${project.version}</finalName>
-        <outputDirectory>${basedir}/dist</outputDirectory>
+        <outputDirectory>${basedir}/dist/${project.version}</outputDirectory>
         <main.class>pokedex.PokedexApplication</main.class>
+
+        <jakarta.servlet.jstl.version>3.0.1</jakarta.servlet.jstl.version>
+        <jakarta.servlet.jstl-api.version>3.0.2</jakarta.servlet.jstl-api.version>
+        <pokedex.api.version>1.2.0</pokedex.api.version>
+        <taglibs.standard.version>1.2.5</taglibs.standard.version>
+        <taglibs.standard.impl.version>1.2.5</taglibs.standard.impl.version>
     </properties>
 
     <!-- Included in Parent. Left as a reference -->
     <dependencyManagement/>
 
     <dependencies>
+        <!-- Classifier "code" jar contains the main code classes -->
+        <dependency>
+            <groupId>com.skvllprodvctions</groupId>
+            <artifactId>PokedexApi</artifactId>
+            <version>${pokedex.api.version}</version>
+            <classifier>code</classifier>
+            <exclusions>
+                <!-- spring-boot-starter-logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+                <!-- spring-boot-starter-jdbc: brings in HikariCP -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jdbc</artifactId>
+                </exclusion>
+                <!-- spring-boot-starter-data-jpa -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-jpa</artifactId>
+                </exclusion>
+                <!-- mysql connector -->
+                <exclusion>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- spring boot starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,15 +87,15 @@
             </exclusions>
         </dependency>
         <!-- spring boot starter webservices -->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-webservices</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webservices</artifactId>
+        </dependency>
         <!-- spring-boot-starter-actuator -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-actuator</artifactId>
-            </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
         <!-- spring boot starter devtools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -99,6 +134,7 @@
             <groupId>skaro.pokeapi</groupId>
             <artifactId>pokeapi-reactor</artifactId>
 <!--            <version>1.0.9</version>-->
+            <version>2.0.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
         <dependency>
@@ -123,25 +159,25 @@
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-            <version>3.0.2</version>
+            <version>${jakarta.servlet.jstl-api.version}</version>
         </dependency>
         <!-- jsp jstl: required if your Spring Boot application uses JSPs with JSTL tags -->
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
-            <version>3.0.1</version>
+            <version>${jakarta.servlet.jstl.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-jstlel -->
         <dependency>
             <groupId>org.apache.taglibs</groupId>
             <artifactId>taglibs-standard-jstlel</artifactId>
-            <version>1.2.5</version>
+            <version>${taglibs.standard.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-impl -->
         <dependency>
             <groupId>org.apache.taglibs</groupId>
             <artifactId>taglibs-standard-impl</artifactId>
-            <version>1.2.5</version>
+            <version>${taglibs.standard.impl.version}</version>
             <scope>runtime</scope>
         </dependency>
 

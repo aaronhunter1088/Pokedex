@@ -2,7 +2,8 @@ package pokedex.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pokedex.service.PokemonService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import pokedexapi.service.PokemonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,8 @@ public class SearchController extends BaseController
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(SearchController.class);
     @Autowired
-    public SearchController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public SearchController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
+                            PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
     }

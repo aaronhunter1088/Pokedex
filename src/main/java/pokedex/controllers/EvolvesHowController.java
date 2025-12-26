@@ -1,6 +1,7 @@
 package pokedex.controllers;
 
-import pokedex.service.PokemonService;
+import org.springframework.beans.factory.annotation.Qualifier;
+import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,8 @@ public class EvolvesHowController extends BaseController
             emptyChain = true;
 
     @Autowired
-    public EvolvesHowController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public EvolvesHowController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
+                                PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
     }

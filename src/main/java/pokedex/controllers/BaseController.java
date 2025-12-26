@@ -1,11 +1,16 @@
 package pokedex.controllers;
 
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import pokedex.service.PokemonService;
+import pokedex.service.PokemonSpringBootService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import pokedexapi.service.PokemonApiService;
+import pokedexapi.service.PokemonService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
@@ -15,35 +20,36 @@ import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.util.*;
 
-import static pokedex.utilities.Constants.GIF_IMAGE_URL;
-import static pokedex.utilities.Constants.OFFICIAL_IMAGE_URL;
+import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
+import static pokedexapi.utilities.Constants.OFFICIAL_IMAGE_URL;
 
 @Controller
 public class BaseController
 {
     /* Logging instance */
-    private static final Logger logger = LogManager.getLogger(BaseController.class);
+    private static final Logger LOGGER = LogManager.getLogger(BaseController.class);
 
     String pokemonId = "";
     int page = 1;
     int lastPageSearched = 1;
     int pkmnPerPage = 10;
 
-    protected final PokemonService pokemonService;
+    protected final PokemonSpringBootService pokemonService;
     protected final PokeApiClient pokeApiClient;
     @Value("${skaro.pokeapi.baseUri}")
     protected String pokeApiBaseUrl;
 
     @Autowired
-    public BaseController(PokemonService pokemonService, PokeApiClient pokeApiClient)
+    public BaseController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
+                          PokeApiClient pokeApiClient)
     {
-        this.pokemonService = pokemonService;
+        this.pokemonService = (PokemonSpringBootService) pokemonService;
         this.pokeApiClient = pokeApiClient;
     }
 
     protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId)
     {
-        logger.info("id: {}", pokemonId);
+        LOGGER.info("id: {}", pokemonId);
         List<Integer> keys = pokemonIDToEvolutionChainMap.keySet().stream().toList();
         Integer keyToReturn = 0;
         keysLoop:
@@ -56,7 +62,7 @@ public class BaseController
                 }
             }
         }
-        logger.info("chainKey: {}", keyToReturn);
+        LOGGER.info("chainKey: {}", keyToReturn);
         return keyToReturn;
     }
 
@@ -85,11 +91,11 @@ public class BaseController
         List<PokemonType> types = pokemon.types();
         String typeString = "";
         if (types.size() > 1) {
-            logger.debug("More than 1 pokemonType");
+            LOGGER.debug("More than 1 pokemonType");
             typeString = types.get(0).getType().name().substring(0,1).toUpperCase() + types.get(0).getType().name().substring(1)
                     + " & " + types.get(1).getType().name().substring(0,1).toUpperCase() + types.get(1).getType().name().substring(1);
         } else {
-            logger.debug("One pokemonType");
+            LOGGER.debug("One pokemonType");
             typeString = types.get(0).getType().name().substring(0,1).toUpperCase() + types.get(0).getType().name().substring(1);
         }
         String pokemonLocation = pokemon.locationAreaEncounters();
@@ -125,11 +131,11 @@ public class BaseController
      */
     public Pokemon retrievePokemon(String nameOrId)
     {
-        logger.info("retrievePokemon");
+        LOGGER.info("retrievePokemon");
         try {
             return pokeApiClient.getResource(Pokemon.class, nameOrId).block();
         } catch (Exception e) {
-            logger.error("Could not find pokemon with value: {}", nameOrId);
+            LOGGER.error("Could not find pokemon with value: {}", nameOrId);
             return null;
         }
     }
