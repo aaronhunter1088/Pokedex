@@ -240,7 +240,7 @@
         switch (divName) {
             case 'description' : {
                 $("#descriptionDiv").show();
-                $("#descriptionDiv").css('display','inline-flex');
+                $("#descriptionDiv").css('display', 'inline-flex');
                 $("#descriptionBtn").css('font-weight', 'bold');
                 break;
             }
@@ -265,14 +265,14 @@
                     dataType: "application/json",
                     crossDomain: true,
                     statusCode: {
-                        200: function(data) {
+                        200: function (data) {
                             $("#evolvesHowDiv").html(data.responseText);
                         },
-                        404: function() {
+                        404: function () {
                             console.log('Failed');
                             $("#evolutionsDiv").html('Request failed');
                         },
-                        500: function() {
+                        500: function () {
                             console.log('Server Error');
                         }
                     }
@@ -295,12 +295,12 @@
             async: false,
             dataType: "json",
             crossDomain: true,
-            success: function(data) {
+            success: function (data) {
                 //$("#evolutions").html(data.responseText);
                 console.log('evolutions: ' + data.responseText);
                 return data.responseText;
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     console.log('Failed');
                     $("#evolutions").html('Request failed');

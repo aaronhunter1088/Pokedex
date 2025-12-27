@@ -1,24 +1,28 @@
 # Pokedex - A Spring Boot App
+
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
 # v0.6
+
 Upgraded several major dependencies. Update Parent version reference to 1.0.0,
 updated Spring Boot from 3.3.1 to 4.0.0, and Jackson from 2.x to 3.x. Updated
 file paths to simplify the structure.
 
 # v0.5
+
 This version introduced the usage of the Parent Pom. This pom manages
 all the versions used within the project.
 
 # v0.4
-This Spring boot application has been upgraded from 2.7.5 to 3.3.1! 
+
+This Spring boot application has been upgraded from 2.7.5 to 3.3.1!
 
 The app begins by listing the Pokemon out in a grid
 pattern, defaulting to 10 pokemon per page. On the homepage, there will
 be a Pokedex image which directs to the search page. Then there is a
 pagination list for all pokemon, a GIF toggle, Jump to Page, and Pokemon
 Per Page actions. Finally the list of Pokemon is displayed, followed by
-one more pagination option. 
+one more pagination option.
 If you toggle the GIF button, if a Pokemon has a GIF icon, then that icon
 will be displayed instead of the default image. When the GIF toggle is not
 enabled, if you hover over the default image, if a Pokemon has an official
@@ -42,20 +46,21 @@ Once a valid name or ID is given, the page will display that Pokemon info.
 
 I have also created a Pull Request for the PokeApi-Reactor code to fix
 an issue I encountered. This was previously identified and documented as an
-issue on the Github account. 
+issue on the Github account.
 My PR: https://github.com/SirSkaro/pokeapi-reactor/pull/10
 The Issue: https://github.com/SirSkaro/pokeapi-reactor/issues/8
 Submitted on: June 28th, 2024
 Merged in on: July 2nd, 2024
 
 # v<=0.3
+
 This Spring boot application allows you to enter the ID or name of a pokemon
 and it will return two images, and details about the Pokemon. If there
 is no image available, a pokeball will appear in place of the images.
 
 If the name is mistyped or an ID is not a valid ID for a Pokemon,
-an alert will appear. 
+an alert will appear.
 
 I am making calls to https://pokeapi.co/docs/v2.
-I am utilizing Java (Spring Boot) with auto caching: pokeapi-reactor 
+I am utilizing Java (Spring Boot) with auto caching: pokeapi-reactor
 written by Benjamin Churchill to create a client.

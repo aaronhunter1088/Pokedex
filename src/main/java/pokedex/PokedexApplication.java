@@ -12,7 +12,8 @@ import pokedexapi.config.MyPokeApiReactorCachingConfiguration;
 @Import(MyPokeApiReactorCachingConfiguration.class)
 @EnableConfigurationProperties
 @SpringBootApplication(scanBasePackages = {"pokedex", "pokedexapi"})
-public class PokedexApplication extends SpringBootServletInitializer {
+public class PokedexApplication extends SpringBootServletInitializer
+{
 
     public static void main(String[] args)
     {

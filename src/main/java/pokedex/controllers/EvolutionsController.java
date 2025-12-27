@@ -1,9 +1,5 @@
 package pokedex.controllers;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import pokedex.service.PokemonSpringBootService;
-import pokedexapi.service.PokemonApiService;
-import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,38 +7,44 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
+import pokedexapi.service.PokemonApiService;
+import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class EvolutionsController extends BaseController
 {
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(EvolutionsController.class);
-    Map<Integer,List<List<Integer>>> pokemonIDToEvolutionChainMap;
+    Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap;
     Integer pokemonChainID;
     List<List<Integer>> pokemonFamilyIDs;
     List<Integer> allIDs;
     List<List<Pokemon>> pokemonFamily;
     List<Integer> pokemonFamilyAltLevels;
-    Map<String,Object> specificAttributesMap;
+    Map<String, Object> specificAttributesMap;
     Integer pokemonFamilySize;
     List<Integer> stages;
     Integer stage = 0;
     Integer counter = 0;
 
     @Autowired
-    public EvolutionsController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
-                                PokeApiClient pokeApiClient)
+    public EvolutionsController(PokemonApiService pokemonService,
+                                PokeApiClient pokeApiClient,
+                                PokemonLocationEncounterService pokemonLocationEncounterService)
     {
-        super(pokemonService, pokeApiClient);
+        super(pokemonService, pokeApiClient, pokemonLocationEncounterService);
         resetEvolutionParameters();
     }
 
-    @GetMapping(value="/evolutions/{pokemonId}")
+    @GetMapping(value = "/evolutions/{pokemonId}")
     public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav)
     {
         resetEvolutionParameters();
@@ -73,7 +75,7 @@ public class EvolutionsController extends BaseController
     private void setupEvolutions()
     {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        if (pokemonFamilyIDs != null && pokemonFamilyIDs.size() != 1 ) {
+        if (pokemonFamilyIDs != null && pokemonFamilyIDs.size() != 1) {
             setFamilySize();
             setStages();
             setAllIDs();
@@ -121,10 +123,15 @@ public class EvolutionsController extends BaseController
             try {
                 speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResponse.getId()));
                 if (null != speciesData) previousId = String.valueOf(id);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 LOGGER.warn("No species data found for {}. Using previousId {}", pokemonResponse.getId(), previousId);
-                try { speciesData = pokemonService.getPokemonSpeciesData(previousId); }
-                catch (Exception e2) { LOGGER.error("No species data found using previousId {}", previousId); }
+                try {
+                    speciesData = pokemonService.getPokemonSpeciesData(previousId);
+                }
+                catch (Exception e2) {
+                    LOGGER.error("No species data found using previousId {}", previousId);
+                }
             }
             assert speciesData != null;
             Pokemon pokemon = createPokemon(pokemonResponse, speciesData);

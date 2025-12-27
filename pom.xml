@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>Pokedex</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
@@ -64,58 +64,15 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- spring boot starter -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <!-- spring boot starter web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <!-- spring boot starter webservices -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webservices</artifactId>
         </dependency>
-        <!-- spring-boot-starter-actuator -->
+        <!-- spring boot rest client -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!-- spring boot starter devtools -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <!-- spring boot properties migrator: useful when upgrading between major SB versions
-             scans config files, logs warnings, suggests new names. remove after migration is complete -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-properties-migrator</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId
-            ><artifactId>spring-boot-restclient</artifactId>
+            <artifactId>spring-boot-restclient</artifactId>
         </dependency>
         <!-- log4j2 -->
         <dependency>
@@ -132,11 +89,6 @@
             <artifactId>slf4j-api</artifactId>
             <version>2.0.7</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--            <artifactId>jackson-databind</artifactId>-->
-<!--            <version>2.20.1</version>-->
-<!--        </dependency>-->
         <!-- pokeapi-reactor -->
         <dependency>
             <groupId>skaro.pokeapi</groupId>
@@ -159,7 +111,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-<!--            <scope>provided</scope>-->
+            <!--            <scope>provided</scope>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
         <dependency>
@@ -173,19 +125,19 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>${jakarta.servlet.jstl.version}</version>
         </dependency>
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-jstlel &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.taglibs</groupId>-->
-<!--            <artifactId>taglibs-standard-jstlel</artifactId>-->
-<!--            <version>${taglibs.standard.version}</version>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-impl &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.taglibs</groupId>-->
-<!--            <artifactId>taglibs-standard-impl</artifactId>-->
-<!--            <version>${taglibs.standard.impl.version}</version>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-jstlel &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.taglibs</groupId>-->
+        <!--            <artifactId>taglibs-standard-jstlel</artifactId>-->
+        <!--            <version>${taglibs.standard.version}</version>-->
+        <!--        </dependency>-->
+        <!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-impl &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.taglibs</groupId>-->
+        <!--            <artifactId>taglibs-standard-impl</artifactId>-->
+        <!--            <version>${taglibs.standard.impl.version}</version>-->
+        <!--            <scope>runtime</scope>-->
+        <!--        </dependency>-->
 
         <!-- Test dependencies -->
 
@@ -230,12 +182,12 @@
                     <!--<include>**/sounds/*.mp3</include>-->
                 </includes>
             </resource>
-<!--            <resource>-->
-<!--                <directory>src/main/webapp</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/**</include>-->
-<!--                </includes>-->
-<!--            </resource>-->
+            <!--            <resource>-->
+            <!--                <directory>src/main/webapp</directory>-->
+            <!--                <includes>-->
+            <!--                    <include>**/**</include>-->
+            <!--                </includes>-->
+            <!--            </resource>-->
         </resources>
 
         <!-- NOTES -->
@@ -260,9 +212,9 @@
                     </execution>
                 </executions>
                 <configuration>
-<!--                    <outputDirectory>${outputDirectory}</outputDirectory>-->
-<!--                    <excludeDevtools>true</excludeDevtools>-->
-<!--                    <layers enabled="false"/>-->
+                    <!--                    <outputDirectory>${outputDirectory}</outputDirectory>-->
+                    <!--                    <excludeDevtools>true</excludeDevtools>-->
+                    <!--                    <layers enabled="false"/>-->
                 </configuration>
             </plugin>
             <!-- Compile found in parent -->
