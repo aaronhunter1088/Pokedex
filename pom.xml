@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>Pokedex</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <packaging>war</packaging>
     <name>Pokédex</name>
     <description>Springboot Pokédex App</description>
@@ -19,9 +19,13 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <outputDirectory>${basedir}/dist/${project.version}</outputDirectory>
         <main.class>pokedex.PokedexApplication</main.class>
+        <springdoc.openapi.swagger-ui>http://localhost:4201/pokedexapi/swagger-ui/index.html
+        </springdoc.openapi.swagger-ui>
+        <springdoc.openapi.url>http://localhost:4201/pokedexapi/v3/api-docs</springdoc.openapi.url>
 
         <jakarta.servlet.jstl.version>3.0.1</jakarta.servlet.jstl.version>
         <jakarta.servlet.jstl-api.version>3.0.2</jakarta.servlet.jstl-api.version>
+        <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <pokedex.api.version>1.2.0</pokedex.api.version>
         <taglibs.standard.version>1.2.5</taglibs.standard.version>
         <taglibs.standard.impl.version>1.2.5</taglibs.standard.impl.version>
@@ -109,6 +113,10 @@
             <artifactId>spring-boot-properties-migrator</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId
+            ><artifactId>spring-boot-restclient</artifactId>
+        </dependency>
         <!-- log4j2 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -133,14 +141,12 @@
         <dependency>
             <groupId>skaro.pokeapi</groupId>
             <artifactId>pokeapi-reactor</artifactId>
-<!--            <version>1.0.9</version>-->
-            <version>2.0.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/javax.ws.rs/javax.ws.rs-api -->
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
-            <version>4.0.0</version>
+            <version>${jakarta.ws.rs-api.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
         <dependency>
@@ -153,7 +159,7 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
+<!--            <scope>provided</scope>-->
         </dependency>
         <!-- https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
         <dependency>
@@ -167,23 +173,23 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>${jakarta.servlet.jstl.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-jstlel -->
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-jstlel</artifactId>
-            <version>${taglibs.standard.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-impl -->
-        <dependency>
-            <groupId>org.apache.taglibs</groupId>
-            <artifactId>taglibs-standard-impl</artifactId>
-            <version>${taglibs.standard.impl.version}</version>
-            <scope>runtime</scope>
-        </dependency>
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-jstlel &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.taglibs</groupId>-->
+<!--            <artifactId>taglibs-standard-jstlel</artifactId>-->
+<!--            <version>${taglibs.standard.version}</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.taglibs/taglibs-standard-impl &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.taglibs</groupId>-->
+<!--            <artifactId>taglibs-standard-impl</artifactId>-->
+<!--            <version>${taglibs.standard.impl.version}</version>-->
+<!--            <scope>runtime</scope>-->
+<!--        </dependency>-->
 
         <!-- Test dependencies -->
 
-        <!-- Spring Boot Test -->
+        <!-- spring boot starter test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -224,12 +230,12 @@
                     <!--<include>**/sounds/*.mp3</include>-->
                 </includes>
             </resource>
-            <resource>
-                <directory>src/main/webapp</directory>
-                <includes>
-                    <include>**/**</include>
-                </includes>
-            </resource>
+<!--            <resource>-->
+<!--                <directory>src/main/webapp</directory>-->
+<!--                <includes>-->
+<!--                    <include>**/**</include>-->
+<!--                </includes>-->
+<!--            </resource>-->
         </resources>
 
         <!-- NOTES -->
@@ -254,7 +260,9 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputDirectory>${outputDirectory}</outputDirectory>
+<!--                    <outputDirectory>${outputDirectory}</outputDirectory>-->
+<!--                    <excludeDevtools>true</excludeDevtools>-->
+<!--                    <layers enabled="false"/>-->
                 </configuration>
             </plugin>
             <!-- Compile found in parent -->

@@ -35,7 +35,7 @@ public class EvolutionsController extends BaseController
     Integer counter = 0;
 
     @Autowired
-    public EvolutionsController(@Qualifier("PokemonSpringBootService") PokemonSpringBootService pokemonService,
+    public EvolutionsController(@Qualifier("PokemonSpringBootService") PokemonService pokemonService,
                                 PokeApiClient pokeApiClient)
     {
         super(pokemonService, pokeApiClient);
@@ -43,7 +43,7 @@ public class EvolutionsController extends BaseController
     }
 
     @GetMapping(value="/evolutions/{pokemonId}")
-    public ModelAndView getEvolutions(@PathVariable(name="pokemonId") String pokemonId, ModelAndView mav)
+    public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav)
     {
         resetEvolutionParameters();
         this.pokemonId = pokemonId;

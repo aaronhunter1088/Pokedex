@@ -9,7 +9,12 @@ import org.springframework.stereotype.Service;
 import pokedexapi.service.PokemonApiService;
 import pokedexapi.service.PokemonService;
 import skaro.pokeapi.client.PokeApiClient;
+import skaro.pokeapi.resource.NamedApiResource;
+import skaro.pokeapi.resource.locationarea.LocationArea;
+import skaro.pokeapi.resource.locationarea.PokemonEncounter;
+import skaro.pokeapi.resource.pokemon.LocationEncounterArea;
 import skaro.pokeapi.resource.pokemon.Pokemon;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
@@ -29,7 +34,9 @@ public class PokemonSpringBootService extends PokemonApiService
     /* Logging instance */
     public static final Logger LOGGER = LogManager.getLogger(PokemonSpringBootService.class);
 
-    public PokemonSpringBootService(PokeApiClient pokeApiClient, JsonMapper jsonMapper)
+    public PokemonSpringBootService(PokeApiClient pokeApiClient,
+                                    PokemonLocationEncounterService pokemonLocationEncounterService,
+                                    JsonMapper jsonMapper)
     {
         super(pokeApiClient, jsonMapper);
     }
@@ -557,11 +564,11 @@ public class PokemonSpringBootService extends PokemonApiService
                     .build()
                     .send(request,  HttpResponse.BodyHandlers.ofString());
             LOGGER.info("response: {}", response);
-            jsonParser = new JSONParser(response.body());
-            List<LinkedHashMap<String, String>> map = (List<LinkedHashMap<String, String>>) jsonParser.parse();
-            for(Map m : map) {
-                LinkedHashMap<String, String> area = (LinkedHashMap<String, String>) m.get("location_area");
-                areas.add(area.get("name"));
+            //jsonParser = new JSONParser(response.body());
+            List<LocationEncounterArea> listOfLeas = jsonMapper.readValue(response.body(), new TypeReference<>(){});
+            for(LocationEncounterArea lea : listOfLeas) {
+                String area = lea.getLocationArea().name();
+                areas.add(area);
             }
         } catch (URISyntaxException use) {
             use.printStackTrace();
@@ -569,10 +576,11 @@ public class PokemonSpringBootService extends PokemonApiService
         } catch (IOException | InterruptedException ioe) {
             ioe.printStackTrace();
             LOGGER.error("There was an error sending the request");
-        } catch (ParseException pe) {
-            pe.printStackTrace();
-            LOGGER.error("There was an error parsing the response: {}", pe.getMessage());
         }
+//        catch (ParseException pe) {
+//            pe.printStackTrace();
+//            LOGGER.error("There was an error parsing the response: {}", pe.getMessage());
+//        }
         if (!areas.isEmpty()) {
             areas = areas.stream().sorted().toList();
         }

@@ -74,7 +74,9 @@ public class BaseController
      */
     protected Pokemon createPokemon(Pokemon pokemon, PokemonSpecies speciesData)
     {
-        String defaultImage = null != pokemon.sprites().getFrontDefault() ? pokemon.sprites().getFrontDefault() : "/images/pokeball1.jpg";
+        String defaultImage = null != pokemon.sprites().getFrontDefault()
+                ? pokemon.sprites().getFrontDefault()
+                : "/images/pokeball1.jpg";
         String officialImage = OFFICIAL_IMAGE_URL(pokemon.getId());
         String gifImage = GIF_IMAGE_URL(pokemon.id());
         String shinyImage = pokemon.sprites().getFrontShiny();
