@@ -47,7 +47,7 @@ public class PokedexController extends BaseController
     public Pokemon setupPokedex(String nameOrId)
     {
         logger.info("loading pokedex info for {}", nameOrId);
-        Pokemon pokemonResource = pokemonService.getPokemonByName(nameOrId.toLowerCase());
+        Pokemon pokemonResource = pokemonService.getPokemonByIdOrName(nameOrId.toLowerCase());
         PokemonSpecies speciesData;
         Pokemon pokemon = null;
         try {

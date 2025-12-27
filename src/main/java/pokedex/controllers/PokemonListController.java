@@ -1,7 +1,7 @@
 package pokedex.controllers;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import pokedex.service.PokemonLocationEncounterService;
+import pokedexapi.service.PokemonLocationEncounterService;
 import pokedexapi.service.PokemonService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -128,7 +128,7 @@ public class PokemonListController extends BaseController
             LOGGER.debug("pokemonList limit size: " + listOfPokemon.size());
             totalPokemon = pokemonService.getTotalPokemon(null);
             listOfPokemon.forEach(pkmn -> {
-                Pokemon pokemon = pokemonService.getPokemonByName(pkmn.name());
+                Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmn.name());
                 PokemonSprites sprites = pokemon.sprites();
                 List<PokemonType> types = pokemon.types();
                 String pokemonType = null;

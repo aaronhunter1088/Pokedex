@@ -116,7 +116,7 @@ public class EvolutionsController extends BaseController
         String previousId = "";
         for (Integer id : idList) {
             LOGGER.info("id:{}", id);
-            Pokemon pokemonResponse = pokemonService.getPokemonByName(String.valueOf(id));
+            Pokemon pokemonResponse = pokemonService.getPokemonByIdOrName(String.valueOf(id));
             PokemonSpecies speciesData = null;
             try {
                 speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemonResponse.getId()));
