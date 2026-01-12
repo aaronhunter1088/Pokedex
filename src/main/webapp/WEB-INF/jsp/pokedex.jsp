@@ -115,9 +115,9 @@
                     </c:choose>
                 </div>
                 <div id="movesDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
-                    <c:forEach var="move" items="${pokemon.moves}">
-                        <h3 id="moves" class="listStyle">${move}</h3>
-                    </c:forEach>
+                <c:forEach var="moveName" items="${pokemon.pokemonMoveNames}">
+                    <h3 id="moves" class="listStyle">${moveName}</h3>
+                </c:forEach>
                 </div>
                 <div id="evolvesHowDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
                     <jsp:include page="evolves-how.jsp" />
