@@ -6,6 +6,6 @@ __________       __              .___
  |____|   \____/|__|_ \\___  >____ |\___  >__/\_ \
                      \/    \/     \/    \/      \/
 
-${application.title} ${application.version}
+${spring.application.name} ${spring.application.version}
 Powered by Spring Boot ${spring-boot.version}
 Generated: https://devops.datenkollektiv.de/banner.txt/index.html: Font: Unknown
