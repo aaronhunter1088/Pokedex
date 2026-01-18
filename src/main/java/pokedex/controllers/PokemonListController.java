@@ -85,14 +85,16 @@ public class PokemonListController extends BaseController
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);
-        if (pageNumber < 0) {
-            LOGGER.error("Page number cannot be negative");
+        if (pageNumber < 1) {
+            LOGGER.error("Page number must be at least 1, received: {}", pageNumber);
             return mav;
         } else if (pageNumber > Math.round((float) totalPokemon / pkmnPerPage)) {
             LOGGER.error("Cannot pick a number more than there are pages");
             return mav;
         }
         page = pageNumber;
+        // Clear pokemon map to force reload with new page
+        this.pokemonMap.clear();
         // Clear session cache when changing pages
         httpSession.removeAttribute("pokemonMap");
         return homepage(mav, httpSession, darkmode);
@@ -109,6 +111,10 @@ public class PokemonListController extends BaseController
             if (pkmnPerPage > 50) LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
             this.pkmnPerPage = pkmnPerPage;
         }
+        // Clear pokemon map to force reload with new page size
+        this.pokemonMap.clear();
+        // Reset page to 1
+        this.page = 1;
         // Clear session cache when Pokemon per page changes
         httpSession.removeAttribute("pokemonMap");
         LOGGER.info("pkmnPerPage updated to: {}", pkmnPerPage);
@@ -133,9 +139,17 @@ public class PokemonListController extends BaseController
     public ResponseEntity<String> getPokemonByType(@RequestParam(name = "chosenType", required = false, defaultValue = "") String chosenType,
                                                    HttpSession httpSession)
     {
+        String previousType = this.chosenType;
         this.chosenType = !"none".equals(chosenType) ? chosenType : null;
-        // Clear the session map so homepage will regenerate with the new type filter
-        //httpSession.removeAttribute("pokemonMap");
+        // Reset page to 1 when changing filter
+        this.page = 1;
+        // Clear the pokemon map to force reload
+        this.pokemonMap.clear();
+        // If switching from a type to no filter, clear the filtered cache
+        if (this.chosenType == null && previousType != null) {
+            this.filteredPokemonByType.clear();
+            this.filteringInProgress.clear();
+        }
         LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
