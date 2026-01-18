@@ -33,6 +33,8 @@ public class BaseController
     private static final Logger LOGGER = LogManager.getLogger(BaseController.class);
     private static final int WAIT_INTERVAL_MS = 100; // Time to wait between checks for filtered Pokemon
     private static final int MAX_WAIT_ITERATIONS = 30; // Max iterations to wait (30 * 100ms = 3 seconds)
+    private static final int TIMEOUT_MULTIPLIER = 20; // Multiplier for extended timeout (20 * 3s = 60 seconds)
+    private static final int PROGRESS_LOG_INTERVAL = 50; // Log progress every 50 iterations (5 seconds)
     
     protected final PokemonApiService pokemonService;
     protected final PokeApiClient pokeApiClient;
@@ -238,13 +240,13 @@ public class BaseController
                 // Wait for filtering to complete to ensure accurate totalPokemon and pagination
                 LOGGER.info("Waiting for all Pokemon of type {} to be gathered...", chosenType);
                 int waitCount = 0;
-                int maxWait = MAX_WAIT_ITERATIONS * 20; // Allow up to 60 seconds for complete filtering
+                int maxWait = MAX_WAIT_ITERATIONS * TIMEOUT_MULTIPLIER; // Allow up to 60 seconds for complete filtering
                 while (filteringInProgress.get(chosenType) && waitCount < maxWait) {
                     try {
                         Thread.sleep(WAIT_INTERVAL_MS);
                         waitCount++;
                         // Log progress every 5 seconds
-                        if (waitCount % 50 == 0) {
+                        if (waitCount % PROGRESS_LOG_INTERVAL == 0) {
                             LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, synchronizedList.size());
                         }
                     } catch (InterruptedException e) {
