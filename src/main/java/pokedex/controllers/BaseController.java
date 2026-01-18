@@ -39,6 +39,7 @@ public class BaseController
     protected int lastPageSearched = 1;
     protected int pkmnPerPage = 10;
     Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
+    Map<String, List<Pokemon>> filteredPokemonByType = new TreeMap<>();
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -192,54 +193,95 @@ public class BaseController
 
     protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
     {
-        if (pokemonMap.isEmpty()) {
-            if (chosenType != null && !"none".equals(chosenType)) {
-                while (this.pokemonMap.size() < pkmnPerPage) {
-                    this.pokemonMap.putAll(getPokemonMap());
-                    this.page++;
-                }
-                if (this.pokemonMap.size() > pkmnPerPage) {
-                    List<Pokemon> limitedList = new ArrayList<>(this.pokemonMap.values()).subList(0, pkmnPerPage);
-                    this.pokemonMap.clear();
-                    for (Pokemon pkmn : limitedList) {
-                        this.pokemonMap.put(pkmn.id(), pkmn);
-                    }
-                }
-            } else {
-                this.pokemonMap = getPokemonMap();
-            }
-            return this.pokemonMap;
-        }
-        else {
-            if (chosenType != null && !"none".equals(chosenType)) {
-                while (this.pokemonMap.size() < pkmnPerPage) {
-                    // update the page number based on current last entry in the map
-                    page = this.pokemonMap.entrySet().stream()
-                            .reduce((first, second) -> second)
-                            .map(Map.Entry::getValue)
-                            .map(Pokemon::id)
-                            .map(id -> id / 10 + 1)
-                            .orElse(this.page);
-                    this.pokemonMap.putAll(getPokemonMap()
-                            .values().stream()
-                            .filter(pkmn -> {
-                                boolean hasType = false;
-                                for (PokemonType type : pkmn.types()) {
-                                    if (chosenType.equals(type.getType().name())) {
-                                        hasType = true;
-                                        break;
+        if (chosenType != null && !"none".equals(chosenType)) {
+            // Check if we already have filtered Pokemon for this type
+            if (!filteredPokemonByType.containsKey(chosenType)) {
+                LOGGER.info("Gathering all Pokemon of type: {}", chosenType);
+                List<Pokemon> allFilteredPokemon = new ArrayList<>();
+                int currentPage = 1;
+                int totalAllPokemon = pokemonService.getTotalPokemon(null);
+                int maxPages = (int) Math.ceil((double) totalAllPokemon / 50); // Use larger page size for efficiency
+                
+                // Fetch all Pokemon and filter by type
+                while (currentPage <= maxPages) {
+                    NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(50, ((currentPage - 1) * 50));
+                    if (pokemonList != null && !pokemonList.results().isEmpty()) {
+                        for (NamedApiResource<Pokemon> pkmnResource : pokemonList.results()) {
+                            Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmnResource.name());
+                            // Check if Pokemon has the chosen type
+                            boolean hasType = pokemon.types().stream()
+                                    .anyMatch(pokemonType -> chosenType.equalsIgnoreCase(pokemonType.getType().name()));
+                            
+                            if (hasType) {
+                                // Get species data for color
+                                String color = "white";
+                                PokemonSpecies speciesData = null;
+                                try {
+                                    speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                                    if (speciesData != null && speciesData.getColor() != null) {
+                                        color = speciesData.getColor().name();
                                     }
+                                } catch (Exception e) {
+                                    LOGGER.error("No speciesData found for pokemon id: {}", pokemon.id());
                                 }
-                                return hasType;
-                            }).collect(
-                                    HashMap::new,
-                                    (map, pkmn) -> map.put(pkmn.id(), pkmn),
-                                    HashMap::putAll));
-                    this.page++;
+                                
+                                // Build type string
+                                String pokemonType;
+                                List<PokemonType> types = pokemon.types();
+                                if (types.size() > 1) {
+                                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
+                                            + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
+                                } else {
+                                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
+                                }
+                                
+                                // Create enhanced Pokemon object
+                                PokemonSprites sprites = pokemon.sprites();
+                                pokemon = Pokemon.from(pokemon, Map.of(
+                                        "id", pokemon.id(),
+                                        "type", pokemonType,
+                                        "defaultImage", sprites.getFrontDefault(),
+                                        "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
+                                        "gifImage", GIF_IMAGE_URL(pokemon.id()),
+                                        "color", color,
+                                        "flavorTexts", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                        "descriptions", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                        "description", speciesData != null && !speciesData.getFlavorTextEntries().isEmpty() 
+                                                ? speciesData.getFlavorTextEntries().getFirst().getFlavorText() 
+                                                : "No description available."
+                                ));
+                                
+                                allFilteredPokemon.add(pokemon);
+                            }
+                        }
+                    }
+                    currentPage++;
                 }
-            } else {
-                this.pokemonMap = getPokemonMap();
+                
+                // Store the filtered Pokemon list
+                filteredPokemonByType.put(chosenType, allFilteredPokemon);
+                totalPokemon = allFilteredPokemon.size();
+                LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
             }
+            
+            // Extract the page of Pokemon to display
+            List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
+            totalPokemon = allOfType.size(); // Ensure totalPokemon is set
+            int startIndex = (page - 1) * pkmnPerPage;
+            int endIndex = Math.min(startIndex + pkmnPerPage, allOfType.size());
+            
+            this.pokemonMap.clear();
+            if (startIndex < allOfType.size()) {
+                List<Pokemon> pageOfPokemon = allOfType.subList(startIndex, endIndex);
+                for (Pokemon pkmn : pageOfPokemon) {
+                    this.pokemonMap.put(pkmn.id(), pkmn);
+                }
+            }
+            
+            return this.pokemonMap;
+        } else {
+            // No filter, use normal pagination
+            this.pokemonMap = getPokemonMap();
             return this.pokemonMap;
         }
     }

@@ -134,8 +134,10 @@ public class PokemonListController extends BaseController
                                                    HttpSession httpSession)
     {
         this.chosenType = !"none".equals(chosenType) ? chosenType : null;
-        // Clear the session map so homepage will regenerate with the new type filter
-        //httpSession.removeAttribute("pokemonMap");
+        // Reset page to 1 when changing filter
+        this.page = 1;
+        // Clear the pokemon map to force reload
+        this.pokemonMap.clear();
         LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
