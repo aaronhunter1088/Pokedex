@@ -1,5 +1,6 @@
 package pokedex.controllers;
 
+import jakarta.annotation.PreDestroy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
@@ -30,6 +31,9 @@ public class BaseController
 {
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(BaseController.class);
+    private static final int WAIT_INTERVAL_MS = 100; // Time to wait between checks for filtered Pokemon
+    private static final int MAX_WAIT_ITERATIONS = 30; // Max iterations to wait (30 * 100ms = 3 seconds)
+    
     protected final PokemonApiService pokemonService;
     protected final PokeApiClient pokeApiClient;
     protected final PokemonLocationEncounterService pokemonLocationEncounterService;
@@ -59,6 +63,21 @@ public class BaseController
         this.pokemonService = pokemonService;
         this.pokeApiClient = pokeApiClient;
         this.pokemonLocationEncounterService = pokemonLocationEncounterService;
+    }
+
+    @PreDestroy
+    public void cleanup()
+    {
+        LOGGER.info("Shutting down filter executor service");
+        filterExecutor.shutdown();
+        try {
+            if (!filterExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                filterExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            filterExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId)
@@ -218,9 +237,9 @@ public class BaseController
                 
                 // Wait for at least pkmnPerPage Pokemon to be available
                 int waitCount = 0;
-                while (synchronizedList.size() < pkmnPerPage && filteringInProgress.get(chosenType) && waitCount < 30) {
+                while (synchronizedList.size() < pkmnPerPage && filteringInProgress.get(chosenType) && waitCount < MAX_WAIT_ITERATIONS) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(WAIT_INTERVAL_MS);
                         waitCount++;
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
