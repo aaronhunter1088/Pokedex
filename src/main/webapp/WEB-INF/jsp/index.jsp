@@ -63,7 +63,7 @@
         <div id="loadingOverlay">
             <div id="loadingContent">
                 <h2 id="loadingHeader"></h2>
-                <p>One minute please...</p>
+                <p>One moment please...</p>
                 <div class="spinner"></div>
             </div>
         </div>
