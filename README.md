@@ -2,6 +2,11 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.1.2
+This version fixes a bug when filtering Pokemon by type. While the first set
+some particular type do show, the 'totalPokemon' value was not reflecting the
+actual number of Pokemon of that type.
+
 # v1.1.1
 This version simply includes some previous jars that were never pushed up.
 
