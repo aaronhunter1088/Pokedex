@@ -47,14 +47,13 @@ public class PokemonListController extends BaseController
            @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
     {
         lastPageSearched = page;
-        pokemonMap.clear();
-        @SuppressWarnings("unchecked")
-        Map<Integer, Pokemon> sessionMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
-        pokemonMap = updateSessionMap(sessionMap);
+        if (pokemonMap.isEmpty() || chosenType != null) {
+            //pokemonMap.clear();
+            pokemonMap = updateSessionMap(pokemonMap);
+            //httpSession.setAttribute("pokemonMap", pokemonMap);
+        }
         mav.addObject("pokemonMap", pokemonMap);
-        // store populated map in session so it persists between requests
-        httpSession.setAttribute("pokemonMap", pokemonMap);
-        //this.page = lastPageSearched;
+        this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
@@ -81,8 +80,8 @@ public class PokemonListController extends BaseController
     }
 
     @GetMapping(value = "/page")
-    //@ResponseBody
-    public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "10") int pageNumber,
+    public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
+                             @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode,
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);
@@ -94,14 +93,15 @@ public class PokemonListController extends BaseController
             return mav;
         }
         page = pageNumber;
-        //if (lastPageSearched != page) page = lastPageSearched;
-        //logger.info("page updated to {}", page);
-        return homepage(mav, httpSession, String.valueOf(isDarkMode));
+        // Clear session cache when changing pages
+        httpSession.removeAttribute("pokemonMap");
+        return homepage(mav, httpSession, darkmode);
     }
 
     @GetMapping("/pkmnPerPage")
     @ResponseBody
-    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name = "pkmnPerPage", required = false, defaultValue = "10") int pkmnPerPage)
+    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name = "pkmnPerPage", required = false, defaultValue = "10") int pkmnPerPage,
+                                                     HttpSession httpSession)
     {
         if (pkmnPerPage <= 0) {
             return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
@@ -109,6 +109,8 @@ public class PokemonListController extends BaseController
             if (pkmnPerPage > 50) LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
             this.pkmnPerPage = pkmnPerPage;
         }
+        // Clear session cache when Pokemon per page changes
+        httpSession.removeAttribute("pokemonMap");
         LOGGER.info("pkmnPerPage updated to: {}", pkmnPerPage);
         return ResponseEntity.ok().body("PkmnPerPage set");
     }
@@ -129,12 +131,12 @@ public class PokemonListController extends BaseController
     @GetMapping(value = "/getPokemonByType")
     @ResponseBody
     public ResponseEntity<String> getPokemonByType(@RequestParam(name = "chosenType", required = false, defaultValue = "") String chosenType,
-                                                   ModelAndView mav, HttpSession httpSession)
+                                                   HttpSession httpSession)
     {
         this.chosenType = !"none".equals(chosenType) ? chosenType : null;
-        this.pokemonMap.clear();
-        homepage(mav, httpSession, String.valueOf(isDarkMode));
-        LOGGER.info("lastPageSearched: {}", lastPageSearched);
+        // Clear the session map so homepage will regenerate with the new type filter
+        //httpSession.removeAttribute("pokemonMap");
+        LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
 

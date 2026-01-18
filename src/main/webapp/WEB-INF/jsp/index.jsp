@@ -42,7 +42,7 @@
             &emsp;
             <div id="typeList" style="display:flex;">
                 <label for="typeDropdown"></label>
-                <select id="typeDropdown" title="Type" class="icon" onchange="method(this);">
+                <select id="typeDropdown" title="Type" class="icon" onchange="getByPkmnType(this);">
                     <option value="none" selected>None</option>
                     <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
                         <c:if test="${chosenType.equals(type)}">
@@ -269,7 +269,7 @@
             });
         }
 
-        function method(selectObject) {
+        function getByPkmnType(selectObject) {
             let select = $("#typeDropdown");
             let type = selectObject.value;
             $.ajax({
@@ -284,15 +284,8 @@
                 statusCode: {
                     200: function(data) {
                         console.log('200 chosenType');
-                        //console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        location.reload();
-
-                        let ids = ${pokemonIds};
-                        for(let i=0; i<ids.length; i++) {
-                            let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");
-                            let currentColor = pokemonBox.style.backgroundColor;
-                            pokemonBox.style.backgroundColor = changeColor(currentColor);
-                        }
+                        // Navigate to homepage instead of reload to avoid duplicate fetching
+                        window.location.href = '${pageContext.request.contextPath}/?darkmode=${isDarkMode}';
                     },
                     400: function(data) {
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
