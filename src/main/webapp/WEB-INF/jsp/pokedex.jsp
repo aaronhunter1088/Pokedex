@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pokemon Info</title>
+    <title>Pokémon Info</title>
     <jsp:include page="headCommon.jsp"/>
     <style>
         /* Style the tab */
@@ -39,9 +39,10 @@
         }
     </style>
 </head>
-<body style="justify-content:space-evenly;text-align:center;">
+<body style="justify-content:space-evenly;text-align:center;"
+      class="${isDarkMode?'darkmode':'lightmode'}">
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search?mode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>

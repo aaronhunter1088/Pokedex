@@ -3,14 +3,15 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Pokedex</title>
+        <title>Pok&#233;dex Spring Boot</title>
         <jsp:include page="headCommon.jsp"/>
         <style></style>
     </head>
 
-    <body style="justify-content:space-evenly;text-align:center;">
+    <body style="justify-content:space-evenly;text-align:center;"
+            class="${isDarkMode?'darkmode':'lightmode'}">
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
-            <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+            <a href="${pageContext.request.contextPath}/search?mode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
                 <span class="center">
                 <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
             </a>
@@ -59,7 +60,7 @@
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
                 <c:set var="pokemonId" value="${pokemon.value.id}" />
                 <div id="pokemon${pokemonId}">
-                    <a href="pokedex/${pokemon.value.id}">
+                    <a href="pokedex/${pokemon.value.id}?mode=${isDarkMode}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
                                 <h3 id="name" style="color:black;">${pokemon.value.name}</h3>
