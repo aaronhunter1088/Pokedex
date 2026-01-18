@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pokémon Info</title>
+    <title>Pok&#233;mon Info</title>
     <jsp:include page="headCommon.jsp"/>
     <style>
         /* Style the tab */
@@ -292,13 +292,11 @@
     function setEvolutionsDiv() {
         let response = $.ajax({
             type: "GET",
-            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",
+            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}?mode=${isDarkMode}",
             async: false,
             dataType: "json",
             crossDomain: true,
             success: function (data) {
-                //$("#evolutions").html(data.responseText);
-                console.log('evolutions: ' + data.responseText);
                 return data.responseText;
             },
             error: function (jqXHR, textStatus, errorThrown) {
