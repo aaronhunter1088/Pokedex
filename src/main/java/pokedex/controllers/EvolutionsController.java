@@ -1,11 +1,13 @@
 package pokedex.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import pokedexapi.service.PokemonLocationEncounterService;
@@ -45,8 +47,10 @@ public class EvolutionsController extends BaseController
     }
 
     @GetMapping(value = "/evolutions/{pokemonId}")
-    public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav)
+    public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav,
+                                      @RequestParam(name = "mode", required = false, defaultValue = "false") String mode)
     {
+        pokemonMap = updateSessionMap(pokemonMap);
         resetEvolutionParameters();
         this.pokemonId = pokemonId;
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, pokemonId);
@@ -55,6 +59,7 @@ public class EvolutionsController extends BaseController
         mav.addObject("stages", stages);
         mav.addObject("pokemonFamily", pokemonFamily);
         mav.addObject("allIDs", allIDs);
+        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
         mav.setViewName("evolutions");
         return mav;
     }

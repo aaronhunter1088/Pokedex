@@ -19,7 +19,7 @@
         <a href="${pageContext.request.contextPath}/?mode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
         <input id="nameOrId" name="nameOrId" placeholder="Pokemon Name/ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
         <button type="submit" style="background:none;border:none;padding:0;cursor:zoom-in;" title="Search">
-            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+            <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
                  class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
                  onclick="getPokemonFromSearch($('#nameOrId').val(), ${isDarkMode})">
         </button>
@@ -35,11 +35,11 @@
     $(function(){
         $('#pokedex').hide();
         //checks whether the pressed key is "Enter"
-        $('#pokemonName').on('keypress', function(e) {
-            if ($('#pokemonName').val() === '') return;
+        $('#nameOrId').on('keypress', function(e) {
+            if ($('#nameOrId').val() === '') return;
             if (e.code === 'Enter' || e.code === 'Return') {
                 //getPokemonInfo();
-                getPokemonFromSearch($('#pokemonName').val());
+                //getPokemonFromSearch($('#pokemonName').val());
             }
         });
     });
@@ -54,6 +54,19 @@
         //if (nameOrId === undefined) nameOrId = $('#pokemonName').val();
         console.log('nameOrId: ' + nameOrId);
         console.log('mode: ' + isDarkMode);
+
+        //const raw = $("#nameOrId").trim();
+        //if (!raw) return;
+
+        //const ctx = '${pageContext.request.contextPath}';   // e.g. /pokedexapi (or "")
+        //const url = ctx + '/pokedex/' + raw + '?mode=' + isDarkMode;
+
+        console.log('Navigating to: ' + url);
+        window.location.href = url; // navigates like a normal link
+        //loadPokedexPageAjax(url);
+    }
+
+    function loadPokedexPageAjax(url) {
         $.ajax({
             type: "GET",
             url: url,
