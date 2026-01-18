@@ -148,6 +148,7 @@ public class PokemonListController extends BaseController
         // If switching from a type to no filter, clear the filtered cache
         if (this.chosenType == null && previousType != null) {
             this.filteredPokemonByType.clear();
+            this.filteringInProgress.clear();
         }
         LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
