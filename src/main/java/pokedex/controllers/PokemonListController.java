@@ -44,7 +44,7 @@ public class PokemonListController extends BaseController
 
     @GetMapping("/")
     public ModelAndView homepage(ModelAndView mav, HttpSession httpSession,
-           @RequestParam(name = "mode", required = true, defaultValue = "false") String mode)
+           @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
     {
         lastPageSearched = page;
         pokemonMap.clear();
@@ -66,7 +66,7 @@ public class PokemonListController extends BaseController
         mav.addObject("page", page);
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
-        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
+        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
         mav.setViewName("index");
         return mav;
     }

@@ -25,10 +25,10 @@ public class SearchController extends BaseController
 
     @GetMapping("/search")
     public ModelAndView searchPage(ModelAndView mav,
-                                   @RequestParam(name = "mode", required = true, defaultValue = "false") String mode)
+                                   @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
     {
         mav.addObject("pokemonId", 0);
-        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
+        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
         mav.setViewName("search");
         return mav;
     }
