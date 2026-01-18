@@ -216,7 +216,7 @@ public class BaseController
     protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
     {
         if (chosenType != null && !"none".equals(chosenType)) {
-            // Check if we already have some filtered Pokemon for this type
+            // Check if we already have filtered Pokemon for this type
             if (!filteredPokemonByType.containsKey(chosenType)) {
                 LOGGER.info("Starting async gathering of Pokemon of type: {}", chosenType);
                 
@@ -235,27 +235,36 @@ public class BaseController
                     }
                 });
                 
-                // Wait for at least pkmnPerPage Pokemon to be available
+                // Wait for filtering to complete to ensure accurate totalPokemon and pagination
+                LOGGER.info("Waiting for all Pokemon of type {} to be gathered...", chosenType);
                 int waitCount = 0;
-                while (synchronizedList.size() < pkmnPerPage && filteringInProgress.get(chosenType) && waitCount < MAX_WAIT_ITERATIONS) {
+                int maxWait = MAX_WAIT_ITERATIONS * 20; // Allow up to 60 seconds for complete filtering
+                while (filteringInProgress.get(chosenType) && waitCount < maxWait) {
                     try {
                         Thread.sleep(WAIT_INTERVAL_MS);
                         waitCount++;
+                        // Log progress every 5 seconds
+                        if (waitCount % 50 == 0) {
+                            LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, synchronizedList.size());
+                        }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         LOGGER.error("Interrupted while waiting for Pokemon", e);
                         break;
                     }
                 }
-                LOGGER.info("Returning initial results with {} Pokemon found", synchronizedList.size());
+                
+                LOGGER.info("Filtering complete. Total Pokemon of type {}: {}", chosenType, synchronizedList.size());
             }
             
             // Extract the page of Pokemon to display
             List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
-            // Set totalPokemon to current size (will update as more are found)
+            
+            // Set totalPokemon to the complete count
             synchronized (allOfType) {
                 totalPokemon = allOfType.size();
             }
+            
             int startIndex = (page - 1) * pkmnPerPage;
             int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
             
