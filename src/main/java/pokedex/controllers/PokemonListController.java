@@ -93,6 +93,8 @@ public class PokemonListController extends BaseController
             return mav;
         }
         page = pageNumber;
+        // Clear pokemon map to force reload with new page
+        this.pokemonMap.clear();
         // Clear session cache when changing pages
         httpSession.removeAttribute("pokemonMap");
         return homepage(mav, httpSession, darkmode);
@@ -109,6 +111,10 @@ public class PokemonListController extends BaseController
             if (pkmnPerPage > 50) LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
             this.pkmnPerPage = pkmnPerPage;
         }
+        // Clear pokemon map to force reload with new page size
+        this.pokemonMap.clear();
+        // Reset page to 1
+        this.page = 1;
         // Clear session cache when Pokemon per page changes
         httpSession.removeAttribute("pokemonMap");
         LOGGER.info("pkmnPerPage updated to: {}", pkmnPerPage);
@@ -133,11 +139,16 @@ public class PokemonListController extends BaseController
     public ResponseEntity<String> getPokemonByType(@RequestParam(name = "chosenType", required = false, defaultValue = "") String chosenType,
                                                    HttpSession httpSession)
     {
+        String previousType = this.chosenType;
         this.chosenType = !"none".equals(chosenType) ? chosenType : null;
         // Reset page to 1 when changing filter
         this.page = 1;
         // Clear the pokemon map to force reload
         this.pokemonMap.clear();
+        // If switching from a type to no filter, clear the filtered cache
+        if (this.chosenType == null && previousType != null) {
+            this.filteredPokemonByType.clear();
+        }
         LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
