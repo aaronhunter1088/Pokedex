@@ -48,7 +48,7 @@ public class EvolutionsController extends BaseController
 
     @GetMapping(value = "/evolutions/{pokemonId}")
     public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav,
-                                      @RequestParam(name = "mode", required = false, defaultValue = "false") String mode)
+                                      @RequestParam(name = "darkmode", required = false, defaultValue = "false") String darkmode)
     {
         pokemonMap = updateSessionMap(pokemonMap);
         resetEvolutionParameters();
@@ -59,7 +59,7 @@ public class EvolutionsController extends BaseController
         mav.addObject("stages", stages);
         mav.addObject("pokemonFamily", pokemonFamily);
         mav.addObject("allIDs", allIDs);
-        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
+        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
         mav.setViewName("evolutions");
         return mav;
     }

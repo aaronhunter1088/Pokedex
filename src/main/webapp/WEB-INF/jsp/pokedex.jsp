@@ -42,7 +42,7 @@
 <body style="justify-content:space-evenly;text-align:center;"
       class="${isDarkMode?'darkmode':'lightmode'}">
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search?mode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>
@@ -52,7 +52,7 @@
             <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
                 <div id="backAndName" class="parent-div">
                     <div id="backArrow" class="left-div">
-                        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
+                        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
                     </div>
                     &emsp;
                     <div id="mainName" class="center-div">
@@ -292,7 +292,7 @@
     function setEvolutionsDiv() {
         let response = $.ajax({
             type: "GET",
-            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}?mode=${isDarkMode}",
+            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}?darkmode=${isDarkMode}",
             async: false,
             dataType: "json",
             crossDomain: true,
