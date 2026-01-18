@@ -62,7 +62,7 @@
         <!-- Loading Overlay -->
         <div id="loadingOverlay">
             <div id="loadingContent">
-                <h2>Fetching all Pokemon</h2>
+                <h2 id="loadingHeader"></h2>
                 <p>One minute please...</p>
                 <div class="spinner"></div>
             </div>
@@ -333,7 +333,7 @@
             
             // Show loading overlay if a type is selected (not "none")
             if (type !== 'none') {
-                showLoadingOverlay();
+                showLoadingOverlay(type);
             }
             
             $.ajax({
@@ -368,10 +368,16 @@
             console.log(type);
         }
         
-        function showLoadingOverlay() {
+        function showLoadingOverlay(selectedType) {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
                 overlay.style.display = 'flex';
+                // update heading text with selectedType
+                const heading = $("#loadingHeader");
+                if (heading) {
+                    heading.text('Fetching all ' + selectedType + ' Pokemon');
+                }
+
             }
         }
         
