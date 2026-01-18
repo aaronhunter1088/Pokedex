@@ -19,6 +19,7 @@ import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
 import static pokedexapi.utilities.Constants.OFFICIAL_IMAGE_URL;
@@ -189,14 +190,57 @@ public class BaseController
         }};
     }
 
-    protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> sessionMap)
+    protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
     {
-        if (sessionMap == null || sessionMap.isEmpty()) {
-            pokemonMap.clear();
-            return getPokemonMap();
-        } else {
-            // restore controller state from session for this request
-            return sessionMap;
+        if (pokemonMap.isEmpty()) {
+            if (chosenType != null && !"none".equals(chosenType)) {
+                while (this.pokemonMap.size() < pkmnPerPage) {
+                    this.pokemonMap.putAll(getPokemonMap());
+                    this.page++;
+                }
+                if (this.pokemonMap.size() > pkmnPerPage) {
+                    List<Pokemon> limitedList = new ArrayList<>(this.pokemonMap.values()).subList(0, pkmnPerPage);
+                    this.pokemonMap.clear();
+                    for (Pokemon pkmn : limitedList) {
+                        this.pokemonMap.put(pkmn.id(), pkmn);
+                    }
+                }
+            } else {
+                this.pokemonMap = getPokemonMap();
+            }
+            return this.pokemonMap;
+        }
+        else {
+            if (chosenType != null && !"none".equals(chosenType)) {
+                while (this.pokemonMap.size() < pkmnPerPage) {
+                    // update the page number based on current last entry in the map
+                    page = this.pokemonMap.entrySet().stream()
+                            .reduce((first, second) -> second)
+                            .map(Map.Entry::getValue)
+                            .map(Pokemon::id)
+                            .map(id -> id / 10 + 1)
+                            .orElse(this.page);
+                    this.pokemonMap.putAll(getPokemonMap()
+                            .values().stream()
+                            .filter(pkmn -> {
+                                boolean hasType = false;
+                                for (PokemonType type : pkmn.types()) {
+                                    if (chosenType.equals(type.getType().name())) {
+                                        hasType = true;
+                                        break;
+                                    }
+                                }
+                                return hasType;
+                            }).collect(
+                                    HashMap::new,
+                                    (map, pkmn) -> map.put(pkmn.id(), pkmn),
+                                    HashMap::putAll));
+                    this.page++;
+                }
+            } else {
+                this.pokemonMap = getPokemonMap();
+            }
+            return this.pokemonMap;
         }
     }
 
@@ -215,14 +259,28 @@ public class BaseController
                 String color = "white";
                 PokemonSpecies speciesData = null;
                 try {
-                    speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
-                    if (speciesData != null && speciesData.getColor() != null) {
-                        LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
-                        color = speciesData.getColor().name();
+                    if (chosenType != null && !"none".equals(chosenType)) {
+                        LOGGER.info("chosenType: {}", chosenType);
+                        if (!pokemon.types().stream().anyMatch(pokemonType -> chosenType.equalsIgnoreCase(pokemonType.getType().name()))) {
+                            LOGGER.info("Skipping pokemon id {} as it is not of type {}", pokemon.id(), chosenType);
+                            return;
+                        } else {
+                            speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                            if (speciesData != null && speciesData.getColor() != null) {
+                                LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
+                                color = speciesData.getColor().name();
+                            }
+                        }
+                    } else {
+                        speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                        if (speciesData != null && speciesData.getColor() != null) {
+                            LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
+                            color = speciesData.getColor().name();
+                        }
                     }
                 }
                 catch (Exception e) {
-                    LOGGER.error("No speciesData found using {}", pokemon.id());
+                    LOGGER.error("No speciesData found using {}", pkmn);
                     //logger.warn("setting color to white");
                     //pokemon.setColor("white");
                 }
@@ -246,28 +304,6 @@ public class BaseController
                         break;
                     }
                 }
-//                List<LocationEncounterArea> listOfLeas = new ArrayList<>();
-//                ResponseEntity<String> locationEncounters = pokemonLocationEncounterService.getPokemonLocationEncounters(pokemon.id());
-//                try {
-//                    // readValue parses JSON text and produces Java objects; convertValue converts between already-parsed Java values (or JsonNode/Map) into a target type.
-//                    listOfLeas = jsonMapper.readValue(locationEncounters.getBody(), new TypeReference<List<LocationEncounterArea>>()
-//                    {
-//                    });
-//                }
-//                catch (Exception e) {
-//                    LOGGER.error("Error converting locationEncounters for pokemon id {}: {}", pokemon.id(), e.getMessage());
-//                }
-//                LOGGER.info("locationExchange: {}", listOfLeas);
-                //pokemon = new Pokemon(pokemon.id(), pokemonType);
-                //pokemon.setType(pokemonType);
-                //pokemon.setDefaultImage(sprites.getFrontDefault());
-                //pokemon.setOfficialImage(OFFICIAL_IMAGE_URL(pokemon.id()));
-                //HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.id()+".gif");
-//                if (response.statusCode() == 404) {
-//                    pokemon.setGifImage(null);
-//                } else {
-//                    pokemon.setGifImage(GIF_IMAGE_URL(pokemon.id()));
-//                }
 
                 pokemon = Pokemon.from(pokemon, Map.of(
                         "id", pokemon.id(),
@@ -275,15 +311,12 @@ public class BaseController
                         "defaultImage", sprites.getFrontDefault(),
                         "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
                         "gifImage", GIF_IMAGE_URL(pokemon.id()),
-                        "color", color, "flavorTexts", speciesData.getFlavorTextEntries(),
+                        "color", color,
+                        "flavorTexts", speciesData.getFlavorTextEntries(),
                         "descriptions", speciesData.getFlavorTextEntries(),
                         "description", speciesData.getFlavorTextEntries().getFirst().getFlavorText()
                 ));
-//                pokemon = Pokemon.from(pokemon, Map.of(
-//                        "locationAreaEncounters", listOfLeas
-////                        "moveNames", moves
-//                ));
-                if (!("".equals(chosenType)) && specificTypeToFind) {
+                if (chosenType != null && !("none".equals(chosenType)) && specificTypeToFind) {
                     pokemonMap.put(pokemon.id(), pokemon);
                 } else if (null == chosenType) {
                     pokemonMap.put(pokemon.id(), pokemon);
