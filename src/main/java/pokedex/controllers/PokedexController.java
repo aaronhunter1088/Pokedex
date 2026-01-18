@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.client.PokeApiClient;
@@ -29,13 +30,17 @@ public class PokedexController extends BaseController
         super(pokemonService, pokeApiClient, null);
     }
 
-    @GetMapping(value = "/pokedex/{pokemonId}")
-    public ModelAndView pokedex(@PathVariable(name = "pokemonId") Integer nameOrId, ModelAndView mav,
-                                HttpSession httpSession)
+    @GetMapping(value = "/pokedex/{nameOrId}")
+    public ModelAndView pokedex(@PathVariable(name = "nameOrId") Integer nameOrId, ModelAndView mav,
+                                HttpSession httpSession,
+                                @RequestParam(name = "mode", required = false, defaultValue = "false") String mode)
     {
         @SuppressWarnings("unchecked")
         Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
-        Pokemon pokemon = setupPokedex(pokemonMap.get(nameOrId));
+        pokemonMap = updateSessionMap(pokemonMap);
+        Pokemon pokemon = pokemonMap.get(nameOrId);
+        if (pokemon == null) pokemon = pokemonService.getPokemonByIdOrName(String.valueOf(nameOrId));
+        pokemon = setupPokedex(pokemon);
         mav.addObject("pokemonId", super.pokemonId);
         mav.addObject("defaultImage", pokemon.defaultImage());
         mav.addObject("officialImage", pokemon.officialImage());
@@ -44,6 +49,7 @@ public class PokedexController extends BaseController
         mav.addObject("pokemon", pokemon);
         mav.addObject("randomDescriptionNumber", !pokemon.descriptions().isEmpty() ?
                 new Random().nextInt(pokemon.descriptions().size()) : 0);
+        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
         mav.setViewName("pokedex");
         return mav;
     }

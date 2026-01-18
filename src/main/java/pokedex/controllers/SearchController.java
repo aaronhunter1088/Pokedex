@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.client.PokeApiClient;
@@ -23,9 +24,11 @@ public class SearchController extends BaseController
     }
 
     @GetMapping("/search")
-    public ModelAndView searchPage(ModelAndView mav)
+    public ModelAndView searchPage(ModelAndView mav,
+                                   @RequestParam(name = "mode", required = true, defaultValue = "false") String mode)
     {
         mav.addObject("pokemonId", 0);
+        mav.addObject("isDarkMode", isDarkMode = mode.equals("true"));
         mav.setViewName("search");
         return mav;
     }

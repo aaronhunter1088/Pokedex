@@ -11,8 +11,10 @@ import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
+import skaro.pokeapi.resource.NamedApiResourceList;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonMove;
+import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 
@@ -35,6 +37,14 @@ public class BaseController
     protected int page = 1;
     protected int lastPageSearched = 1;
     protected int pkmnPerPage = 10;
+    Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
+    int totalPokemon = 0;
+    boolean defaultImagePresent = false,
+            officialImagePresent = false,
+            gifImagePresent = false,
+            showGifs = false;
+    String chosenType;
+    boolean isDarkMode = false; // "light" or "dark"
 
     @Autowired
     public BaseController(PokemonApiService pokemonService,
@@ -177,5 +187,115 @@ public class BaseController
             put("tradeSpecies", null);
             put("turnUpsideDown", null); // on screen
         }};
+    }
+
+    protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> sessionMap)
+    {
+        if (sessionMap == null || sessionMap.isEmpty()) {
+            pokemonMap.clear();
+            return getPokemonMap();
+        } else {
+            // restore controller state from session for this request
+            return sessionMap;
+        }
+    }
+
+    public Map<Integer, Pokemon> getPokemonMap()
+    {
+        LOGGER.info("page number: {}", page);
+        LOGGER.info("pkmnPerPage: {}", pkmnPerPage);
+        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(pkmnPerPage, ((page - 1) * pkmnPerPage));
+        if (null != pokemonList && !pokemonList.results().isEmpty()) {
+            LOGGER.debug("pokemonList size: {}", pokemonList.results().size());
+            List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.results();
+            LOGGER.debug("pokemonList limit size: {}", listOfPokemon.size());
+            totalPokemon = pokemonService.getTotalPokemon(null);
+            listOfPokemon.forEach(pkmn -> {
+                Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmn.name());
+                String color = "white";
+                PokemonSpecies speciesData = null;
+                try {
+                    speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                    if (speciesData != null && speciesData.getColor() != null) {
+                        LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
+                        color = speciesData.getColor().name();
+                    }
+                }
+                catch (Exception e) {
+                    LOGGER.error("No speciesData found using {}", pokemon.id());
+                    //logger.warn("setting color to white");
+                    //pokemon.setColor("white");
+                }
+                pokemon = Pokemon.from(pokemon, Map.of("color", color));
+
+                PokemonSprites sprites = pokemon.sprites();
+                List<PokemonType> types = pokemon.types();
+                String pokemonType = null;
+                if (types.size() > 1) {
+                    LOGGER.debug("More than 1 pokemonType");
+                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
+                            + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
+                } else {
+                    LOGGER.debug("One pokemonType");
+                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
+                }
+                boolean specificTypeToFind = false;
+                for (PokemonType type : types) {
+                    if ((null != chosenType) && chosenType.equals(type.getType().name())) {
+                        specificTypeToFind = true;
+                        break;
+                    }
+                }
+//                List<LocationEncounterArea> listOfLeas = new ArrayList<>();
+//                ResponseEntity<String> locationEncounters = pokemonLocationEncounterService.getPokemonLocationEncounters(pokemon.id());
+//                try {
+//                    // readValue parses JSON text and produces Java objects; convertValue converts between already-parsed Java values (or JsonNode/Map) into a target type.
+//                    listOfLeas = jsonMapper.readValue(locationEncounters.getBody(), new TypeReference<List<LocationEncounterArea>>()
+//                    {
+//                    });
+//                }
+//                catch (Exception e) {
+//                    LOGGER.error("Error converting locationEncounters for pokemon id {}: {}", pokemon.id(), e.getMessage());
+//                }
+//                LOGGER.info("locationExchange: {}", listOfLeas);
+                //pokemon = new Pokemon(pokemon.id(), pokemonType);
+                //pokemon.setType(pokemonType);
+                //pokemon.setDefaultImage(sprites.getFrontDefault());
+                //pokemon.setOfficialImage(OFFICIAL_IMAGE_URL(pokemon.id()));
+                //HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.id()+".gif");
+//                if (response.statusCode() == 404) {
+//                    pokemon.setGifImage(null);
+//                } else {
+//                    pokemon.setGifImage(GIF_IMAGE_URL(pokemon.id()));
+//                }
+
+                pokemon = Pokemon.from(pokemon, Map.of(
+                        "id", pokemon.id(),
+                        "type", pokemonType,
+                        "defaultImage", sprites.getFrontDefault(),
+                        "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
+                        "gifImage", GIF_IMAGE_URL(pokemon.id()),
+                        "color", color, "flavorTexts", speciesData.getFlavorTextEntries(),
+                        "descriptions", speciesData.getFlavorTextEntries(),
+                        "description", speciesData.getFlavorTextEntries().getFirst().getFlavorText()
+                ));
+//                pokemon = Pokemon.from(pokemon, Map.of(
+//                        "locationAreaEncounters", listOfLeas
+////                        "moveNames", moves
+//                ));
+                if (!("".equals(chosenType)) && specificTypeToFind) {
+                    pokemonMap.put(pokemon.id(), pokemon);
+                } else if (null == chosenType) {
+                    pokemonMap.put(pokemon.id(), pokemon);
+                }
+            });
+        }
+        if (pokemonMap.size() >= pkmnPerPage) {
+            return pokemonMap;
+        } else {
+            this.page = this.page + 1;
+            LOGGER.info("pokemonMap size: {}", pokemonMap.size());
+            return getPokemonMap();
+        }
     }
 }

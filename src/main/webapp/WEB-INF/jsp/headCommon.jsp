@@ -77,4 +77,13 @@
         display: inline-block;
         vertical-align: middle;
     }
+
+    .lightmode {
+        background-color: white;
+        color: black;
+    }
+    .darkmode {
+        background-color: black;
+        color: white;
+    }
 </style>
