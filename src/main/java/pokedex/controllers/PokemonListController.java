@@ -85,8 +85,8 @@ public class PokemonListController extends BaseController
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);
-        if (pageNumber < 0) {
-            LOGGER.error("Page number cannot be negative");
+        if (pageNumber < 1) {
+            LOGGER.error("Page number must be at least 1, received: {}", pageNumber);
             return mav;
         } else if (pageNumber > Math.round((float) totalPokemon / pkmnPerPage)) {
             LOGGER.error("Cannot pick a number more than there are pages");

@@ -14,12 +14,12 @@
                 <c:choose>
                     <c:when test="${page == 1}">
                         <li class="page-item disabled">
-                            <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber-1});">Previous</button>
+                            <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" disabled>Previous</button>
                         </li>
                     </c:when>
                     <c:when test="${page != 1}">
                         <li class="page-item">
-                            <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber-1});">Previous</button>
+                            <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page-1});">Previous</button>
                         </li>
                     </c:when>
                 </c:choose>
@@ -97,7 +97,7 @@
                 <c:choose>
                     <c:when test="${page == totalPages}">
                         <li class="page-item disabled">
-                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}">Next</button>
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" disabled>Next</button>
                         </li>
                     </c:when>
                     <c:when test="${page != totalPages}">
