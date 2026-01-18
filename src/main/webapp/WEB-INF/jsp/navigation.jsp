@@ -25,73 +25,68 @@
                 </c:choose>
                 <!-- Pages -->
                 <c:choose>
+                    <c:when test="${totalPages <= 8}">
+                        <!-- If total pages is 8 or less, show all pages -->
+                        <c:forEach begin="1" end="${totalPages}" var="pageNumber">
+                            <li class="page-item">
+                              <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber});">${pageNumber}</button>
+                            </li>
+                        </c:forEach>
+                    </c:when>
                     <c:when test="${page < 6}">
-                        <c:forEach begin="1" end="8" var="pageNumber">
-                            <c:if test="${pageNumber <= 8}">
+                        <!-- Show first 6-8 pages, ellipsis, and last page -->
+                        <c:forEach begin="1" end="${page < 6 ? 7 : 8}" var="pageNumber">
+                            <c:if test="${pageNumber <= totalPages}">
                                 <li class="page-item">
                                   <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber});">${pageNumber}</button>
                                 </li>
                             </c:if>
-                            <c:if test="${pageNumber == 8}">
+                        </c:forEach>
+                        <c:if test="${totalPages > 8}">
+                            <li class="page-item">
+                              <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages - 1});">...</button>
+                            </li>
+                            <li class="page-item">
+                              <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages});">${totalPages}</button>
+                            </li>
+                        </c:if>
+                    </c:when>
+                    <c:when test="${page >= 6 && page <= (totalPages - 5)}">
+                        <!-- Show first page, ellipsis, pages around current, ellipsis, last page -->
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(1);">1</button>
+                        </li>
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page-3});">...</button>
+                        </li>
+                        <c:forEach begin="${page-2}" end="${page+2}" var="pageNumber">
+                            <c:if test="${pageNumber > 1 && pageNumber < totalPages}">
                                 <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber+1});">...</button>
-                                </li>
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages});">${totalPages}</button>
+                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber});">${pageNumber}</button>
                                 </li>
                             </c:if>
                         </c:forEach>
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page+3});">...</button>
+                        </li>
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages});">${totalPages}</button>
+                        </li>
                     </c:when>
-                    <c:when test="${page >= 6}">
-                        <c:forEach begin="1" end="${page+8}" var="pageNumber">
-                            <c:if test="${pageNumber == 1}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(1);">1</button>
-                                </li>
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page-3});">...</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 2}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page-2});">${page-2}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 3}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page-1});">${page-1}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 4}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" style="background-color:#2196F3;color:#ffffff;" onclick="setPageToView(${page});">${page}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 5 && ((page+1) <= totalPages)}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page+1});">${page+1}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 6 && ((page+2) <= totalPages)}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page+2});">${page+2}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 7 && ((page+3) <= totalPages)}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page+3});">${page+3}</button>
-                                </li>
-                            </c:if>
-                            <c:if test="${pageNumber == 8 && ((page+4) <= totalPages)}">
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${page+4});">...</button>
-                                </li>
-                                <li class="page-item">
-                                  <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages});">${totalPages}</button>
-                                </li>
-                            </c:if>
-                          </c:forEach>
-                    </c:when>
+                    <c:otherwise>
+                        <!-- Near the end: show first page, ellipsis, and last 6-8 pages -->
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(1);">1</button>
+                        </li>
+                        <li class="page-item">
+                          <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${totalPages - 7});">...</button>
+                        </li>
+                        <c:forEach begin="${totalPages - 6}" end="${totalPages}" var="pageNumber">
+                            <li class="page-item">
+                              <button class="page-link ${isDarkMode ? 'darkmode !important' : 'lightmode !important'}" onclick="setPageToView(${pageNumber});">${pageNumber}</button>
+                            </li>
+                        </c:forEach>
+                    </c:otherwise>
                 </c:choose>
                 <!-- Next -->
                 <c:choose>
