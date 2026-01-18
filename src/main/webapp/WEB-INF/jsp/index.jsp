@@ -5,11 +5,69 @@
     <head>
         <title>Pok&#233;dex Spring Boot</title>
         <jsp:include page="headCommon.jsp"/>
-        <style></style>
+        <style>
+            #loadingOverlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.7);
+                z-index: 9999;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            #loadingContent {
+                background-color: white;
+                padding: 40px 60px;
+                border-radius: 10px;
+                text-align: center;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+            
+            #loadingContent h2 {
+                margin: 0 0 20px 0;
+                color: #333;
+                font-size: 24px;
+            }
+            
+            #loadingContent p {
+                margin: 0;
+                color: #666;
+                font-size: 16px;
+            }
+            
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #3498db;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 20px auto 0 auto;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
     </head>
 
     <body style="justify-content:space-evenly;text-align:center;"
             class="${isDarkMode?'darkmode':'lightmode'}">
+        
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay">
+            <div id="loadingContent">
+                <h2>Fetching all Pokemon</h2>
+                <p>One minute please...</p>
+                <div class="spinner"></div>
+            </div>
+        </div>
+        
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
             <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
                 <span class="center">
@@ -272,6 +330,12 @@
         function getByPkmnType(selectObject) {
             let select = $("#typeDropdown");
             let type = selectObject.value;
+            
+            // Show loading overlay if a type is selected (not "none")
+            if (type !== 'none') {
+                showLoadingOverlay();
+            }
+            
             $.ajax({
                 type: "GET",
                 url: "getPokemonByType",
@@ -289,16 +353,33 @@
                     },
                     400: function(data) {
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
+                        hideLoadingOverlay();
                     },
                     404: function() {
                         console.log('Resource not found');
+                        hideLoadingOverlay();
                     },
                     500: function() {
                         console.log('Server Error');
+                        hideLoadingOverlay();
                     }
                 }
             });
             console.log(type);
+        }
+        
+        function showLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+            }
+        }
+        
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
         }
 
     </script>
