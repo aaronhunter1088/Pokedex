@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import pokedexapi.service.PokemonApiService;
@@ -18,7 +19,9 @@ import skaro.pokeapi.resource.pokemon.PokemonMove;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
+import tools.jackson.databind.ObjectMapper;
 
+import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -39,6 +42,7 @@ public class BaseController
     protected final PokemonApiService pokemonService;
     protected final PokeApiClient pokeApiClient;
     protected final PokemonLocationEncounterService pokemonLocationEncounterService;
+    private final ObjectMapper objectMapper;
     @Value("${skaro.pokeapi.baseUri}")
     protected String pokeApiBaseUrl;
     protected String pokemonId = "";
@@ -60,11 +64,13 @@ public class BaseController
     @Autowired
     public BaseController(PokemonApiService pokemonService,
                           PokeApiClient pokeApiClient,
-                          PokemonLocationEncounterService pokemonLocationEncounterService)
+                          PokemonLocationEncounterService pokemonLocationEncounterService,
+                          ObjectMapper objectMapper)
     {
         this.pokemonService = pokemonService;
         this.pokeApiClient = pokeApiClient;
         this.pokemonLocationEncounterService = pokemonLocationEncounterService;
+        this.objectMapper = objectMapper;
     }
 
     @PreDestroy
@@ -344,6 +350,24 @@ public class BaseController
                                             ? speciesData.getFlavorTextEntries().getFirst().getFlavorText() 
                                             : "No description available."
                             ));
+
+                            // Check pokemon gifImage for existence.
+                            // If image returns 404, reset gifImage to official image.
+                            // If image returns 200, no change is needed
+                            try {
+                                HttpResponse<String> response = pokemonService.callUrl(pokemon.gifImage());
+                                if (response.statusCode() == 404) {
+                                    LOGGER.debug("GIF image not found for {}, using official image instead", pokemon.name());
+                                    pokemon = Pokemon.from(pokemon, Map.of(
+                                            "gifImage", pokemon.officialImage()
+                                    ));
+                                }
+                            } catch (Exception e) {
+                                LOGGER.debug("Error validating GIF image for {}, using official image instead", pokemon.name());
+                                pokemon = Pokemon.from(pokemon, Map.of(
+                                        "gifImage", pokemon.officialImage()
+                                ));
+                            }
                             
                             resultList.add(pokemon);
                             LOGGER.debug("Added {} to filtered list. Total so far: {}", pokemon.name(), resultList.size());
@@ -386,7 +410,8 @@ public class BaseController
                                 color = speciesData.getColor().name();
                             }
                         }
-                    } else {
+                    }
+                    else {
                         speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
                         if (speciesData != null && speciesData.getColor() != null) {
                             LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
@@ -395,8 +420,17 @@ public class BaseController
                     }
                 }
                 catch (Exception e) {
-                    LOGGER.error("No speciesData found using {}", pkmn);
-                    //logger.warn("setting color to white");
+                    LOGGER.error("No speciesData found using {} and service species call", pkmn);
+                    LOGGER.info("Trying direct call with species: {}, url: {}", pokemon.species().name(), pokemon.species().url());
+                    try {
+                        String responseBody = pokemonService.callUrl(pokemon.species().url()).body();
+                        speciesData = objectMapper.readValue(responseBody, PokemonSpecies.class);
+                        LOGGER.info("Successfully retrieved speciesData for pokemon id: {}", pokemon.id());
+                    }
+                    catch (Exception ex) {
+                        LOGGER.error("No speciesData found using {} and direct call. Empty speciesData created.", pokemon.id());
+                        speciesData = new PokemonSpecies();
+                    }
                     //pokemon.setColor("white");
                 }
                 pokemon = Pokemon.from(pokemon, Map.of("color", color));
@@ -427,9 +461,11 @@ public class BaseController
                         "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
                         "gifImage", GIF_IMAGE_URL(pokemon.id()),
                         "color", color,
-                        "flavorTexts", speciesData.getFlavorTextEntries(),
-                        "descriptions", speciesData.getFlavorTextEntries(),
-                        "description", speciesData.getFlavorTextEntries().getFirst().getFlavorText()
+                        "flavorTexts", speciesData.getFlavorTextEntries() != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                        "descriptions", speciesData.getFlavorTextEntries() != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                        "description", speciesData.getFlavorTextEntries() != null
+                                ? speciesData.getFlavorTextEntries().getFirst().getFlavorText()
+                                : "No description available."
                 ));
                 if (chosenType != null && !("none".equals(chosenType)) && specificTypeToFind) {
                     pokemonMap.put(pokemon.id(), pokemon);

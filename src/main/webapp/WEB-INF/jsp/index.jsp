@@ -76,8 +76,6 @@
         </h1>
         <br>
 
-        <jsp:include page="navigation.jsp"/>
-
         <div style="display:inline-flex;align-items:center;">
             <label class="switch" title="If GIF is not present, official artwork will show!">
                 <input id="gifSwitch" type="checkbox" onclick="toggleGifs();">
@@ -101,7 +99,7 @@
             <div id="typeList" style="display:flex;">
                 <label for="typeDropdown"></label>
                 <select id="typeDropdown" title="Type" class="icon" onchange="getByPkmnType(this);">
-                    <option value="none" selected>None</option>
+                    <option value="none" selected>Type (All)</option>
                     <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
                         <c:if test="${chosenType.equals(type)}">
                             <option value="${type}" selected>${type}</option>
@@ -114,6 +112,8 @@
             </div>
         </div>
         <br>
+        <jsp:include page="navigation.jsp"/>
+
         <div id="pokemonGrid" class="list-grid">
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
                 <c:set var="pokemonId" value="${pokemon.value.id}" />
