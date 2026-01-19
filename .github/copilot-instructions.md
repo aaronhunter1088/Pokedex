@@ -51,6 +51,6 @@ This is a Spring Boot-based Pokédex web application that displays Pokémon info
 - Depends on a parent POM (`com.skvllprodvctions:parent:1.0.0`)
 
 ## Notes
-- The application runs on port 4201 with context path `/pokedexSpringboot` (access at http://localhost:4201/pokedexSpringboot)
+- The application runs on port 4201 with context path `/springboot` (access at http://localhost:4201/springboot)
 - WAR packaging is used for deployment
 - Caching is enabled for API responses via `MyPokeApiReactorCachingConfiguration`
