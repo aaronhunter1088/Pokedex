@@ -2,6 +2,41 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.1.2
+This version fixes a bug when filtering Pokemon by type. While the first set
+some particular type do show, the 'totalPokemon' value was not reflecting the
+actual number of Pokemon of that type. Now, when a type is chosen, all Pokémon
+of that type are fetched. A popup informs the user to wait while we gather all
+the Pokémon to display. Once completed, Pokémon of just the selected type are
+shown on the page. The results are cached for faster retrieval on subsequent
+requests of the same type.
+
+# v1.1.1
+This version simply includes some previous jars that were never pushed up.
+
+# v1.1.0
+This version added the darkmode value passed in from the new Pokedex Landing
+Page. This value is either true or false, darkmode or lightmode respectively.
+This value is then passed to all other pages, and the CSS is adjusted
+accordingly.
+
+# v1.0.3
+This version fixed some issues with description, locations, moves, colors,
+and other minor issues found.
+
+# v1.0.2
+This version addressed a few minor bugs and improved the user interface
+for better usability. Also created the bootable jar file for easier
+deployment and confirmed its operability.
+
+# v1.0.0 - v1.0.1
+This version integrated with PokedexApi code, removing several duplicate
+classes and simplifying the codebase. The PokedexApi library now handles
+interactions with the PokeAPI, while the Pokedex application focuses on
+the user interface and experience. This change enhances maintainability
+and leverages the specialized functionality of the PokedexApi library all
+while still maintaining its status of being a 100% Spring Boot application.
+
 # v0.6
 
 Upgraded several major dependencies. Update Parent version reference to 1.0.0,

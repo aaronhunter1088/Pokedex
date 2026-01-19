@@ -1,9 +1,11 @@
 package pokedex.controllers;
 
+import jakarta.annotation.PreDestroy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import pokedexapi.service.PokemonApiService;
@@ -11,12 +13,18 @@ import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
+import skaro.pokeapi.resource.NamedApiResourceList;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonMove;
+import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
+import tools.jackson.databind.ObjectMapper;
 
+import java.net.http.HttpResponse;
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
 import static pokedexapi.utilities.Constants.OFFICIAL_IMAGE_URL;
@@ -26,24 +34,58 @@ public class BaseController
 {
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(BaseController.class);
+    private static final int WAIT_INTERVAL_MS = 100; // Time to wait between checks for filtered Pokemon
+    private static final int MAX_WAIT_ITERATIONS = 30; // Max iterations to wait (30 * 100ms = 3 seconds)
+    private static final int TIMEOUT_MULTIPLIER = 20; // Multiplier for extended timeout (20 * 3s = 60 seconds)
+    private static final int PROGRESS_LOG_INTERVAL = 50; // Log progress every 50 iterations (5 seconds)
+    
     protected final PokemonApiService pokemonService;
     protected final PokeApiClient pokeApiClient;
     protected final PokemonLocationEncounterService pokemonLocationEncounterService;
+    private final ObjectMapper objectMapper;
     @Value("${skaro.pokeapi.baseUri}")
     protected String pokeApiBaseUrl;
     protected String pokemonId = "";
     protected int page = 1;
     protected int lastPageSearched = 1;
     protected int pkmnPerPage = 10;
+    Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
+    Map<String, List<Pokemon>> filteredPokemonByType = new ConcurrentHashMap<>();
+    Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
+    private final ExecutorService filterExecutor = Executors.newSingleThreadExecutor();
+    int totalPokemon = 0;
+    boolean defaultImagePresent = false,
+            officialImagePresent = false,
+            gifImagePresent = false,
+            showGifs = false;
+    String chosenType;
+    boolean isDarkMode = false; // "light" or "dark"
 
     @Autowired
     public BaseController(PokemonApiService pokemonService,
                           PokeApiClient pokeApiClient,
-                          PokemonLocationEncounterService pokemonLocationEncounterService)
+                          PokemonLocationEncounterService pokemonLocationEncounterService,
+                          ObjectMapper objectMapper)
     {
         this.pokemonService = pokemonService;
         this.pokeApiClient = pokeApiClient;
         this.pokemonLocationEncounterService = pokemonLocationEncounterService;
+        this.objectMapper = objectMapper;
+    }
+
+    @PreDestroy
+    public void cleanup()
+    {
+        LOGGER.info("Shutting down filter executor service");
+        filterExecutor.shutdown();
+        try {
+            if (!filterExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
+                filterExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            filterExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
     protected Integer getEvolutionChainID(Map<Integer, List<List<Integer>>> pokemonIDToEvolutionChainMap, String pokemonId)
@@ -177,5 +219,267 @@ public class BaseController
             put("tradeSpecies", null);
             put("turnUpsideDown", null); // on screen
         }};
+    }
+
+    protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
+    {
+        if (chosenType != null && !"none".equals(chosenType)) {
+            // Check if we already have filtered Pokemon for this type
+            if (!filteredPokemonByType.containsKey(chosenType)) {
+                LOGGER.info("Starting async gathering of Pokemon of type: {}", chosenType);
+                
+                // Initialize with empty list for this type
+                List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+                filteredPokemonByType.put(chosenType, synchronizedList);
+                filteringInProgress.put(chosenType, true);
+                
+                // Start background thread to fetch all Pokemon
+                filterExecutor.submit(() -> {
+                    try {
+                        fetchAllPokemonByType(chosenType, synchronizedList);
+                    } finally {
+                        filteringInProgress.put(chosenType, false);
+                        LOGGER.info("Completed gathering all Pokemon of type: {}", chosenType);
+                    }
+                });
+                
+                // Wait for filtering to complete to ensure accurate totalPokemon and pagination
+                LOGGER.info("Waiting for all Pokemon of type {} to be gathered...", chosenType);
+                int waitCount = 0;
+                int maxWait = MAX_WAIT_ITERATIONS * TIMEOUT_MULTIPLIER; // Allow up to 60 seconds for complete filtering
+                while (filteringInProgress.get(chosenType) && waitCount < maxWait) {
+                    try {
+                        Thread.sleep(WAIT_INTERVAL_MS);
+                        waitCount++;
+                        // Log progress every 5 seconds
+                        if (waitCount % PROGRESS_LOG_INTERVAL == 0) {
+                            LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, synchronizedList.size());
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        LOGGER.error("Interrupted while waiting for Pokemon", e);
+                        break;
+                    }
+                }
+                
+                LOGGER.info("Filtering complete. Total Pokemon of type {}: {}", chosenType, synchronizedList.size());
+            }
+            
+            // Extract the page of Pokemon to display
+            List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
+            
+            // Set totalPokemon to the complete count
+            synchronized (allOfType) {
+                totalPokemon = allOfType.size();
+            }
+            
+            int startIndex = (page - 1) * pkmnPerPage;
+            int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
+            
+            this.pokemonMap.clear();
+            if (startIndex < totalPokemon) {
+                synchronized (allOfType) {
+                    List<Pokemon> pageOfPokemon = new ArrayList<>(allOfType.subList(startIndex, endIndex));
+                    for (Pokemon pkmn : pageOfPokemon) {
+                        this.pokemonMap.put(pkmn.id(), pkmn);
+                    }
+                }
+            }
+            
+            return this.pokemonMap;
+        } else {
+            // No filter, use normal pagination
+            this.pokemonMap = getPokemonMap();
+            return this.pokemonMap;
+        }
+    }
+    
+    private void fetchAllPokemonByType(String type, List<Pokemon> resultList)
+    {
+        LOGGER.info("Background thread: Gathering all Pokemon of type: {}", type);
+        int currentPage = 1;
+        int totalAllPokemon = pokemonService.getTotalPokemon(null);
+        int maxPages = (int) Math.ceil((double) totalAllPokemon / 50); // Use larger page size for efficiency
+        
+        // Fetch all Pokemon and filter by type
+        while (currentPage <= maxPages) {
+            NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(50, ((currentPage - 1) * 50));
+            if (pokemonList != null && !pokemonList.results().isEmpty()) {
+                for (NamedApiResource<Pokemon> pkmnResource : pokemonList.results()) {
+                    try {
+                        Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmnResource.name());
+                        // Check if Pokemon has the chosen type
+                        boolean hasType = pokemon.types().stream()
+                                .anyMatch(pokemonType -> type.equalsIgnoreCase(pokemonType.getType().name()));
+                        
+                        if (hasType) {
+                            // Get species data for color
+                            String color = "white";
+                            PokemonSpecies speciesData = null;
+                            try {
+                                speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                                if (speciesData != null && speciesData.getColor() != null) {
+                                    color = speciesData.getColor().name();
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error("No speciesData found for pokemon id: {}", pokemon.id());
+                            }
+                            
+                            // Build type string
+                            String pokemonType;
+                            List<PokemonType> types = pokemon.types();
+                            if (types.size() > 1) {
+                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
+                                        + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
+                            } else {
+                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
+                            }
+                            
+                            // Create enhanced Pokemon object
+                            PokemonSprites sprites = pokemon.sprites();
+                            pokemon = Pokemon.from(pokemon, Map.of(
+                                    "id", pokemon.id(),
+                                    "type", pokemonType,
+                                    "defaultImage", sprites.getFrontDefault(),
+                                    "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
+                                    "gifImage", GIF_IMAGE_URL(pokemon.id()),
+                                    "color", color,
+                                    "flavorTexts", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                    "descriptions", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                    "description", speciesData != null && !speciesData.getFlavorTextEntries().isEmpty() 
+                                            ? speciesData.getFlavorTextEntries().getFirst().getFlavorText() 
+                                            : "No description available."
+                            ));
+
+                            // Check pokemon gifImage for existence.
+                            // If image returns 404, reset gifImage to official image.
+                            // If image returns 200, no change is needed
+                            try {
+                                HttpResponse<String> response = pokemonService.callUrl(pokemon.gifImage());
+                                if (response.statusCode() == 404) {
+                                    LOGGER.debug("GIF image not found for {}, using official image instead", pokemon.name());
+                                    pokemon = Pokemon.from(pokemon, Map.of(
+                                            "gifImage", pokemon.officialImage()
+                                    ));
+                                }
+                            } catch (Exception e) {
+                                LOGGER.debug("Error validating GIF image for {}, using official image instead", pokemon.name());
+                                pokemon = Pokemon.from(pokemon, Map.of(
+                                        "gifImage", pokemon.officialImage()
+                                ));
+                            }
+                            
+                            resultList.add(pokemon);
+                            LOGGER.debug("Added {} to filtered list. Total so far: {}", pokemon.name(), resultList.size());
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error processing pokemon: {}", pkmnResource.name(), e);
+                    }
+                }
+            }
+            currentPage++;
+        }
+        
+        LOGGER.info("Background thread: Total Pokemon of type {}: {}", type, resultList.size());
+    }
+
+    public Map<Integer, Pokemon> getPokemonMap()
+    {
+        LOGGER.info("page number: {}", page);
+        LOGGER.info("pkmnPerPage: {}", pkmnPerPage);
+        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(pkmnPerPage, ((page - 1) * pkmnPerPage));
+        if (null != pokemonList && !pokemonList.results().isEmpty()) {
+            LOGGER.debug("pokemonList size: {}", pokemonList.results().size());
+            List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.results();
+            LOGGER.debug("pokemonList limit size: {}", listOfPokemon.size());
+            totalPokemon = pokemonService.getTotalPokemon(null);
+            listOfPokemon.forEach(pkmn -> {
+                Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmn.name());
+                String color = "white";
+                PokemonSpecies speciesData = null;
+                try {
+                    if (chosenType != null && !"none".equals(chosenType)) {
+                        LOGGER.info("chosenType: {}", chosenType);
+                        if (!pokemon.types().stream().anyMatch(pokemonType -> chosenType.equalsIgnoreCase(pokemonType.getType().name()))) {
+                            LOGGER.info("Skipping pokemon id {} as it is not of type {}", pokemon.id(), chosenType);
+                            return;
+                        } else {
+                            speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                            if (speciesData != null && speciesData.getColor() != null) {
+                                LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
+                                color = speciesData.getColor().name();
+                            }
+                        }
+                    }
+                    else {
+                        speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                        if (speciesData != null && speciesData.getColor() != null) {
+                            LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
+                            color = speciesData.getColor().name();
+                        }
+                    }
+                }
+                catch (Exception e) {
+                    LOGGER.error("No speciesData found using {} and service species call", pkmn);
+                    LOGGER.info("Trying direct call with species: {}, url: {}", pokemon.species().name(), pokemon.species().url());
+                    try {
+                        String responseBody = pokemonService.callUrl(pokemon.species().url()).body();
+                        speciesData = objectMapper.readValue(responseBody, PokemonSpecies.class);
+                        LOGGER.info("Successfully retrieved speciesData for pokemon id: {}", pokemon.id());
+                    }
+                    catch (Exception ex) {
+                        LOGGER.error("No speciesData found using {} and direct call. Empty speciesData created.", pokemon.id());
+                        speciesData = new PokemonSpecies();
+                    }
+                    //pokemon.setColor("white");
+                }
+                pokemon = Pokemon.from(pokemon, Map.of("color", color));
+
+                PokemonSprites sprites = pokemon.sprites();
+                List<PokemonType> types = pokemon.types();
+                String pokemonType = null;
+                if (types.size() > 1) {
+                    LOGGER.debug("More than 1 pokemonType");
+                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
+                            + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
+                } else {
+                    LOGGER.debug("One pokemonType");
+                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
+                }
+                boolean specificTypeToFind = false;
+                for (PokemonType type : types) {
+                    if ((null != chosenType) && chosenType.equals(type.getType().name())) {
+                        specificTypeToFind = true;
+                        break;
+                    }
+                }
+
+                pokemon = Pokemon.from(pokemon, Map.of(
+                        "id", pokemon.id(),
+                        "type", pokemonType,
+                        "defaultImage", sprites.getFrontDefault(),
+                        "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
+                        "gifImage", GIF_IMAGE_URL(pokemon.id()),
+                        "color", color,
+                        "flavorTexts", speciesData.getFlavorTextEntries() != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                        "descriptions", speciesData.getFlavorTextEntries() != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                        "description", speciesData.getFlavorTextEntries() != null
+                                ? speciesData.getFlavorTextEntries().getFirst().getFlavorText()
+                                : "No description available."
+                ));
+                if (chosenType != null && !("none".equals(chosenType)) && specificTypeToFind) {
+                    pokemonMap.put(pokemon.id(), pokemon);
+                } else if (null == chosenType) {
+                    pokemonMap.put(pokemon.id(), pokemon);
+                }
+            });
+        }
+        if (pokemonMap.size() >= pkmnPerPage) {
+            return pokemonMap;
+        } else {
+            this.page = this.page + 1;
+            LOGGER.info("pokemonMap size: {}", pokemonMap.size());
+            return getPokemonMap();
+        }
     }
 }

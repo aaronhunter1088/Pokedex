@@ -16,13 +16,11 @@ import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.pokemon.LocationEncounterArea;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,49 +29,34 @@ import java.util.TreeMap;
 
 import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
 import static pokedexapi.utilities.Constants.OFFICIAL_IMAGE_URL;
-import static skaro.pokeapi.utils.PokeApiConstants.POKEAPI_JSON_DECODER_BEAN;
 
 @Controller
 public class PokemonListController extends BaseController
 {
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(PokemonListController.class);
-    Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
-    int totalPokemon = 0;
-    boolean defaultImagePresent = false,
-            officialImagePresent = false,
-            gifImagePresent = false,
-            showGifs = false;
-    String chosenType;
 
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
                                  PokeApiClient pokeApiClient,
-                                 PokemonLocationEncounterService pokemonLocationEncounterService)
+                                 PokemonLocationEncounterService pokemonLocationEncounterService,
+                                 ObjectMapper objectMapper)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService);
+        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper);
     }
 
     @GetMapping("/")
-    public ModelAndView homepage(ModelAndView mav, HttpSession httpSession)
+    public ModelAndView homepage(ModelAndView mav, HttpSession httpSession,
+           @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
     {
         lastPageSearched = page;
-        pokemonMap.clear();
-        @SuppressWarnings("unchecked")
-        Map<Integer, Pokemon> sessionMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
-
-        if (sessionMap == null || sessionMap.isEmpty()) {
-            pokemonMap.clear();
-            pokemonMap = getPokemonMap();
-            mav.addObject("pokemonMap", pokemonMap);
-            // store populated map in session so it persists between requests
-            httpSession.setAttribute("pokemonMap", pokemonMap);
-        } else {
-            // restore controller state from session for this request
-            this.pokemonMap = sessionMap;
-            mav.addObject("pokemonMap", this.pokemonMap);
+        if (pokemonMap.isEmpty() || chosenType != null) {
+            //pokemonMap.clear();
+            pokemonMap = updateSessionMap(pokemonMap);
+            //httpSession.setAttribute("pokemonMap", pokemonMap);
         }
-        //this.page = lastPageSearched;
+        mav.addObject("pokemonMap", pokemonMap);
+        this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
         mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("officialImagePresent", officialImagePresent);
@@ -85,6 +68,7 @@ public class PokemonListController extends BaseController
         mav.addObject("page", page);
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
+        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
         mav.setViewName("index");
         return mav;
     }
@@ -99,27 +83,30 @@ public class PokemonListController extends BaseController
     }
 
     @GetMapping(value = "/page")
-    //@ResponseBody
-    public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "10") int pageNumber,
+    public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
+                             @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode,
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);
-        if (pageNumber < 0) {
-            LOGGER.error("Page number cannot be negative");
+        if (pageNumber < 1) {
+            LOGGER.error("Page number must be at least 1, received: {}", pageNumber);
             return mav;
         } else if (pageNumber > Math.round((float) totalPokemon / pkmnPerPage)) {
             LOGGER.error("Cannot pick a number more than there are pages");
             return mav;
         }
         page = pageNumber;
-        //if (lastPageSearched != page) page = lastPageSearched;
-        //logger.info("page updated to {}", page);
-        return homepage(mav, httpSession);
+        // Clear pokemon map to force reload with new page
+        this.pokemonMap.clear();
+        // Clear session cache when changing pages
+        httpSession.removeAttribute("pokemonMap");
+        return homepage(mav, httpSession, darkmode);
     }
 
     @GetMapping("/pkmnPerPage")
     @ResponseBody
-    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name = "pkmnPerPage", required = false, defaultValue = "10") int pkmnPerPage)
+    public ResponseEntity<String> getPokemonPerPage(@RequestParam(name = "pkmnPerPage", required = false, defaultValue = "10") int pkmnPerPage,
+                                                     HttpSession httpSession)
     {
         if (pkmnPerPage <= 0) {
             return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
@@ -127,108 +114,17 @@ public class PokemonListController extends BaseController
             if (pkmnPerPage > 50) LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
             this.pkmnPerPage = pkmnPerPage;
         }
+        // Clear pokemon map to force reload with new page size
+        this.pokemonMap.clear();
+        // Reset page to 1
+        this.page = 1;
+        // Clear session cache when Pokemon per page changes
+        httpSession.removeAttribute("pokemonMap");
         LOGGER.info("pkmnPerPage updated to: {}", pkmnPerPage);
         return ResponseEntity.ok().body("PkmnPerPage set");
     }
 
-    public Map<Integer, Pokemon> getPokemonMap()
-    {
-        LOGGER.info("page number: {}", page);
-        LOGGER.info("pkmnPerPage: {}", pkmnPerPage);
-        NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(pkmnPerPage, ((page - 1) * pkmnPerPage));
-        if (null != pokemonList && !pokemonList.results().isEmpty()) {
-            LOGGER.debug("pokemonList size: " + pokemonList.results().size());
-            List<NamedApiResource<Pokemon>> listOfPokemon = pokemonList.results();
-            LOGGER.debug("pokemonList limit size: " + listOfPokemon.size());
-            totalPokemon = pokemonService.getTotalPokemon(null);
-            listOfPokemon.forEach(pkmn -> {
-                Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmn.name());
-                String color = "white";
-                PokemonSpecies speciesData = null;
-                try {
-                    speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
-                    if (speciesData != null && speciesData.getColor() != null) {
-                        LOGGER.debug("speciesData.color: {}", speciesData.getColor().name());
-                        color = speciesData.getColor().name();
-                    }
-                }
-                catch (Exception e) {
-                    LOGGER.error("No speciesData found using {}", pokemon.id());
-                    //logger.warn("setting color to white");
-                    //pokemon.setColor("white");
-                }
-                pokemon = Pokemon.from(pokemon, Map.of("color", color));
 
-                PokemonSprites sprites = pokemon.sprites();
-                List<PokemonType> types = pokemon.types();
-                String pokemonType = null;
-                if (types.size() > 1) {
-                    LOGGER.debug("More than 1 pokemonType");
-                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
-                            + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
-                } else {
-                    LOGGER.debug("One pokemonType");
-                    pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
-                }
-                boolean specificTypeToFind = false;
-                for (PokemonType type : types) {
-                    if ((null != chosenType) && chosenType.equals(type.getType().name())) {
-                        specificTypeToFind = true;
-                        break;
-                    }
-                }
-//                List<LocationEncounterArea> listOfLeas = new ArrayList<>();
-//                ResponseEntity<String> locationEncounters = pokemonLocationEncounterService.getPokemonLocationEncounters(pokemon.id());
-//                try {
-//                    // readValue parses JSON text and produces Java objects; convertValue converts between already-parsed Java values (or JsonNode/Map) into a target type.
-//                    listOfLeas = jsonMapper.readValue(locationEncounters.getBody(), new TypeReference<List<LocationEncounterArea>>()
-//                    {
-//                    });
-//                }
-//                catch (Exception e) {
-//                    LOGGER.error("Error converting locationEncounters for pokemon id {}: {}", pokemon.id(), e.getMessage());
-//                }
-//                LOGGER.info("locationExchange: {}", listOfLeas);
-                //pokemon = new Pokemon(pokemon.id(), pokemonType);
-                //pokemon.setType(pokemonType);
-                //pokemon.setDefaultImage(sprites.getFrontDefault());
-                //pokemon.setOfficialImage(OFFICIAL_IMAGE_URL(pokemon.id()));
-                //HttpResponse<String> response = pokemonService.callUrl("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/"+pokemon.id()+".gif");
-//                if (response.statusCode() == 404) {
-//                    pokemon.setGifImage(null);
-//                } else {
-//                    pokemon.setGifImage(GIF_IMAGE_URL(pokemon.id()));
-//                }
-
-                pokemon = Pokemon.from(pokemon, Map.of(
-                        "id", pokemon.id(),
-                        "type", pokemonType,
-                        "defaultImage", sprites.getFrontDefault(),
-                        "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
-                        "gifImage", GIF_IMAGE_URL(pokemon.id()),
-                        "color", color, "flavorTexts", speciesData.getFlavorTextEntries(),
-                        "descriptions", speciesData.getFlavorTextEntries(),
-                        "description", speciesData.getFlavorTextEntries().getFirst().getFlavorText()
-                ));
-//                pokemon = Pokemon.from(pokemon, Map.of(
-//                        "locationAreaEncounters", listOfLeas
-////                        "moveNames", moves
-//                ));
-                if (!("".equals(chosenType)) && specificTypeToFind) {
-                    pokemonMap.put(pokemon.id(), pokemon);
-                } else if (null == chosenType) {
-                    pokemonMap.put(pokemon.id(), pokemon);
-                }
-            });
-        }
-        if (pokemonMap.size() >= pkmnPerPage) {
-            return pokemonMap;
-        } else {
-            this.page = this.page + 1;
-            LOGGER.info("pokemonMap size: {}", pokemonMap.size());
-            return getPokemonMap();
-        }
-    }
 
     public List<String> getUniqueTypes()
     {
@@ -244,12 +140,21 @@ public class PokemonListController extends BaseController
     @GetMapping(value = "/getPokemonByType")
     @ResponseBody
     public ResponseEntity<String> getPokemonByType(@RequestParam(name = "chosenType", required = false, defaultValue = "") String chosenType,
-                                                   ModelAndView mav, HttpSession httpSession)
+                                                   HttpSession httpSession)
     {
+        String previousType = this.chosenType;
         this.chosenType = !"none".equals(chosenType) ? chosenType : null;
+        // Reset page to 1 when changing filter
+        this.page = 1;
+        // Clear the pokemon map to force reload
         this.pokemonMap.clear();
-        homepage(mav, httpSession);
-        LOGGER.info("lastPageSearched: {}", lastPageSearched);
+        // If switching from a type to no filter, clear the filtered cache
+        if (this.chosenType == null && previousType != null) {
+            this.filteredPokemonByType.clear();
+            this.filteringInProgress.clear();
+        }
+        LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
+
 }

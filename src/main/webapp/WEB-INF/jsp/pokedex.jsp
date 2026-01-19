@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pokemon Info</title>
+    <title>Pok&#233;mon Info</title>
     <jsp:include page="headCommon.jsp"/>
     <style>
         /* Style the tab */
@@ -39,9 +39,10 @@
         }
     </style>
 </head>
-<body style="justify-content:space-evenly;text-align:center;">
+<body style="justify-content:space-evenly;text-align:center;"
+      class="${isDarkMode?'darkmode':'lightmode'}">
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>
@@ -51,7 +52,7 @@
             <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
                 <div id="backAndName" class="parent-div">
                     <div id="backArrow" class="left-div">
-                        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
+                        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
                     </div>
                     &emsp;
                     <div id="mainName" class="center-div">
@@ -291,13 +292,11 @@
     function setEvolutionsDiv() {
         let response = $.ajax({
             type: "GET",
-            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",
+            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}?darkmode=${isDarkMode}",
             async: false,
             dataType: "json",
             crossDomain: true,
             success: function (data) {
-                //$("#evolutions").html(data.responseText);
-                console.log('evolutions: ' + data.responseText);
                 return data.responseText;
             },
             error: function (jqXHR, textStatus, errorThrown) {

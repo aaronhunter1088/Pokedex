@@ -6,22 +6,26 @@
     <style>
     </style>
 </head>
-<body style="justify-content:space-evenly;text-align:center;">
+<body style="justify-content:space-evenly;text-align:center;"
+      class="${isDarkMode?'darkmode':'lightmode'}">
     <h1 id="searchImgReloadPage" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>
     </h1>
 
     <h4 style="vertical-align: middle;">
-        <a href="${pageContext.request.contextPath}/" title="Go back to list"><i class="fas fa-arrow-left" style="color:#000000;"></i></a>
-        <input id="pokemonName" placeholder="Pokemon Name/ID" type="text"/>
-        <img alt="pokeball" onclick="getPokemonFromSearch($('#pokemonName').val())" class="button cursor" title="Find Pokemon"
-             src="${pageContext.request.contextPath}/images/pokeball1.jpg" style="height:30px;width:30px;">
+        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
+        <input id="nameOrId" name="nameOrId" placeholder="Pokemon Name/ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
+        <button type="submit" style="background:none;border:none;padding:0;cursor:zoom-in;" title="Search">
+            <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+                 class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
+                 onclick="getPokemonFromSearch($('#nameOrId').val(), ${isDarkMode})">
+        </button>
     </h4>
 
-    <div id="pokedex"></div>
+    <div id="pokedex" class="${isDarkMode?'darkmode':'lightmode'}"></div>
 
 </body>
 
@@ -31,21 +35,41 @@
     $(function(){
         $('#pokedex').hide();
         //checks whether the pressed key is "Enter"
-        $('#pokemonName').on('keypress', function(e) {
-            if ($('#pokemonName').val() === '') return;
+        $('#nameOrId').on('keypress', function(e) {
+            if ($('#nameOrId').val() === '') return;
             if (e.code === 'Enter' || e.code === 'Return') {
                 //getPokemonInfo();
-                getPokemonFromSearch($('#pokemonName').val());
+                //getPokemonFromSearch($('#pokemonName').val());
             }
         });
     });
 
-    function getPokemonFromSearch(nameOrId) {
+    function getPokemonFromSearch(nameOrId, isDarkMode) {
+        //event.preventDefault();
+        //const nameOrId = $('#nameOrId').val();
+        let url = '';
+        if (nameOrId) {
+            url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+        }
         //if (nameOrId === undefined) nameOrId = $('#pokemonName').val();
         console.log('nameOrId: ' + nameOrId);
+        console.log('mode: ' + isDarkMode);
+
+        //const raw = $("#nameOrId").trim();
+        //if (!raw) return;
+
+        //const ctx = '${pageContext.request.contextPath}';   // e.g. /pokedexapi (or "")
+        //const url = ctx + '/pokedex/' + raw + '?darkmode=' + isDarkMode;
+
+        console.log('Navigating to: ' + url);
+        window.location.href = url; // navigates like a normal link
+        //loadPokedexPageAjax(url);
+    }
+
+    function loadPokedexPageAjax(url) {
         $.ajax({
             type: "GET",
-            url: "${pageContext.request.contextPath}/pokedex/"+nameOrId,
+            url: url,
             async: false,
             dataType: "application/json",
             statusCode: {
@@ -70,7 +94,7 @@
     let desc = "", color = "";
     // Actions performed when you click "Get Info"
     function getPokemonInfo() {
-        let name = $('#pokemonName').val();
+        let name = $('#nameOrId').val();
         name = name.toLowerCase().trim();
         if (!isNameValid(name)) { alert("Not a valid name or ID"); }
         else {
