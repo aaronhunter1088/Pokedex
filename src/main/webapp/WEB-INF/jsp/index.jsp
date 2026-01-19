@@ -110,6 +110,11 @@
                     </c:forEach>
                 </select>
             </div>
+            &emsp;
+            <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
+                    title="Return to Landing Page">
+                Back to Landing Page
+            </button>
         </div>
         <br>
         <jsp:include page="navigation.jsp"/>
@@ -386,6 +391,10 @@
             if (overlay) {
                 overlay.style.display = 'none';
             }
+        }
+
+        function navigateToLandingPage() {
+            window.location.href = '${baseUrl}';
         }
 
     </script>

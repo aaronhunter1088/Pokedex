@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +36,9 @@ public class PokemonListController extends BaseController
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(PokemonListController.class);
 
+    @Value("${app.base.url}")
+    private String baseUrl;
+
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
                                  PokeApiClient pokeApiClient,
@@ -49,6 +52,7 @@ public class PokemonListController extends BaseController
     public ModelAndView homepage(ModelAndView mav, HttpSession httpSession,
            @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
     {
+
         lastPageSearched = page;
         if (pokemonMap.isEmpty() || chosenType != null) {
             //pokemonMap.clear();
@@ -69,6 +73,7 @@ public class PokemonListController extends BaseController
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
         mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
+        mav.addObject("baseUrl", baseUrl);
         mav.setViewName("index");
         return mav;
     }
