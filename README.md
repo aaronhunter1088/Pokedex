@@ -5,7 +5,11 @@
 # v1.1.2
 This version fixes a bug when filtering Pokemon by type. While the first set
 some particular type do show, the 'totalPokemon' value was not reflecting the
-actual number of Pokemon of that type.
+actual number of Pokemon of that type. Now, when a type is chosen, all Pokémon
+of that type are fetched. A popup informs the user to wait while we gather all
+the Pokémon to display. Once completed, Pokémon of just the selected type are
+shown on the page. The results are cached for faster retrieval on subsequent
+requests of the same type.
 
 # v1.1.1
 This version simply includes some previous jars that were never pushed up.

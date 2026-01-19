@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import skaro.pokeapi.resource.pokemon.PokemonType;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +39,10 @@ public class PokemonListController extends BaseController
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
                                  PokeApiClient pokeApiClient,
-                                 PokemonLocationEncounterService pokemonLocationEncounterService)
+                                 PokemonLocationEncounterService pokemonLocationEncounterService,
+                                 ObjectMapper objectMapper)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService);
+        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper);
     }
 
     @GetMapping("/")

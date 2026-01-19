@@ -3,12 +3,14 @@ package pokedex.controllers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.client.PokeApiClient;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
@@ -44,9 +46,10 @@ public class EvolvesHowController extends BaseController
 
     @Autowired
     public EvolvesHowController(PokemonApiService pokemonService,
-                                PokeApiClient pokeApiClient)
+                                PokeApiClient pokeApiClient,
+                                ObjectMapper objectMapper)
     {
-        super(pokemonService, pokeApiClient, null);
+        super(pokemonService, pokeApiClient, null, objectMapper);
     }
 
     @GetMapping(value = "/evolves-how")

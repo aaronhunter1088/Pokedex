@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 import java.util.Random;
@@ -25,9 +27,10 @@ public class PokedexController extends BaseController
 
     @Autowired
     public PokedexController(PokemonApiService pokemonService,
-                             PokeApiClient pokeApiClient)
+                             PokeApiClient pokeApiClient,
+                             ObjectMapper objectMapper)
     {
-        super(pokemonService, pokeApiClient, null);
+        super(pokemonService, pokeApiClient, null, objectMapper);
     }
 
     @GetMapping(value = "/pokedex/{nameOrId}")
