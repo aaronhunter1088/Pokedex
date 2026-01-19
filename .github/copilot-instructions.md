@@ -1,6 +1,6 @@
 # Copilot Instructions for Pokédex
 
-This is a Spring Boot-based Pokédex web application that displays Pokémon information retrieved from the PokéAPI. The application uses JSP templates for the frontend and communicates with the PokeAPI via the pokeapi-reactor client library.
+This is a Spring Boot-based Pokédex web application that displays Pokémon information retrieved from the PokéAPI. The application uses JSP templates for the frontend and communicates with the PokéAPI via the pokeapi-reactor client library.
 
 ## Code Standards
 
