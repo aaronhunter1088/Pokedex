@@ -394,7 +394,7 @@
         }
 
         function navigateToLandingPage() {
-            window.location.href = '${baseUrl}';
+            window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
         }
 
     </script>
