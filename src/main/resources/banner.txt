@@ -6,6 +6,6 @@
 ##        ##     ## ##   ##  ##       ##     ## ##        ##   ##
 ##         #######  ##    ## ######## ########  ######## ##     ##
 --------------------------------------------------------
-${spring.application.title} ${spring.application.version}
+${spring.application.name} ${spring.application.version}
 Powered by Spring Boot ${spring-boot.version}
 Generated: https://devops.datenkollektiv.de/banner.txt/index.html: Font: banner3
