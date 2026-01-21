@@ -2,6 +2,10 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.3.0
+This version simply updates the application version to match the corresponding
+API code's version. We are skipping v1.2.0.
+
 # v1.1.2
 This version fixes a bug when filtering Pokemon by type. While the first set
 some particular type do show, the 'totalPokemon' value was not reflecting the

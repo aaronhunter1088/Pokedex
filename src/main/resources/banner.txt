@@ -1,11 +1,11 @@
-
-__________       __              .___
-\______   \____ |  | __ ____   __| _/____ ___  ___
- |     ___/  _ \|  |/ // __ \ / __ |/ __ \\  \/  /
- |    |  (  <_> )    <\  ___// /_/ \  ___/ >    <
- |____|   \____/|__|_ \\___  >____ |\___  >__/\_ \
-                     \/    \/     \/    \/      \/
-
-${spring.application.name} ${spring.application.version}
+########   #######  ##    ## ######## ########  ######## ##     ##
+##     ## ##     ## ##   ##  ##       ##     ## ##        ##   ##
+##     ## ##     ## ##  ##   ##       ##     ## ##         ## ##
+########  ##     ## #####    ######   ##     ## ######      ###
+##        ##     ## ##  ##   ##       ##     ## ##         ## ##
+##        ##     ## ##   ##  ##       ##     ## ##        ##   ##
+##         #######  ##    ## ######## ########  ######## ##     ##
+--------------------------------------------------------
+${spring.application.title} ${spring.application.version}
 Powered by Spring Boot ${spring-boot.version}
-Generated: https://devops.datenkollektiv.de/banner.txt/index.html: Font: Unknown
+Generated: https://devops.datenkollektiv.de/banner.txt/index.html: Font: banner3
