@@ -326,7 +326,7 @@
     
     /* Evolutions Section - Stack vertically on mobile */
     #evolutions {
-        display: block !important;
+        display: flex !important;
         flex-direction: column !important;
     }
     

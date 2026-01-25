@@ -64,7 +64,7 @@
         </button>
         
         <div class="mobile-menu-item">
-            <button class="back-to-home-btn icon" onclick="navigateToHomePage()"
+            <button class="icon" onclick="navigateToHomePage()"
                     title="Return to Home Page">
                 Back to Home
             </button>
