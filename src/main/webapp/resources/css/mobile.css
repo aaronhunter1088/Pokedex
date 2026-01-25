@@ -24,7 +24,7 @@
     /* Show and style mobile header */
     .mobile-header {
         display: flex;
-        position: sticky;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
@@ -102,8 +102,9 @@
         height: 100%;
         background-color: white;
         z-index: 1002;
-        padding: 60px 20px 20px 20px;
+        padding: 60px 20px 40px 20px;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
         transition: right 0.3s ease-in-out;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     }
@@ -169,13 +170,17 @@
     
     .mobile-menu-item .switch {
         margin: 10px 0;
+        display: inline-block;
     }
     
     /* GIF Toggle in mobile menu */
     .mobile-gif-toggle {
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        display: block;
+        text-align: left;
+    }
+    
+    .mobile-gif-toggle .switch {
+        margin: 0;
     }
     
     /* Hide desktop header logo */
@@ -212,6 +217,25 @@
     .list-grid .box {
         width: 100%;
         max-width: 100%;
+        height: auto !important;
+        min-height: 400px;
+        padding: 15px;
+    }
+    
+    /* Adjust Pokemon card content for mobile */
+    .list-grid .box #info h3 {
+        font-size: 14px;
+        margin: 5px 0;
+        line-height: 1.4;
+    }
+    
+    .list-grid .box #nameAndId h3 {
+        font-size: 16px;
+    }
+    
+    .list-grid .box #image img {
+        height: 150px !important;
+        width: 150px !important;
     }
     
     /* Adjust body padding for sticky header */

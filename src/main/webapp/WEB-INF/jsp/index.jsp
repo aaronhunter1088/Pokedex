@@ -90,12 +90,12 @@
             </button>
             
             <div class="mobile-menu-item">
+                <label>Show GIFs</label>
                 <div class="mobile-gif-toggle">
                     <label class="switch" title="If GIF is not present, official artwork will show!">
                         <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
                         <span class="slider round"></span>
                     </label>
-                    <label>Show GIFs</label>
                 </div>
             </div>
             
