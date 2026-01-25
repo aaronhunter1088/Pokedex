@@ -323,4 +323,32 @@
         font-size: 16px;
         margin: 5px 0;
     }
+    
+    /* Evolutions Section - Stack vertically on mobile */
+    #evolutions {
+        display: block !important;
+        flex-direction: column !important;
+    }
+    
+    #evolutions > div {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+    
+    #evolutions #stagesHeader {
+        width: 100% !important;
+        text-align: center;
+    }
+    
+    #evolutions .evolution-grid {
+        width: 100%;
+        grid-template-columns: 1fr !important;
+        justify-items: center;
+    }
+    
+    #evolutions .evolution-grid .box {
+        width: 90% !important;
+        max-width: 350px;
+    }
 }

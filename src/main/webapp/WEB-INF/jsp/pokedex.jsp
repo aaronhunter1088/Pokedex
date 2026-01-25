@@ -49,9 +49,26 @@
                 <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
             </a>
         </div>
-        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Back to Home" class="mobile-back-link">
-            <i class="fas fa-arrow-left fa-2x"></i>
-        </a>
+        <button class="mobile-menu-button" onclick="toggleMobileMenu();" aria-label="Menu">
+            <i class="fa-solid fa-ellipsis-vertical"></i>
+        </button>
+    </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu();"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu ${isDarkMode?'darkmode':'lightmode'}" id="mobileMenu">
+        <button class="mobile-menu-close" onclick="closeMobileMenu();" aria-label="Close menu">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        
+        <div class="mobile-menu-item">
+            <button class="back-to-home-btn icon" onclick="navigateToHomePage()"
+                    title="Return to Home Page">
+                Back to Home
+            </button>
+        </div>
     </div>
     
     <!-- Desktop Header -->
@@ -325,6 +342,31 @@
             div.style.backgroundColor = changeColor(div.style.backgroundColor);
             console.log('updated color of ' + div.id);
         });
+    }
+
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+        // Prevent body scroll when menu is open
+        if (menu.classList.contains('active')) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+    }
+
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const overlay = document.getElementById('mobileMenuOverlay');
+        menu.classList.remove('active');
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function navigateToHomePage() {
+        window.location.href = '${pageContext.request.contextPath}/?darkmode=${isDarkMode}';
     }
 
 </script>

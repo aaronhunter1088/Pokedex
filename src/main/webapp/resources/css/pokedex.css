@@ -33,7 +33,24 @@
 }
 
 .darkmode #backArrow a i {
-    color: #ffffff;
+    color: #000000;
+}
+
+/* Force black text in pokemon info section */
+.pokedex-grid .box h3,
+.pokedex-grid .box #name,
+.pokedex-grid .box #idOfPokemon,
+.pokedex-grid .box #heightOfPokemon,
+.pokedex-grid .box #weightOfPokemon,
+.pokedex-grid .box #colorOfPokemon,
+.pokedex-grid .box #typeOfPokemon {
+    color: #000000 !important;
+}
+
+/* Force black text on buttons */
+.tab,
+.tab button {
+    color: #000000 !important;
 }
 
 .stacked {
