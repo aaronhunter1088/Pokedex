@@ -315,7 +315,16 @@
 
         function setPkmnPerPageMobile() {
             let value = $("#showPkmnNumberMobile").val();
-            console.log("showPkmnNumber (mobile): " + value);
+            setPkmnPerPageImpl(value, true);
+        }
+
+        function setPkmnPerPage() {
+            let value = $("#showPkmnNumber").val();
+            setPkmnPerPageImpl(value, false);
+        }
+
+        function setPkmnPerPageImpl(value, isMobile) {
+            console.log("showPkmnNumber: " + value);
             $.ajax({
                 type: "GET",
                 url: "pkmnPerPage",
@@ -328,7 +337,7 @@
                 statusCode: {
                     200: function(data) {
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        closeMobileMenu();
+                        if (isMobile) closeMobileMenu();
                         location.reload();
                     },
                     400: function(data) {
@@ -443,36 +452,10 @@
 
         function setPkmnPerPage() {
             let value = $("#showPkmnNumber").val();
-            console.log("showPkmnNumber: " + value);
-            $.ajax({
-                type: "GET",
-                url: "pkmnPerPage",
-                data: {
-                    pkmnPerPage: value
-                },
-                async: false,
-                dataType: "application/json",
-                crossDomain: true,
-                statusCode: {
-                    200: function(data) {
-                        console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        location.reload();
-                    },
-                    400: function(data) {
-                        console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        },
-                    404: function() {
-                        console.log('Resource not found');
-                    },
-                    500: function() {
-                        console.log('Server Error');
-                    }
-                }
-            });
+            setPkmnPerPageImpl(value, false);
         }
 
         function getByPkmnType(selectObject) {
-            let select = $("#typeDropdown");
             let type = selectObject.value;
             
             // Show loading overlay if a type is selected (not "none")

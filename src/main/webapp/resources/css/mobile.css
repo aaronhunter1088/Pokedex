@@ -12,6 +12,10 @@
 /* Mobile Media Query */
 @media screen and (max-width: 650px) {
     
+    :root {
+        --mobile-header-height: 70px;
+    }
+    
     /* Hide desktop controls */
     .desktop-controls {
         display: none !important;
@@ -30,6 +34,7 @@
         align-items: center;
         justify-content: space-between;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        min-height: var(--mobile-header-height);
     }
     
     .mobile-header.darkmode {
@@ -211,6 +216,6 @@
     
     /* Adjust body padding for sticky header */
     body {
-        padding-top: 80px;
+        padding-top: calc(var(--mobile-header-height) + 10px);
     }
 }
