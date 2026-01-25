@@ -194,7 +194,7 @@
                     <a href="pokedex/${pokemon.value.id}?darkmode=${isDarkMode}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
-                                <h3 id="name" style="color:black;">${pokemon.value.name}</h3>
+                                <h3 id="name" style="color:black;">${pokemon.value.name.substring(0,1).toUpperCase()}${pokemon.value.name.substring(1)}</h3>
                                 <div style="display: block;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
                                 <h3 id="id" style="color:black;">ID: ${pokemon.value.id}</h3>
                             </div>
@@ -228,10 +228,10 @@
                                 </c:choose>
                             </div>
                             <div id="info" style="display:inline-block;">
-                                <h3 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.heightInInches} in</h3><br>
-                                <h3 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weightInPounds} lbs</h3><br>
-                                <h3 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h3><br>
-                                <h3 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h3><br>
+                                <h5 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.heightInInches} in</h5>
+                                <h5 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weightInPounds} lbs</h5>
+                                <h5 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h5>
+                                <h5 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h5>
                             </div>
                         </div>
                     </a>
