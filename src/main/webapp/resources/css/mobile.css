@@ -348,11 +348,13 @@
     #evolutions .evolution-grid {
         width: 100%;
         grid-template-columns: 1fr !important;
-        justify-items: center;
+        justify-items: stretch;
+        padding: 10px;
     }
     
     #evolutions .evolution-grid .box {
         width: 100% !important;
         max-width: 100%;
+        box-sizing: border-box;
     }
 }
