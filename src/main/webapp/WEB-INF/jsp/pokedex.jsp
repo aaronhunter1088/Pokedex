@@ -41,6 +41,20 @@
 </head>
 <body style="justify-content:space-evenly;text-align:center;"
       class="${isDarkMode?'darkmode':'lightmode'}">
+    
+    <!-- Mobile Header -->
+    <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
+        <div class="pokemon-logo">
+            <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" title="Search">
+                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
+            </a>
+        </div>
+        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Back to Home">
+            <i class="fas fa-arrow-left fa-2x" style="color:#1e90ff;"></i>
+        </a>
+    </div>
+    
+    <!-- Desktop Header -->
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
         <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
             <span class="center">

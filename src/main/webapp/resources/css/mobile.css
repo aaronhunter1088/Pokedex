@@ -45,6 +45,10 @@
         color: white;
     }
     
+    .mobile-header.darkmode a i {
+        color: #1e90ff !important;
+    }
+    
     /* Pokemon logo in header */
     .mobile-header .pokemon-logo {
         flex: 1;
