@@ -49,8 +49,8 @@
                 <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
             </a>
         </div>
-        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Back to Home">
-            <i class="fas fa-arrow-left fa-2x" style="color:#1e90ff;"></i>
+        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Back to Home" class="mobile-back-link">
+            <i class="fas fa-arrow-left fa-2x"></i>
         </a>
     </div>
     
@@ -67,7 +67,7 @@
                 <!-- Back arrow, Name, and ID -->
                 <div id="backAndName" class="parent-div">
                     <div id="backArrow" class="left-div">
-                        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
+                        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x"></i></a>
                     </div>
                     <div id="nameAndID" class="center-div" style="display:inline-flex;gap:20px;">
                         <h3 id="name">Name: ${pokemon.name}</h3>
@@ -108,7 +108,7 @@
                 <br>
                 
                 <!-- Info Display Divs -->
-                <div id="descriptionDiv" style="display:inline-flex;width:300px;justify-content:center;">
+                <div id="descriptionDiv" class="info-display-div">
                     <h3 id="description">${pokemon.description}</h3>
                 </div>
                 <div id="locationsDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
