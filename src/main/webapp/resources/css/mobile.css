@@ -45,6 +45,10 @@
         color: white;
     }
     
+    .mobile-header.darkmode a i {
+        color: #1e90ff !important;
+    }
+    
     /* Pokemon logo in header */
     .mobile-header .pokemon-logo {
         flex: 1;
@@ -187,7 +191,8 @@
     }
     
     /* Hide desktop header logo */
-    #indexSearchImgSearchLink {
+    #indexSearchImgSearchLink,
+    #pokedexSearchImgSearchLink {
         display: none !important;
     }
     
@@ -244,5 +249,106 @@
     /* Adjust body padding for sticky header */
     body {
         padding-top: calc(var(--mobile-header-height) + 10px);
+    }
+    
+    /* Pokedex Page Specific Mobile Styles */
+    .pokedex-grid {
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    .pokedex-grid .box {
+        min-height: auto;
+        padding: 15px;
+    }
+    
+    /* Stack image and basic info on mobile */
+    #imageAndBasicInfo {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    #basicInfo {
+        text-align: center !important;
+        width: 100%;
+    }
+    
+    #basicInfo h3 {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    /* Smaller Pokemon image on mobile */
+    #pkmnImage {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    /* Make buttons stack better on mobile */
+    #actionButtons .tab {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    #infoButtonsDiv,
+    #photoButtonsDiv {
+        width: 100%;
+    }
+    
+    /* Adjust info display divs for mobile */
+    #descriptionDiv,
+    .info-display-div {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    
+    #descriptionDiv h3,
+    #locationsDiv h3,
+    #movesDiv h3,
+    #evolvesHowDiv h3 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    /* Adjust name and ID header on mobile */
+    #nameAndID {
+        flex-direction: column !important;
+        gap: 5px !important;
+        align-items: center;
+    }
+    
+    #nameAndID h3 {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    /* Evolutions Section - Stack vertically on mobile */
+    #evolutions {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #evolutions > div {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+    
+    #evolutions #stagesHeader {
+        width: 100% !important;
+        text-align: center;
+    }
+    
+    #evolutions .evolution-grid {
+        width: 100%;
+        grid-template-columns: 1fr !important;
+        justify-items: center;
+    }
+    
+    #evolutions .evolution-grid .box {
+        width: 90% !important;
+        max-width: 350px;
     }
 }
