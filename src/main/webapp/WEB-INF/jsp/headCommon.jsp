@@ -18,6 +18,7 @@
 <link href="${pageContext.request.contextPath}/resources/css/pokemonGrid.css" type="text/css" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/resources/css/pokedex.css" type="text/css" rel="stylesheet">
 <link href="${pageContext.request.contextPath}/resources/css/evolutions.css" type="text/css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/resources/css/mobile.css" type="text/css" rel="stylesheet">
 
 <!-- jQuery (must come before jquery-ui and Bootstrap JS) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
