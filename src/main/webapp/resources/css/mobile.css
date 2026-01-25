@@ -336,6 +336,12 @@
         margin-bottom: 20px;
     }
     
+    /* Scroll container for evolution tiles - height increased to fit single tile content without scrolling */
+    #evolutions > div > div[style*="overflow-y:scroll"] {
+        width: 100% !important;
+        height: 520px !important; /* Fits: name/ID (~40px) + image (200px) + 4 stat lines (~160px) + padding (~120px) */
+    }
+    
     #evolutions #stagesHeader {
         width: 100% !important;
         text-align: center;
@@ -344,11 +350,13 @@
     #evolutions .evolution-grid {
         width: 100%;
         grid-template-columns: 1fr !important;
-        justify-items: center;
+        justify-items: stretch;
+        padding: 10px;
     }
     
     #evolutions .evolution-grid .box {
-        width: 90% !important;
-        max-width: 350px;
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 }
