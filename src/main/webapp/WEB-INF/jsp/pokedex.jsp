@@ -49,57 +49,51 @@
     </h1>
     <div id="pokedex">
         <div class="pokedex-grid">
-            <div id="nameAndImages" class="box" style="padding-top:10px;background-color:${pokemon.color};">
+            <div id="pokemonInfo" class="box" style="padding-top:10px;background-color:${pokemon.color};">
+                <!-- Back arrow, Name, and ID -->
                 <div id="backAndName" class="parent-div">
                     <div id="backArrow" class="left-div">
                         <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x" style="color:#000000;"></i></a>
                     </div>
-                    &emsp;
-                    <div id="mainName" class="center-div">
-                        <h1 id="infoTitle">${pokemon.name}</h1>
+                    <div id="nameAndID" class="center-div" style="display:inline-flex;gap:20px;">
+                        <h3 id="name">Name: ${pokemon.name}</h3>
+                        <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
                     </div>
                 </div>
-                <div id="imageOfPokemon" style="justify-content:center;display:block;">
-                    <img id="pkmnImage" src="${defaultImage}" alt="image" style="width:250px;height:250px;">
+                <br>
+                
+                <!-- Pokemon Image and Basic Info -->
+                <div id="imageAndBasicInfo" style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <div id="imageOfPokemon" style="justify-content:center;display:block;">
+                        <img id="pkmnImage" src="${defaultImage}" alt="image" style="width:250px;height:250px;">
+                    </div>
+                    <div id="basicInfo" style="text-align:left;">
+                        <h3 id="heightOfPokemon">Height: ${pokemon.heightInInches} in</h3>
+                        <h3 id="weightOfPokemon">Weight: ${pokemon.weightInPounds} lbs</h3>
+                        <h3 id="colorOfPokemon">Color: ${pokemon.capitalizedColor}</h3>
+                        <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
+                    </div>
                 </div>
-                <div id="photoButtonsDiv" style="justify-content:center;text-align:center;display:inline-flex;">
-                    <div style="">
+                <br>
+                
+                <!-- Action Buttons - Two Rows -->
+                <div id="actionButtons" style="justify-content:center;text-align:center;">
+                    <div id="infoButtonsDiv" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
+                        <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
+                        <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
+                        <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
+                        <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
+                    </div>
+                    <div id="photoButtonsDiv" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;">
                         <button id="defaultImgBtn" class="tab" onclick="showImage('default');">Show Default</button>
-                    </div>
-                    <div style="">
                         <button id="officialImgBtn" class="tab" onclick="showImage('official');">Show Official</button>
-                    </div>
-                    <div style="">
                         <button id="shinyImgBtn" class="tab" onclick="showImage('shiny');">Show Shiny</button>
-                    </div>
-                    <div style="">
                         <button id="gifImgBtn" class="tab" onclick="showImage('gif');">Show Gif</button>
                     </div>
                 </div>
-            </div>
-            <div id="info" class="box" style="padding-top:10px;background-color:${pokemon.color};">
-                <div id="nameAndID" style="display:inline-flex;">
-                    <h3 id="name">Name: ${pokemon.name}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                    <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
-                </div>
-                <br><br>
-                <div id="hAndW" style="display:inline-flex;">
-                    <h3 id="heightOfPokemon">Height: ${pokemon.heightInInches} in</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                    <h3 id="weightOfPokemon">Weight: ${pokemon.weightInPounds} lbs</h3>
-                </div>
-                <br><br>
-                <div id="colorAndType" style="display:inline-flex;">
-                    <h3 id="colorOfPokemon">Color: ${pokemon.capitalizedColor}</h3> &nbsp;&nbsp;&nbsp;&nbsp;
-                    <h3 id="typeOfPokemon">Type: ${pokemon.type}</h3>
-                </div>
-                <br><br>
-                <div style="display:flow;">
-                    <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
-                    <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
-                    <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
-                    <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
-                </div>
                 <br>
+                
+                <!-- Info Display Divs -->
                 <div id="descriptionDiv" style="display:inline-flex;width:300px;justify-content:center;">
                     <h3 id="description">${pokemon.description}</h3>
                 </div>
@@ -138,10 +132,8 @@
     $(function(){
         $("#defaultImgBtn").css('font-weight', 'bold');
 
-        let nameAndImagesDiv = document.getElementById("nameAndImages");
-        nameAndImagesDiv.style.backgroundColor = changeColor("${pokemon.color}");
-        let infoDiv = document.getElementById("info");
-        infoDiv.style.backgroundColor = changeColor("${pokemon.color}");
+        let pokemonInfoDiv = document.getElementById("pokemonInfo");
+        pokemonInfoDiv.style.backgroundColor = changeColor("${pokemon.color}");
 
         defaultInfoDivs();
         $("#descriptionDiv").show();
