@@ -336,6 +336,10 @@
         margin-bottom: 20px;
     }
     
+    #evolutions > div > div[style*="overflow-y:scroll"] {
+        width: 100% !important;
+    }
+    
     #evolutions #stagesHeader {
         width: 100% !important;
         text-align: center;
@@ -348,7 +352,7 @@
     }
     
     #evolutions .evolution-grid .box {
-        width: 90% !important;
-        max-width: 350px;
+        width: 100% !important;
+        max-width: 100%;
     }
 }
