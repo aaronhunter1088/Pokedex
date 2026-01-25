@@ -450,11 +450,6 @@
             });
         }
 
-        function setPkmnPerPage() {
-            let value = $("#showPkmnNumber").val();
-            setPkmnPerPageImpl(value, false);
-        }
-
         function getByPkmnType(selectObject) {
             let type = selectObject.value;
             
