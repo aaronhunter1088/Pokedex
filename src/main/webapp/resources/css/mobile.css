@@ -336,9 +336,10 @@
         margin-bottom: 20px;
     }
     
+    /* Scroll container for evolution tiles - height increased to fit single tile content without scrolling */
     #evolutions > div > div[style*="overflow-y:scroll"] {
         width: 100% !important;
-        height: 520px !important;
+        height: 520px !important; /* Fits: name/ID (~40px) + image (200px) + 4 stat lines (~160px) + padding (~120px) */
     }
     
     #evolutions #stagesHeader {
