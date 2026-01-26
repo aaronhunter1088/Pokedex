@@ -1,0 +1,362 @@
+/* Mobile Styles for Viewport <= 650px */
+
+/* Desktop styles - hide mobile menu by default */
+.mobile-header {
+    display: none;
+}
+.mobile-menu {
+    display: none;
+}
+
+.desktop-controls {
+    display: inline-flex;
+}
+
+/* Mobile Media Query */
+@media screen and (max-width: 650px) {
+    
+    :root {
+        --mobile-header-height: 70px;
+    }
+    
+    /* Hide desktop controls */
+    .desktop-controls {
+        display: none !important;
+    }
+    
+    /* Show and style mobile header */
+    .mobile-header {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        z-index: 1000;
+        padding: 10px 15px;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        min-height: var(--mobile-header-height);
+    }
+    
+    .mobile-header.darkmode {
+        background-color: black;
+        color: white;
+    }
+    
+    .mobile-header.darkmode a i {
+        color: #1e90ff !important;
+    }
+    
+    /* Pokemon logo in header */
+    .mobile-header .pokemon-logo {
+        flex: 1;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mobile-header .pokemon-logo img {
+        max-width: 200px;
+        width: 60%;
+        height: auto;
+    }
+    
+    /* Menu button */
+    .mobile-menu-button {
+        background: dodgerblue;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        font-size: 24px;
+        cursor: pointer;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .mobile-menu-button:hover {
+        background: #1e90ff;
+    }
+    
+    /* Mobile Menu Overlay */
+    .mobile-menu-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+    }
+    
+    .mobile-menu-overlay.active {
+        display: block;
+    }
+    
+    /* Mobile Menu */
+    .mobile-menu {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100%;
+        background-color: white;
+        z-index: 1002;
+        padding: 60px 20px 40px 20px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        transition: right 0.3s ease-in-out;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .mobile-menu.darkmode {
+        background-color: #1a1a1a;
+        color: white;
+    }
+    
+    .mobile-menu.active {
+        display: block;
+        right: 0;
+    }
+    
+    /* Close button for menu */
+    .mobile-menu-close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #333;
+    }
+    
+    .mobile-menu.darkmode .mobile-menu-close {
+        color: white;
+    }
+    
+    /* Mobile menu items - stacked */
+    .mobile-menu-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .mobile-menu.darkmode .mobile-menu-item {
+        border-bottom-color: #333;
+    }
+    
+    .mobile-menu-item:last-child {
+        border-bottom: none;
+    }
+    
+    .mobile-menu-item label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+        width: 100%;
+        text-align: left;
+        padding: 0;
+    }
+    
+    .mobile-menu-item input[type="text"],
+    .mobile-menu-item select,
+    .mobile-menu-item button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+    
+    .mobile-menu-item .switch {
+        margin: 10px 0;
+        display: inline-block;
+    }
+    
+    /* GIF Toggle in mobile menu */
+    .mobile-gif-toggle {
+        display: block;
+        text-align: left;
+    }
+    
+    .mobile-gif-toggle .switch {
+        margin: 0;
+    }
+    
+    /* Hide desktop header logo */
+    #indexSearchImgSearchLink,
+    #pokedexSearchImgSearchLink {
+        display: none !important;
+    }
+    
+    /* Adjust pagination for mobile */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center !important;
+        padding: 10px 0;
+    }
+    
+    .pagination .page-item {
+        margin: 2px;
+    }
+    
+    .pagination .page-link {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* Show Previous, Next, first few pages, ellipsis, and last page */
+    /* Keep all navigation visible for better UX */
+    
+    /* Pokemon Grid - Change to single column */
+    .list-grid {
+        grid-template-columns: 1fr !important;
+        padding: 10px;
+        grid-gap: 10px;
+    }
+    
+    .list-grid .box {
+        width: 100%;
+        max-width: 100%;
+        height: auto !important;
+        min-height: 400px;
+        padding: 15px;
+    }
+    
+    /* Adjust Pokemon card content for mobile */
+    .list-grid .box #info h3 {
+        font-size: 14px;
+        margin: 5px 0;
+        line-height: 1.4;
+    }
+    
+    .list-grid .box #nameAndId h3 {
+        font-size: 16px;
+    }
+    
+    .list-grid .box #image img {
+        height: 150px !important;
+        width: 150px !important;
+    }
+    
+    /* Adjust body padding for sticky header */
+    body {
+        padding-top: calc(var(--mobile-header-height) + 10px);
+    }
+    
+    /* Pokedex Page Specific Mobile Styles */
+    .pokedex-grid {
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    .pokedex-grid .box {
+        min-height: auto;
+        padding: 15px;
+    }
+    
+    /* Stack image and basic info on mobile */
+    #imageAndBasicInfo {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    
+    #basicInfo {
+        text-align: center !important;
+        width: 100%;
+    }
+    
+    #basicInfo h3 {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    /* Smaller Pokemon image on mobile */
+    #pkmnImage {
+        width: 200px !important;
+        height: 200px !important;
+    }
+    
+    /* Make buttons stack better on mobile */
+    #actionButtons .tab {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    #infoButtonsDiv,
+    #photoButtonsDiv {
+        width: 100%;
+    }
+    
+    /* Adjust info display divs for mobile */
+    #descriptionDiv,
+    .info-display-div {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    
+    #descriptionDiv h3,
+    #locationsDiv h3,
+    #movesDiv h3,
+    #evolvesHowDiv h3 {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    /* Adjust name and ID header on mobile */
+    #nameAndID {
+        flex-direction: column !important;
+        gap: 5px !important;
+        align-items: center;
+    }
+    
+    #nameAndID h3 {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    /* Evolutions Section - Stack vertically on mobile */
+    #evolutions {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #evolutions > div {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+    
+    /* Scroll container for evolution tiles - height increased to fit single tile content without scrolling */
+    #evolutions > div > div[style*="overflow-y:scroll"] {
+        width: 100% !important;
+        height: 520px !important; /* Fits: name/ID (~40px) + image (200px) + 4 stat lines (~160px) + padding (~120px) */
+    }
+    
+    #evolutions #stagesHeader {
+        width: 100% !important;
+        text-align: center;
+    }
+    
+    #evolutions .evolution-grid {
+        width: 100%;
+        grid-template-columns: 1fr !important;
+        justify-items: stretch;
+        padding: 10px;
+    }
+    
+    #evolutions .evolution-grid .box {
+        width: 100% !important;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}

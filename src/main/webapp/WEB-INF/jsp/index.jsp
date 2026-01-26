@@ -68,6 +68,73 @@
             </div>
         </div>
         
+        <!-- Mobile Header -->
+        <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
+            <div class="pokemon-logo">
+                <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" title="Search">
+                    <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
+                </a>
+            </div>
+            <button class="mobile-menu-button" onclick="toggleMobileMenu();" aria-label="Menu">
+                <i class="fa-solid fa-ellipsis-vertical"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu Overlay -->
+        <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu();"></div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu ${isDarkMode?'darkmode':'lightmode'}" id="mobileMenu">
+            <button class="mobile-menu-close" onclick="closeMobileMenu();" aria-label="Close menu">
+                <i class="fa-solid fa-times"></i>
+            </button>
+            
+            <div class="mobile-menu-item">
+                <label>Show GIFs</label>
+                <div class="mobile-gif-toggle">
+                    <label class="switch" title="If GIF is not present, official artwork will show!">
+                        <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="mobile-menu-item">
+                <label for="pageNumberMobile">Jump to Page</label>
+                <input id="pageNumberMobile" name="pageNumberMobile" type="text" placeholder="Page #"/>
+                <button class="icon" onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">Go</button>
+            </div>
+            
+            <div class="mobile-menu-item">
+                <label for="showPkmnNumberMobile">Pokémon Per Page</label>
+                <input id="showPkmnNumberMobile" name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"/>
+                <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pokemon">Show Pokemon</button>
+            </div>
+            
+            <div class="mobile-menu-item">
+                <label for="typeDropdownMobile">Filter by Type</label>
+                <select id="typeDropdownMobile" title="Type" class="icon" onchange="getByPkmnType(this);">
+                    <option value="none" selected>Type (All)</option>
+                    <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
+                        <c:if test="${chosenType.equals(type)}">
+                            <option value="${type}" selected>${type}</option>
+                        </c:if>
+                        <c:if test="${!chosenType.equals(type)}">
+                            <option value="${type}">${type}</option>
+                        </c:if>
+                    </c:forEach>
+                </select>
+            </div>
+            
+            <div class="mobile-menu-item">
+                <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
+                        title="Return to Landing Page">
+                    Back to Landing Page
+                </button>
+            </div>
+        </div>
+        
+        <!-- Desktop Header -->
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
             <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
                 <span class="center">
@@ -76,7 +143,8 @@
         </h1>
         <br>
 
-        <div style="display:inline-flex;align-items:center;">
+        <!-- Desktop Controls -->
+        <div class="desktop-controls" style="display:inline-flex;align-items:center;">
             <label class="switch" title="If GIF is not present, official artwork will show!">
                 <input id="gifSwitch" type="checkbox" onclick="toggleGifs();">
                 <span class="slider round"></span>
@@ -126,7 +194,7 @@
                     <a href="pokedex/${pokemon.value.id}?darkmode=${isDarkMode}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
-                                <h3 id="name" style="color:black;">${pokemon.value.name}</h3>
+                                <h3 id="name" style="color:black;">${pokemon.value.name.substring(0,1).toUpperCase()}${pokemon.value.name.substring(1)}</h3>
                                 <div style="display: block;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
                                 <h3 id="id" style="color:black;">ID: ${pokemon.value.id}</h3>
                             </div>
@@ -160,10 +228,10 @@
                                 </c:choose>
                             </div>
                             <div id="info" style="display:inline-block;">
-                                <h3 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.heightInInches} in</h3><br>
-                                <h3 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weightInPounds} lbs</h3><br>
-                                <h3 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h3><br>
-                                <h3 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h3><br>
+                                <h5 id="heightOfPokemon" style="color:black;">Height: ${pokemon.value.heightInInches} in</h5>
+                                <h5 id="weightOfPokemon" style="color:black;">Weight: ${pokemon.value.weightInPounds} lbs</h5>
+                                <h5 id="colorOfPokemon" style="color:black;">Color: ${pokemon.value.capitalizedColor}</h5>
+                                <h5 id="typeOfPokemon" style="color:black;">Type: ${pokemon.value.type}</h5>
                             </div>
                         </div>
                     </a>
@@ -208,7 +276,82 @@
                     setPkmnPerPage();
                 }
             });
+
+            $('#pageNumberMobile').on('keypress', function(e) {
+                if ($('#pageNumberMobile').val() === '') return;
+                if (e.code === 'Enter' || e.code === 'Return') {
+                    setPageToView($('#pageNumberMobile').val());
+                }
+            });
+
+            $('#showPkmnNumberMobile').on('keypress', function(e) {
+                if ($('#showPkmnNumberMobile').val() === '') return;
+                if (e.code === 'Enter' || e.code === 'Return') {
+                    setPkmnPerPageMobile();
+                }
+            });
         });
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            // Prevent body scroll when menu is open
+            if (menu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            menu.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function setPkmnPerPageMobile() {
+            let value = $("#showPkmnNumberMobile").val();
+            setPkmnPerPageImpl(value, true);
+        }
+
+        function setPkmnPerPage() {
+            let value = $("#showPkmnNumber").val();
+            setPkmnPerPageImpl(value, false);
+        }
+
+        function setPkmnPerPageImpl(value, isMobile) {
+            console.log("showPkmnNumber: " + value);
+            $.ajax({
+                type: "GET",
+                url: "pkmnPerPage",
+                data: {
+                    pkmnPerPage: value
+                },
+                async: false,
+                dataType: "application/json",
+                crossDomain: true,
+                statusCode: {
+                    200: function(data) {
+                        console.log(JSON.parse(JSON.stringify(data.responseText)));
+                        if (isMobile) closeMobileMenu();
+                        location.reload();
+                    },
+                    400: function(data) {
+                        console.log(JSON.parse(JSON.stringify(data.responseText)));
+                        },
+                    404: function() {
+                        console.log('Resource not found');
+                    },
+                    500: function() {
+                        console.log('Server Error');
+                    }
+                }
+            });
+        }
 
         function toggleGifs() {
             $.ajax({
@@ -239,8 +382,13 @@
                 showGifs = data;
             }
             console.log("showGifs: " + showGifs);
-            if (showGifs === 'true') $("#gifSwitch").attr("checked", true);
-            else $("#gifSwitch").attr("checked", false);
+            if (showGifs === 'true') {
+                $("#gifSwitch").attr("checked", true);
+                $("#gifSwitchMobile").attr("checked", true);
+            } else {
+                $("#gifSwitch").attr("checked", false);
+                $("#gifSwitchMobile").attr("checked", false);
+            }
             if (reload) location.reload();
         }
 
@@ -302,38 +450,7 @@
             });
         }
 
-        function setPkmnPerPage() {
-            let value = $("#showPkmnNumber").val();
-            console.log("showPkmnNumber: " + value);
-            $.ajax({
-                type: "GET",
-                url: "pkmnPerPage",
-                data: {
-                    pkmnPerPage: value
-                },
-                async: false,
-                dataType: "application/json",
-                crossDomain: true,
-                statusCode: {
-                    200: function(data) {
-                        console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        location.reload();
-                    },
-                    400: function(data) {
-                        console.log(JSON.parse(JSON.stringify(data.responseText)));
-                        },
-                    404: function() {
-                        console.log('Resource not found');
-                    },
-                    500: function() {
-                        console.log('Server Error');
-                    }
-                }
-            });
-        }
-
         function getByPkmnType(selectObject) {
-            let select = $("#typeDropdown");
             let type = selectObject.value;
             
             // Show loading overlay if a type is selected (not "none")

@@ -7,13 +7,50 @@
     display: grid;
     grid-gap: 15px;
     padding: 20px;
-    /*grid-template-columns: repeat(auto-fill, minmax(25%, 1fr));*/
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .pokedex-grid .box {
-    height: 400px;
+    min-height: 400px;
     box-shadow: 1px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.info-display-div {
+    display: inline-flex;
+    width: 300px;
+    max-width: 90%;
+    justify-content: center;
+}
+
+.mobile-back-link i {
+    color: #1e90ff;
+}
+
+#backArrow a i {
+    color: #000000;
+}
+
+.darkmode #backArrow a i {
+    color: #000000;
+}
+
+/* Force black text in pokemon info section */
+.pokedex-grid .box h3,
+.pokedex-grid .box #name,
+.pokedex-grid .box #idOfPokemon,
+.pokedex-grid .box #heightOfPokemon,
+.pokedex-grid .box #weightOfPokemon,
+.pokedex-grid .box #colorOfPokemon,
+.pokedex-grid .box #typeOfPokemon {
+    color: #000000 !important;
+}
+
+/* Force black text on buttons */
+.tab,
+.tab button {
+    color: #000000 !important;
 }
 
 .stacked {
