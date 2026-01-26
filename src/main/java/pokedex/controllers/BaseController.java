@@ -245,12 +245,20 @@ public class BaseController
                 });
             }
             
-            // Wait only until we have at least pkmnPerPage Pokemon, not for all of them
+            // Get the list for this type
             List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
-            LOGGER.info("Waiting for at least {} Pokemon of type {}...", pkmnPerPage, chosenType);
+            
+            // Determine how many Pokemon we need for the current page
+            int startIndex = (page - 1) * pkmnPerPage;
+            int minRequired = startIndex + pkmnPerPage;
+            
+            LOGGER.info("Waiting for at least {} Pokemon of type {} (page {} needs {}..{})", 
+                minRequired, chosenType, page, startIndex, minRequired);
+            
             int waitCount = 0;
             int maxWait = MAX_WAIT_ITERATIONS; // 3 seconds max wait for minimum Pokemon
             
+            // Wait only until we have enough Pokemon for the requested page
             while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
                 int currentCount;
                 synchronized (allOfType) {
@@ -258,8 +266,8 @@ public class BaseController
                 }
                 
                 // If we have enough Pokemon for the current page, we can stop waiting
-                if (currentCount >= pkmnPerPage) {
-                    LOGGER.info("Found {} Pokemon of type {}, sufficient for display", currentCount, chosenType);
+                if (currentCount >= minRequired) {
+                    LOGGER.info("Found {} Pokemon of type {}, sufficient for page {}", currentCount, chosenType, page);
                     break;
                 }
                 
@@ -273,41 +281,26 @@ public class BaseController
                 }
             }
             
-            // If still fetching but we have some Pokemon, log it
-            if (filteringInProgress.getOrDefault(chosenType, false)) {
-                synchronized (allOfType) {
-                    LOGGER.info("Fetching still in progress for type {}, but have {} Pokemon to display", 
-                        chosenType, allOfType.size());
-                }
-            }
-            
-            // Wait for complete list to get accurate total count
-            waitCount = 0;
-            maxWait = MAX_WAIT_ITERATIONS * TIMEOUT_MULTIPLIER; // Extended wait for total count
-            while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
-                try {
-                    Thread.sleep(WAIT_INTERVAL_MS);
-                    waitCount++;
-                    // Log progress every 5 seconds
-                    if (waitCount % PROGRESS_LOG_INTERVAL == 0) {
-                        synchronized (allOfType) {
-                            LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, allOfType.size());
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    LOGGER.error("Interrupted while waiting for complete Pokemon list", e);
-                    break;
-                }
-            }
-            
-            // Set totalPokemon to the complete count
+            // Check if fetching is still in progress
+            boolean stillFetching = filteringInProgress.getOrDefault(chosenType, false);
+            int currentSize;
             synchronized (allOfType) {
-                totalPokemon = allOfType.size();
+                currentSize = allOfType.size();
+            }
+            
+            if (stillFetching) {
+                LOGGER.info("Fetching still in progress for type {}, but have {} Pokemon to display (continuing in background)", 
+                    chosenType, currentSize);
+                // Use current size as temporary total, will be updated when fetching completes
+                totalPokemon = currentSize;
+            } else {
+                // Fetching complete, use final count
+                synchronized (allOfType) {
+                    totalPokemon = allOfType.size();
+                }
                 LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
             }
             
-            int startIndex = (page - 1) * pkmnPerPage;
             int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
             
             this.pokemonMap.clear();
