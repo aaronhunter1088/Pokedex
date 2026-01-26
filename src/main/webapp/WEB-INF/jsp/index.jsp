@@ -106,7 +106,7 @@
             </div>
             
             <div class="mobile-menu-item">
-                <label for="showPkmnNumberMobile">Pokémon Per Page</label>
+                <label for="showPkmnNumberMobile">Pok&#233mon Per Page</label>
                 <input id="showPkmnNumberMobile" name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"/>
                 <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pokemon">Show Pokemon</button>
             </div>
