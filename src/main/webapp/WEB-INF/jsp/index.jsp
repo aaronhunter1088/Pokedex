@@ -387,7 +387,11 @@
                 $("#gifSwitch").attr("checked", false);
                 $("#gifSwitchMobile").attr("checked", false);
             }
-            if (reload) location.reload();
+            if (reload) {
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            }
         }
 
         function changeColor(pokemonColor) {
