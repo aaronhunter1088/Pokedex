@@ -24,6 +24,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
@@ -54,7 +55,7 @@ public class BaseController
     Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
     private final ExecutorService filterExecutor = Executors.newFixedThreadPool(
         Math.min(Runtime.getRuntime().availableProcessors() * 2, 20));
-    private volatile boolean retroactiveFetchingStarted = false;
+    private final AtomicBoolean retroactiveFetchingStarted = new AtomicBoolean(false);
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -416,12 +417,11 @@ public class BaseController
      */
     protected void startRetroactiveFetchingByType()
     {
-        if (retroactiveFetchingStarted) {
+        if (!retroactiveFetchingStarted.compareAndSet(false, true)) {
             LOGGER.debug("Retroactive fetching already started, skipping");
             return;
         }
         
-        retroactiveFetchingStarted = true;
         LOGGER.info("Starting retroactive fetching of Pokemon by type");
         
         // Start in a separate thread to not block the page load
