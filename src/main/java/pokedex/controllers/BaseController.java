@@ -52,7 +52,8 @@ public class BaseController
     Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
     Map<String, List<Pokemon>> filteredPokemonByType = new ConcurrentHashMap<>();
     Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
-    private final ExecutorService filterExecutor = Executors.newCachedThreadPool();
+    private final ExecutorService filterExecutor = Executors.newFixedThreadPool(
+        Math.min(Runtime.getRuntime().availableProcessors() * 2, 20));
     private volatile boolean retroactiveFetchingStarted = false;
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
@@ -463,9 +464,16 @@ public class BaseController
                     futures.add(future);
                 }
                 
-                // Wait for all types to complete
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-                LOGGER.info("Completed retroactive fetching of all Pokemon by type");
+                // Wait for all types to complete (with timeout to prevent indefinite blocking)
+                try {
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                        .get(5, TimeUnit.MINUTES); // 5 minute timeout for all types
+                    LOGGER.info("Completed retroactive fetching of all Pokemon by type");
+                } catch (TimeoutException e) {
+                    LOGGER.warn("Retroactive fetching timed out after 5 minutes, some types may still be processing", e);
+                } catch (Exception e) {
+                    LOGGER.error("Error waiting for retroactive fetching to complete", e);
+                }
                 
             } catch (Exception e) {
                 LOGGER.error("Error during retroactive fetching", e);
