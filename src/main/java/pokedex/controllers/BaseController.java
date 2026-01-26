@@ -256,7 +256,8 @@ public class BaseController
                 minRequired, chosenType, page, startIndex, minRequired);
             
             int waitCount = 0;
-            int maxWait = MAX_WAIT_ITERATIONS; // 3 seconds max wait for minimum Pokemon
+            // Wait up to 3 seconds for minimum required Pokemon
+            int maxWait = MAX_WAIT_ITERATIONS;
             
             // Wait only until we have enough Pokemon for the requested page
             while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
@@ -295,9 +296,7 @@ public class BaseController
                 totalPokemon = currentSize;
             } else {
                 // Fetching complete, use final count
-                synchronized (allOfType) {
-                    totalPokemon = allOfType.size();
-                }
+                totalPokemon = currentSize;
                 LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
             }
             
@@ -436,10 +435,14 @@ public class BaseController
                 for (String type : allTypes) {
                     CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                         try {
-                            if (!filteredPokemonByType.containsKey(type)) {
+                            // Use putIfAbsent to avoid race conditions
+                            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(type, 
+                                Collections.synchronizedList(new ArrayList<>()));
+                            
+                            if (existingList == null) {
+                                // We successfully added the type, so we should fetch it
                                 LOGGER.info("Retroactively fetching Pokemon of type: {}", type);
-                                List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
-                                filteredPokemonByType.put(type, synchronizedList);
+                                List<Pokemon> synchronizedList = filteredPokemonByType.get(type);
                                 filteringInProgress.put(type, true);
                                 
                                 try {
@@ -448,6 +451,8 @@ public class BaseController
                                     filteringInProgress.put(type, false);
                                     LOGGER.info("Completed retroactive fetch for type {}: {} Pokemon", type, synchronizedList.size());
                                 }
+                            } else {
+                                LOGGER.debug("Type {} already being fetched, skipping", type);
                             }
                         } catch (Exception e) {
                             LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
