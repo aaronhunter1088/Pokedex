@@ -457,6 +457,8 @@ public class BaseController
                         } catch (Exception e) {
                             LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
                             filteringInProgress.put(type, false);
+                            // Remove potentially partially-populated cache entry so future requests can retry
+                            filteredPokemonByType.remove(type);
                         }
                     });
                     
