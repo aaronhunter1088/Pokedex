@@ -2,6 +2,13 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.5.0
+This version fixes an issue when filtering by type. Now, as the homepage is loaded, the various Pokémon types
+are fetched retroactively. There is a cache map containing the types to their list of Pokémon. When a type is selected,
+the application checks to see if the type is already cached. If so, the cached list is used. If not, or if the
+'pkmnPerPage' value is not yet met in the cache list, then more Pokémon of that type are fetched until we can display
+the requested number of Pokémon per page. The process continues until all Pokémon of each type are fetched.
+
 # v1.4.0
 This version introduced mobilization to the application. There is now a menu to store the filters when
 viewing the list of Pokémon. The menu can be opened and closed with the ellipsis icon. Various other fixes
