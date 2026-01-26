@@ -227,13 +227,12 @@ public class BaseController
     {
         if (chosenType != null && !"none".equals(chosenType)) {
             // Use putIfAbsent to avoid race conditions
-            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(chosenType,
-                Collections.synchronizedList(new ArrayList<>()));
+            List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(chosenType, synchronizedList);
             
             if (existingList == null) {
                 // We successfully added the type, so we should fetch it
                 LOGGER.info("Type {} not yet cached, starting fetch", chosenType);
-                List<Pokemon> synchronizedList = filteredPokemonByType.get(chosenType);
                 filteringInProgress.put(chosenType, true);
                 
                 // Start background thread to fetch all Pokemon
