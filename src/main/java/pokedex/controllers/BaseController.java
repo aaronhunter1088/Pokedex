@@ -52,8 +52,7 @@ public class BaseController
     Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
     Map<String, List<Pokemon>> filteredPokemonByType = new ConcurrentHashMap<>();
     Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
-    private final ExecutorService filterExecutor = Executors.newFixedThreadPool(
-        Math.min(Runtime.getRuntime().availableProcessors() * 2, 20));
+    private final ExecutorService filterExecutor = Executors.newCachedThreadPool();
     private volatile boolean retroactiveFetchingStarted = false;
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
