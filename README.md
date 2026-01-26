@@ -2,6 +2,15 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.4.0
+This version introduced mobilization to the application. There is now a menu to store the filters when
+viewing the list of Pokémon. The menu can be opened and closed with the ellipsis icon. Various other fixes
+were resolved with the mobilization effort. The list of Pokémon correctly displays all default information.
+When viewing a particular Pokémon, all information is now displayed in a single tile. When viewed on a mobile
+device, sections are stacked accordingly. The evolutions section was also revamped to better display the evolution
+stages of the selected Pokémon. Finally, various CSS adjustments were made to ensure a better user experience
+on mobile devices.
+
 # v1.3.0
 This version simply updates the application version to match the corresponding
 API code's version. We are skipping v1.2.0.
