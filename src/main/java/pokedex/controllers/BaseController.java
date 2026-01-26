@@ -467,10 +467,10 @@ public class BaseController
                 // Wait for all types to complete (with timeout to prevent indefinite blocking)
                 try {
                     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .get(5, TimeUnit.MINUTES); // 5 minute timeout for all types
+                        .get(2, TimeUnit.MINUTES); // 2 minute timeout for all types
                     LOGGER.info("Completed retroactive fetching of all Pokemon by type");
                 } catch (TimeoutException e) {
-                    LOGGER.warn("Retroactive fetching timed out after 5 minutes, some types may still be processing", e);
+                    LOGGER.warn("Retroactive fetching timed out after 2 minutes, some types may still be processing", e);
                 } catch (Exception e) {
                     LOGGER.error("Error waiting for retroactive fetching to complete", e);
                 }
