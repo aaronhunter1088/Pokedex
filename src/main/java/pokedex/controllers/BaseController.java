@@ -459,7 +459,7 @@ public class BaseController
                             LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
                             filteringInProgress.put(type, false);
                         }
-                    }, filterExecutor);
+                    });
                     
                     futures.add(future);
                 }
