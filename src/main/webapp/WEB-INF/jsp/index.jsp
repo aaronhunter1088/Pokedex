@@ -89,14 +89,12 @@
                 <i class="fa-solid fa-times"></i>
             </button>
             
-            <div class="mobile-menu-item">
+            <div class="mobile-menu-item mobile-gif-item">
                 <label>Show GIFs</label>
-                <div class="mobile-gif-toggle">
-                    <label class="switch" title="If GIF is not present, official artwork will show!">
-                        <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
-                        <span class="slider round"></span>
-                    </label>
-                </div>
+                <label class="switch" title="If GIF is not present, official artwork will show!">
+                    <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
+                    <span class="slider round"></span>
+                </label>
             </div>
             
             <div class="mobile-menu-item">
