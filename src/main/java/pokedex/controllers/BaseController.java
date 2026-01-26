@@ -52,7 +52,8 @@ public class BaseController
     Map<Integer, Pokemon> pokemonMap = new TreeMap<>();
     Map<String, List<Pokemon>> filteredPokemonByType = new ConcurrentHashMap<>();
     Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
-    private final ExecutorService filterExecutor = Executors.newSingleThreadExecutor();
+    private final ExecutorService filterExecutor = Executors.newCachedThreadPool();
+    private volatile boolean retroactiveFetchingStarted = false;
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -226,7 +227,7 @@ public class BaseController
         if (chosenType != null && !"none".equals(chosenType)) {
             // Check if we already have filtered Pokemon for this type
             if (!filteredPokemonByType.containsKey(chosenType)) {
-                LOGGER.info("Starting async gathering of Pokemon of type: {}", chosenType);
+                LOGGER.info("Type {} not yet cached, starting fetch", chosenType);
                 
                 // Initialize with empty list for this type
                 List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
@@ -242,35 +243,68 @@ public class BaseController
                         LOGGER.info("Completed gathering all Pokemon of type: {}", chosenType);
                     }
                 });
-                
-                // Wait for filtering to complete to ensure accurate totalPokemon and pagination
-                LOGGER.info("Waiting for all Pokemon of type {} to be gathered...", chosenType);
-                int waitCount = 0;
-                int maxWait = MAX_WAIT_ITERATIONS * TIMEOUT_MULTIPLIER; // Allow up to 60 seconds for complete filtering
-                while (filteringInProgress.get(chosenType) && waitCount < maxWait) {
-                    try {
-                        Thread.sleep(WAIT_INTERVAL_MS);
-                        waitCount++;
-                        // Log progress every 5 seconds
-                        if (waitCount % PROGRESS_LOG_INTERVAL == 0) {
-                            LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, synchronizedList.size());
-                        }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        LOGGER.error("Interrupted while waiting for Pokemon", e);
-                        break;
-                    }
-                }
-                
-                LOGGER.info("Filtering complete. Total Pokemon of type {}: {}", chosenType, synchronizedList.size());
             }
             
-            // Extract the page of Pokemon to display
+            // Wait only until we have at least pkmnPerPage Pokemon, not for all of them
             List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
+            LOGGER.info("Waiting for at least {} Pokemon of type {}...", pkmnPerPage, chosenType);
+            int waitCount = 0;
+            int maxWait = MAX_WAIT_ITERATIONS; // 3 seconds max wait for minimum Pokemon
+            
+            while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
+                int currentCount;
+                synchronized (allOfType) {
+                    currentCount = allOfType.size();
+                }
+                
+                // If we have enough Pokemon for the current page, we can stop waiting
+                if (currentCount >= pkmnPerPage) {
+                    LOGGER.info("Found {} Pokemon of type {}, sufficient for display", currentCount, chosenType);
+                    break;
+                }
+                
+                try {
+                    Thread.sleep(WAIT_INTERVAL_MS);
+                    waitCount++;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.error("Interrupted while waiting for Pokemon", e);
+                    break;
+                }
+            }
+            
+            // If still fetching but we have some Pokemon, log it
+            if (filteringInProgress.getOrDefault(chosenType, false)) {
+                synchronized (allOfType) {
+                    LOGGER.info("Fetching still in progress for type {}, but have {} Pokemon to display", 
+                        chosenType, allOfType.size());
+                }
+            }
+            
+            // Wait for complete list to get accurate total count
+            waitCount = 0;
+            maxWait = MAX_WAIT_ITERATIONS * TIMEOUT_MULTIPLIER; // Extended wait for total count
+            while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
+                try {
+                    Thread.sleep(WAIT_INTERVAL_MS);
+                    waitCount++;
+                    // Log progress every 5 seconds
+                    if (waitCount % PROGRESS_LOG_INTERVAL == 0) {
+                        synchronized (allOfType) {
+                            LOGGER.info("Still gathering Pokemon of type {}... found {} so far", chosenType, allOfType.size());
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    LOGGER.error("Interrupted while waiting for complete Pokemon list", e);
+                    break;
+                }
+            }
             
             // Set totalPokemon to the complete count
             synchronized (allOfType) {
                 totalPokemon = allOfType.size();
+                LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
             }
             
             int startIndex = (page - 1) * pkmnPerPage;
@@ -381,6 +415,64 @@ public class BaseController
         }
         
         LOGGER.info("Background thread: Total Pokemon of type {}: {}", type, resultList.size());
+    }
+    
+    /**
+     * Starts retroactive fetching of all Pokemon by type in the background.
+     * This method should be called after the initial page load to pre-populate the cache.
+     */
+    protected void startRetroactiveFetchingByType()
+    {
+        if (retroactiveFetchingStarted) {
+            LOGGER.debug("Retroactive fetching already started, skipping");
+            return;
+        }
+        
+        retroactiveFetchingStarted = true;
+        LOGGER.info("Starting retroactive fetching of Pokemon by type");
+        
+        // Start in a separate thread to not block the page load
+        filterExecutor.submit(() -> {
+            try {
+                // Get all types from the API
+                List<String> allTypes = pokemonService.getAllTypes();
+                LOGGER.info("Found {} types to fetch Pokemon for", allTypes.size());
+                
+                // For each type, start fetching Pokemon in parallel
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+                for (String type : allTypes) {
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                        try {
+                            if (!filteredPokemonByType.containsKey(type)) {
+                                LOGGER.info("Retroactively fetching Pokemon of type: {}", type);
+                                List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+                                filteredPokemonByType.put(type, synchronizedList);
+                                filteringInProgress.put(type, true);
+                                
+                                try {
+                                    fetchAllPokemonByType(type, synchronizedList);
+                                } finally {
+                                    filteringInProgress.put(type, false);
+                                    LOGGER.info("Completed retroactive fetch for type {}: {} Pokemon", type, synchronizedList.size());
+                                }
+                            }
+                        } catch (Exception e) {
+                            LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
+                            filteringInProgress.put(type, false);
+                        }
+                    }, filterExecutor);
+                    
+                    futures.add(future);
+                }
+                
+                // Wait for all types to complete
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+                LOGGER.info("Completed retroactive fetching of all Pokemon by type");
+                
+            } catch (Exception e) {
+                LOGGER.error("Error during retroactive fetching", e);
+            }
+        });
     }
 
     public Map<Integer, Pokemon> getPokemonMap()

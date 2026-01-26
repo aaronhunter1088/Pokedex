@@ -59,6 +59,11 @@ public class PokemonListController extends BaseController
             pokemonMap = updateSessionMap(pokemonMap);
             //httpSession.setAttribute("pokemonMap", pokemonMap);
         }
+        
+        // Start retroactive fetching of Pokemon by type in the background
+        // This will happen after the initial page load and won't block it
+        startRetroactiveFetchingByType();
+        
         mav.addObject("pokemonMap", pokemonMap);
         this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
