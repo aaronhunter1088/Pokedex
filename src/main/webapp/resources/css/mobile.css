@@ -157,7 +157,7 @@
         border-bottom: none;
     }
     
-    .mobile-menu-item label {
+    .mobile-menu-item label:not(.switch) {
         display: block;
         margin-bottom: 10px;
         font-weight: bold;
@@ -194,6 +194,7 @@
     .mobile-gif-item .switch {
         margin: 0;
         flex-shrink: 0;
+        width: 60px;
     }
     
     /* Hide desktop header logo */
