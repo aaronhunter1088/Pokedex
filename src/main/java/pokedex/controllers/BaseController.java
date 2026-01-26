@@ -471,6 +471,22 @@ public class BaseController
                     LOGGER.info("Completed retroactive fetching of all Pokemon by type");
                 } catch (TimeoutException e) {
                     LOGGER.warn("Retroactive fetching timed out after 2 minutes, some types may still be processing", e);
+
+                    // Cancel any futures that are still running to avoid unnecessary background work
+                    int cancelledCount = 0;
+                    for (CompletableFuture<Void> future : futures) {
+                        if (!future.isDone()) {
+                            boolean cancelled = future.cancel(true);
+                            if (cancelled) {
+                                cancelledCount++;
+                            }
+                        }
+                    }
+                    if (cancelledCount > 0) {
+                        LOGGER.info("Cancelled {} incomplete retroactive fetch tasks after timeout", cancelledCount);
+                    } else {
+                        LOGGER.debug("No incomplete retroactive fetch tasks to cancel after timeout");
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error waiting for retroactive fetching to complete", e);
                 }
