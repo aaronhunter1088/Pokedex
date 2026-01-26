@@ -157,7 +157,7 @@
         border-bottom: none;
     }
     
-    .mobile-menu-item label {
+    .mobile-menu-item label:not(.switch) {
         display: block;
         margin-bottom: 10px;
         font-weight: bold;
@@ -180,14 +180,21 @@
         display: inline-block;
     }
     
-    /* GIF Toggle in mobile menu */
-    .mobile-gif-toggle {
-        display: block;
-        text-align: left;
+    /* GIF Toggle in mobile menu - display inline */
+    .mobile-gif-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
     
-    .mobile-gif-toggle .switch {
+    .mobile-gif-item label:first-child {
+        margin-bottom: 0;
+    }
+    
+    .mobile-gif-item .switch {
         margin: 0;
+        flex-shrink: 0;
+        width: 60px;
     }
     
     /* Hide desktop header logo */
