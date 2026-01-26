@@ -227,13 +227,13 @@ public class BaseController
     protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
     {
         if (chosenType != null && !"none".equals(chosenType)) {
-            // Check if we already have filtered Pokemon for this type
-            if (!filteredPokemonByType.containsKey(chosenType)) {
+            // Use putIfAbsent to avoid race conditions
+            List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(chosenType, synchronizedList);
+            
+            if (existingList == null) {
+                // We successfully added the type, so we should fetch it
                 LOGGER.info("Type {} not yet cached, starting fetch", chosenType);
-                
-                // Initialize with empty list for this type
-                List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
-                filteredPokemonByType.put(chosenType, synchronizedList);
                 filteringInProgress.put(chosenType, true);
                 
                 // Start background thread to fetch all Pokemon
@@ -458,6 +458,8 @@ public class BaseController
                         } catch (Exception e) {
                             LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
                             filteringInProgress.put(type, false);
+                            // Remove potentially partially-populated cache entry so future requests can retry
+                            filteredPokemonByType.remove(type);
                         }
                     });
                     
