@@ -87,7 +87,7 @@
                         <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x"></i></a>
                     </div>
                     <div id="nameAndID" class="center-div" style="display:inline-flex;gap:20px;">
-                        <h3 id="name">Name: ${pokemon.name}</h3>
+                        <h3 id="name">Name: ${pokemon.name.substring(0,1).toUpperCase()}${pokemon.name.substring(1)}</h3>
                         <h3 id="idOfPokemon">ID: ${pokemon.id}</h3>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         <button id="descriptionBtn" class="tab" onclick="showDiv('description');">Description</button>
                         <button id="locationsBtn" class="tab" onclick="showDiv('locations');">Locations</button>
                         <button id="movesBtn" class="tab" onclick="showDiv('moves');">Moves</button>
-                        <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name} Evolves</button>
+                        <button id="evolvesHowBtn" class="tab" onclick="showDiv('evolvesHow');">How ${pokemon.name().substring(0,1).toUpperCase()}${pokemon.name().substring(1)} Evolves</button>
                     </div>
                     <div id="photoButtonsDiv" style="display:flex;justify-content:center;gap:5px;flex-wrap:wrap;">
                         <button id="defaultImgBtn" class="tab" onclick="showImage('default');">Show Default</button>
@@ -325,14 +325,30 @@
             error: function (jqXHR, textStatus, errorThrown) {
                 if (jqXHR.status === 404) {
                     console.log('Failed');
-                    $("#evolutions").html('Request failed');
+                    $("#evolutions").html('There was an error retrieving evolutions.'
+                        + textStatus
+                        + ': '
+                        + errorThrown
+                    );
                 } else if (jqXHR.status === 500) {
                     console.log('Server Error');
                 }
             }
         });
         if (response.responseText !== undefined) {
-            $("#evolutions").html(response.responseText);
+            /*
+            response.responseText contains HTML as a string. jQuery's find() method searches
+            within the DOM elements, not the outer container, so using filter() instead. When
+            you do $(response.responseText), jQuery parses the HTML but the <body> tag itself
+            becomes the root element, not a child element you can search for with find().
+             */
+            let firstH2Text = $(response.responseText).filter('h2').first().text().trim();
+            //console.debug('firstH2Text: ' + firstH2Text);
+            if (firstH2Text === 'No Evolutions') {
+                $("#evolutions").hide();
+            } else {
+                $("#evolutions").html(response.responseText);
+            }
         }
     }
 

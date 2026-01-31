@@ -58,12 +58,19 @@ public class EvolutionsController extends BaseController
         this.pokemonId = pokemonId;
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, pokemonId);
         setupEvolutions();
+        mav.setViewName("evolutions");
+        if (pokemonFamilySize == 0) {
+            mav.addObject("pokemonFamilySize", pokemonFamilySize);
+            return mav;
+        }
+        String name = retrievePokemon(pokemonId).name();
+        String capitalizedName = name.substring(0,1).toUpperCase() + name.substring(1);
+        mav.addObject("pokemonName", capitalizedName);
         mav.addObject("pokemonId", pokemonId);
         mav.addObject("stages", stages);
         mav.addObject("pokemonFamily", pokemonFamily);
         mav.addObject("allIDs", allIDs);
         mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
-        mav.setViewName("evolutions");
         return mav;
     }
 

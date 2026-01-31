@@ -55,7 +55,7 @@ public class BaseController
     Map<String, Boolean> filteringInProgress = new ConcurrentHashMap<>();
     private final ExecutorService filterExecutor = Executors.newFixedThreadPool(
         Math.min(Runtime.getRuntime().availableProcessors() * 2, 20));
-    private final AtomicBoolean retroactiveFetchingStarted = new AtomicBoolean(false);
+    protected final AtomicBoolean retroactiveFetchingStarted = new AtomicBoolean(false);
     int totalPokemon = 0;
     boolean defaultImagePresent = false,
             officialImagePresent = false,
@@ -303,7 +303,7 @@ public class BaseController
             }
             
             int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
-            
+
             this.pokemonMap.clear();
             if (startIndex < totalPokemon) {
                 synchronized (allOfType) {
@@ -327,8 +327,11 @@ public class BaseController
         LOGGER.info("Background thread: Gathering all Pokemon of type: {}", type);
         int currentPage = 1;
         int totalAllPokemon = pokemonService.getTotalPokemon(null);
-        int maxPages = (int) Math.ceil((double) totalAllPokemon / 50); // Use larger page size for efficiency
-        
+        int maxPages = (int) Math.ceil((double) totalAllPokemon / this.pkmnPerPage); // Use larger page size for efficiency
+        maxPages = (int) Math.ceil((double) totalAllPokemon % this.pkmnPerPage) == 0
+                ? maxPages
+                : maxPages + 1; // for any remainder pokemon left over
+
         // Fetch all Pokemon and filter by type
         while (currentPage <= maxPages) {
             NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(50, ((currentPage - 1) * 50));
@@ -417,11 +420,6 @@ public class BaseController
      */
     protected void startRetroactiveFetchingByType()
     {
-        if (!retroactiveFetchingStarted.compareAndSet(false, true)) {
-            LOGGER.debug("Retroactive fetching already started, skipping");
-            return;
-        }
-        
         LOGGER.info("Starting retroactive fetching of Pokemon by type");
         
         // Start in a separate thread to not block the page load

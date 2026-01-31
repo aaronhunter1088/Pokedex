@@ -26,7 +26,7 @@
         <jakarta.servlet.jstl.version>3.0.1</jakarta.servlet.jstl.version>
         <jakarta.servlet.jstl-api.version>3.0.2</jakarta.servlet.jstl-api.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
-        <pokedex.api.version>1.3.0</pokedex.api.version>
+        <pokedex.api.version>1.5.0</pokedex.api.version>
         <taglibs.standard.version>1.2.5</taglibs.standard.version>
         <taglibs.standard.impl.version>1.2.5</taglibs.standard.impl.version>
     </properties>

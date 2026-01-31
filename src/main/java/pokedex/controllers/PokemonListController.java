@@ -62,7 +62,11 @@ public class PokemonListController extends BaseController
         
         // Start retroactive fetching of Pokemon by type in the background
         // This will happen after the initial page load and won't block it
-        startRetroactiveFetchingByType();
+        if (!retroactiveFetchingStarted.compareAndSet(false, true)) {
+            LOGGER.debug("Retroactive fetching already started, skipping");
+        } else {
+            startRetroactiveFetchingByType();
+        }
         
         mav.addObject("pokemonMap", pokemonMap);
         this.page = lastPageSearched;

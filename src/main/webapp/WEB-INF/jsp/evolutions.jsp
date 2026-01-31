@@ -13,7 +13,7 @@
         <h2>No Evolutions</h2>
     </c:when>
     <c:when test="${pokemonFamily != null}">
-        <h2>Evolutions</h2>
+        <h2>${pokemonName}'s Family</h2> <!-- Venasuar's Family -->
         <div id="evolutions" style="display:inline-flex; justify-content: center; width:100%; height:45%;">
             <c:forEach var="pokemonList" items="${pokemonFamily}" varStatus="status">
                 <c:set var="listNumber" value="${status.count}"/>
