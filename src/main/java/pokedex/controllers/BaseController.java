@@ -189,7 +189,7 @@ public class BaseController
     {
         LOGGER.info("retrievePokemon");
         try {
-            return pokeApiClient.getResource(Pokemon.class, nameOrId).block();
+            return pokemonService.getPokemonByIdOrName(nameOrId);
         }
         catch (Exception e) {
             LOGGER.error("Could not find pokemon with value: {}", nameOrId);
@@ -327,14 +327,14 @@ public class BaseController
         LOGGER.info("Background thread: Gathering all Pokemon of type: {}", type);
         int currentPage = 1;
         int totalAllPokemon = pokemonService.getTotalPokemon(null);
-        int maxPages = (int) Math.ceil((double) totalAllPokemon / this.pkmnPerPage); // Use larger page size for efficiency
+        int maxPages = (int) Math.ceil((double) totalAllPokemon / this.pkmnPerPage);
         maxPages = (int) Math.ceil((double) totalAllPokemon % this.pkmnPerPage) == 0
                 ? maxPages
                 : maxPages + 1; // for any remainder pokemon left over
 
         // Fetch all Pokemon and filter by type
         while (currentPage <= maxPages) {
-            NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(50, ((currentPage - 1) * 50));
+            NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(this.pkmnPerPage, ((currentPage - 1) * this.pkmnPerPage));
             if (pokemonList != null && !pokemonList.results().isEmpty()) {
                 for (NamedApiResource<Pokemon> pkmnResource : pokemonList.results()) {
                     try {
@@ -467,7 +467,7 @@ public class BaseController
                 // Wait for all types to complete (with timeout to prevent indefinite blocking)
                 try {
                     CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .get(2, TimeUnit.MINUTES); // 2 minute timeout for all types
+                        .get(3, TimeUnit.MINUTES); // x minutes timeout for all types
                     LOGGER.info("Completed retroactive fetching of all Pokemon by type");
                 } catch (TimeoutException e) {
                     LOGGER.warn("Retroactive fetching timed out after 2 minutes, some types may still be processing", e);
