@@ -104,6 +104,12 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+
+            <div class="mobile-menu-item">
+                <label for="searchMobile">Search for Pkmn</label>
+                <input id="searchMobile" name="searchMobile" type="text" placeholder="Name or ID"/>
+                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search</button>
+            </div>
             
             <div class="mobile-menu-item">
                 <label for="pageNumberMobile">Jump to Page</label>
@@ -164,18 +170,24 @@
             </label>
             &nbsp;
             <label style="margin:10px auto;width:auto;padding-top:0;">
-                ${isDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}
+                ${isDarkMode ? 'Dark Mode On' : 'Light Mode On'}
             </label>
+            &emsp;
+            <div id="searchForPkmn" style="display:flex;">
+                <label for="searchForPkmn"></label>
+                <input id="search" name="search" type="text" placeholder="Name or ID" style="width:100px;"/>
+                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search for Pkmn</button>
+            </div>
             &emsp;
             <div id="jumpToPage" style="display:flex;">
                 <label for="pageNumber"></label>
-                <input id="pageNumber" name="pageNumber" type="text" placeholder="Page #" style="width:auto;"/>
+                <input id="pageNumber" name="pageNumber" type="text" placeholder="Page #" style="width:50px;"/>
                 <button class="icon" onclick="setPageToView();" title="Jump to Page">Jump to Page</button>
             </div>
             &emsp;
             <div id="showPokemon" style="display:flex;">
                 <label for="showPkmnNumber"></label>
-                <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:auto;"/>
+                <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:75px;"/>
                 <button class="icon" onclick="setPkmnPerPage();" title="Show Pokemon">Show Pokemon</button>
             </div>
             &emsp;
@@ -435,6 +447,42 @@
 
         function showArtwork(imgTag, artwork) {
             imgTag.src = artwork;
+        }
+
+        function searchForPkmn(isDarkMode) {
+            let nameOrId = $("#search").val().trim();
+            if (nameOrId === '') {
+                nameOrId = $("#searchMobile").val().trim();
+            }
+            console.log('nameOrId: ' + nameOrId);
+
+            let response = $.ajax({
+                type: "GET",
+                url: "/springboot/pokemon/" + nameOrId + "/validateNameOrId",
+                //url: "/springboot/" + nameOrId + "/validateNameOrId",
+                async: false,
+                dataType: "application/json",
+                crossDomain: true,
+                statusCode: {
+                    200: function(data) {
+                        console.log('200 validatePkmn');
+                        console.log(JSON.parse(JSON.stringify(data.responseText)));
+                        let url = '';
+                        if (nameOrId) {
+                            url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+                        }
+                        console.log('Navigating to: ' + url);
+                        window.location.href = url; // navigates like a normal link
+                    },
+                    404: function(data) {
+                        console.log(JSON.parse(JSON.stringify(data.responseText)));
+                        alert("Pok\u00e9mon not found. Please check the Name or ID and try again.");
+                    },
+                    500: function() {
+                        alert('Pok\u00e9mon search failed. Please try again later.');
+                    }
+                }
+            });
         }
 
         function setPageToView(pageNumber) {

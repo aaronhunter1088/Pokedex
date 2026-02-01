@@ -36,7 +36,7 @@ public class PokedexController extends BaseController
     @GetMapping(value = "/pokedex/{nameOrId}")
     public ModelAndView pokedex(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav,
                                 HttpSession httpSession,
-                                @RequestParam(name = "darkmode", required = false, defaultValue = "false") String darkmode)
+                                @RequestParam(name = "darkmode", required = false) String darkmode) // defaultValue = "false"
     {
         @SuppressWarnings("unchecked")
         Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
@@ -64,7 +64,8 @@ public class PokedexController extends BaseController
         mav.addObject("pokemon", pokemon);
         mav.addObject("randomDescriptionNumber", !pokemon.descriptions().isEmpty() ?
                 new Random().nextInt(pokemon.descriptions().size()) : 0);
-        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
+        isDarkMode = darkmode != null ? darkmode.equals("true") : isDarkMode;
+        mav.addObject("isDarkMode", isDarkMode);
         mav.setViewName("pokedex");
         return mav;
     }
