@@ -13,7 +13,7 @@
         <h2>No Evolutions</h2>
     </c:when>
     <c:when test="${pokemonFamily != null}">
-        <h2>${pokemonName}'s Family</h2> <!-- Venasuar's Family -->
+        <h2>${pokemonName}'s Family</h2>
         <div id="evolutions" style="display:inline-flex; justify-content: center; width:100%; height:45%;">
             <c:forEach var="pokemonList" items="${pokemonFamily}" varStatus="status">
                 <c:set var="listNumber" value="${status.count}"/>
@@ -23,7 +23,7 @@
                          class=""> <!-- class="pokemon-grid box" -->
                         <h2>Stage ${listNumber}</h2>
                     </div>
-                    <div style="overflow-y:scroll;overflow-x:hidden;height:460px;width:90%;">
+                    <div style="overflow-y:scroll;overflow-x:hidden;max-height:500px;width:auto;">
                         <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
                             <div class="evolution-grid" style="">
                                 <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}?darkmode=${isDarkMode}"
