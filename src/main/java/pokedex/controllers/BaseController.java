@@ -321,181 +321,6 @@ public class BaseController
             return this.pokemonMap;
         }
     }
-    
-    private void fetchAllPokemonByType(String type, List<Pokemon> resultList)
-    {
-        LOGGER.info("Background thread: Gathering all Pokemon of type: {}", type);
-        int currentPage = 1;
-        int totalAllPokemon = pokemonService.getTotalPokemon(null);
-        int maxPages = (int) Math.ceil((double) totalAllPokemon / this.pkmnPerPage);
-        maxPages = (int) Math.ceil((double) totalAllPokemon % this.pkmnPerPage) == 0
-                ? maxPages
-                : maxPages + 1; // for any remainder pokemon left over
-
-        // Fetch all Pokemon and filter by type
-        while (currentPage <= maxPages) {
-            NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(this.pkmnPerPage, ((currentPage - 1) * this.pkmnPerPage));
-            if (pokemonList != null && !pokemonList.results().isEmpty()) {
-                for (NamedApiResource<Pokemon> pkmnResource : pokemonList.results()) {
-                    try {
-                        Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmnResource.name());
-                        // Check if Pokemon has the chosen type
-                        boolean hasType = pokemon.types().stream()
-                                .anyMatch(pokemonType -> type.equalsIgnoreCase(pokemonType.getType().name()));
-                        
-                        if (hasType) {
-                            // Get species data for color
-                            String color = "white";
-                            PokemonSpecies speciesData = null;
-                            try {
-                                speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
-                                if (speciesData != null && speciesData.getColor() != null) {
-                                    color = speciesData.getColor().name();
-                                }
-                            } catch (Exception e) {
-                                LOGGER.error("No speciesData found for pokemon id: {}", pokemon.id());
-                            }
-                            
-                            // Build type string
-                            String pokemonType;
-                            List<PokemonType> types = pokemon.types();
-                            if (types.size() > 1) {
-                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
-                                        + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
-                            } else {
-                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
-                            }
-                            
-                            // Create enhanced Pokemon object
-                            PokemonSprites sprites = pokemon.sprites();
-                            pokemon = Pokemon.from(pokemon, Map.of(
-                                    "id", pokemon.id(),
-                                    "type", pokemonType,
-                                    "defaultImage", sprites.getFrontDefault(),
-                                    "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
-                                    "gifImage", GIF_IMAGE_URL(pokemon.id()),
-                                    "color", color,
-                                    "flavorTexts", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
-                                    "descriptions", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
-                                    "description", speciesData != null && !speciesData.getFlavorTextEntries().isEmpty() 
-                                            ? speciesData.getFlavorTextEntries().getFirst().getFlavorText() 
-                                            : "No description available."
-                            ));
-
-                            // Check pokemon gifImage for existence.
-                            // If image returns 404, reset gifImage to official image.
-                            // If image returns 200, no change is needed
-                            try {
-                                HttpResponse<String> response = pokemonService.callUrl(pokemon.gifImage());
-                                if (response.statusCode() == 404) {
-                                    LOGGER.debug("GIF image not found for {}, using official image instead", pokemon.name());
-                                    pokemon = Pokemon.from(pokemon, Map.of(
-                                            "gifImage", pokemon.officialImage()
-                                    ));
-                                }
-                            } catch (Exception e) {
-                                LOGGER.debug("Error validating GIF image for {}, using official image instead", pokemon.name());
-                                pokemon = Pokemon.from(pokemon, Map.of(
-                                        "gifImage", pokemon.officialImage()
-                                ));
-                            }
-                            
-                            resultList.add(pokemon);
-                            LOGGER.debug("Added {} to filtered list. Total so far: {}", pokemon.name(), resultList.size());
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("Error processing pokemon: {}", pkmnResource.name(), e);
-                    }
-                }
-            }
-            currentPage++;
-        }
-        
-        LOGGER.info("Background thread: Total Pokemon of type {}: {}", type, resultList.size());
-    }
-    
-    /**
-     * Starts retroactive fetching of all Pokemon by type in the background.
-     * This method should be called after the initial page load to pre-populate the cache.
-     */
-    protected void startRetroactiveFetchingByType()
-    {
-        LOGGER.info("Starting retroactive fetching of Pokemon by type");
-        
-        // Start in a separate thread to not block the page load
-        filterExecutor.submit(() -> {
-            try {
-                // Get all types from the API
-                List<String> allTypes = pokemonService.getAllTypes();
-                LOGGER.info("Found {} types to fetch Pokemon for", allTypes.size());
-                
-                // For each type, start fetching Pokemon in parallel
-                List<CompletableFuture<Void>> futures = new ArrayList<>();
-                for (String type : allTypes) {
-                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                        try {
-                            // Use putIfAbsent to avoid race conditions
-                            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(type, 
-                                Collections.synchronizedList(new ArrayList<>()));
-                            
-                            if (existingList == null) {
-                                // We successfully added the type, so we should fetch it
-                                LOGGER.info("Retroactively fetching Pokemon of type: {}", type);
-                                List<Pokemon> synchronizedList = filteredPokemonByType.get(type);
-                                filteringInProgress.put(type, true);
-                                
-                                try {
-                                    fetchAllPokemonByType(type, synchronizedList);
-                                } finally {
-                                    filteringInProgress.put(type, false);
-                                    LOGGER.info("Completed retroactive fetch for type {}: {} Pokemon", type, synchronizedList.size());
-                                }
-                            } else {
-                                LOGGER.debug("Type {} already being fetched, skipping", type);
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
-                            filteringInProgress.put(type, false);
-                            // Remove potentially partially-populated cache entry so future requests can retry
-                            filteredPokemonByType.remove(type);
-                        }
-                    });
-                    
-                    futures.add(future);
-                }
-                
-                // Wait for all types to complete (with timeout to prevent indefinite blocking)
-                try {
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                        .get(3, TimeUnit.MINUTES); // x minutes timeout for all types
-                    LOGGER.info("Completed retroactive fetching of all Pokemon by type");
-                } catch (TimeoutException e) {
-                    LOGGER.warn("Retroactive fetching timed out after 2 minutes, some types may still be processing", e);
-
-                    // Cancel any futures that are still running to avoid unnecessary background work
-                    int cancelledCount = 0;
-                    for (CompletableFuture<Void> future : futures) {
-                        if (!future.isDone()) {
-                            boolean cancelled = future.cancel(true);
-                            if (cancelled) {
-                                cancelledCount++;
-                            }
-                        }
-                    }
-                    if (cancelledCount > 0) {
-                        LOGGER.info("Cancelled {} incomplete retroactive fetch tasks after timeout", cancelledCount);
-                    } else {
-                        LOGGER.debug("No incomplete retroactive fetch tasks to cancel after timeout");
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Error waiting for retroactive fetching to complete", e);
-                }
-                
-            } catch (Exception e) {
-                LOGGER.error("Error during retroactive fetching", e);
-            }
-        });
-    }
 
     public Map<Integer, Pokemon> getPokemonMap()
     {
@@ -595,5 +420,183 @@ public class BaseController
             LOGGER.info("pokemonMap size: {}", pokemonMap.size());
             return getPokemonMap();
         }
+    }
+
+    /**
+     * Starts retroactive fetching of all Pokemon by type in the background.
+     * This method should be called after the initial page load to pre-populate the cache.
+     */
+    protected void startRetroactiveFetchingByType()
+    {
+        LOGGER.info("Starting retroactive fetching of Pokemon by type");
+
+        // Start in a separate thread to not block the page load
+        filterExecutor.submit(() -> {
+            try {
+                // Get all types from the API
+                List<String> allTypes = pokemonService.getAllTypes();
+                LOGGER.info("Found {} types to fetch Pokemon for", allTypes.size());
+
+                // For each type, start fetching Pokemon in parallel
+                List<CompletableFuture<Void>> futures = new ArrayList<>();
+                for (String type : allTypes) {
+                    CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+                        try {
+                            // Use putIfAbsent to avoid race conditions
+                            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(type,
+                                    Collections.synchronizedList(new ArrayList<>()));
+
+                            if (existingList == null) {
+                                // We successfully added the type, so we should fetch it
+                                LOGGER.info("Retroactively fetching Pokemon of type: {}", type);
+                                List<Pokemon> synchronizedList = filteredPokemonByType.get(type);
+                                filteringInProgress.put(type, true);
+
+                                try {
+                                    fetchAllPokemonByType(type, synchronizedList);
+                                } finally {
+                                    filteringInProgress.put(type, false);
+                                    LOGGER.info("Completed retroactive fetch for type {}: {} Pokemon", type, synchronizedList.size());
+                                }
+                            } else {
+                                LOGGER.debug("Type {} already being fetched, skipping", type);
+                            }
+                        }
+                        catch (Exception e) {
+                            LOGGER.error("Error retroactively fetching Pokemon of type {}", type, e);
+                            filteringInProgress.put(type, false);
+                            // Remove potentially partially-populated cache entry so future requests can retry
+                            filteredPokemonByType.remove(type);
+                        }
+                    });
+
+                    futures.add(future);
+                }
+
+                // Wait for all types to complete (with timeout to prevent indefinite blocking)
+                try {
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                            .get(3, TimeUnit.MINUTES); // x minutes timeout for all types
+                    LOGGER.info("Completed retroactive fetching of all Pokemon by type");
+                }
+                catch (TimeoutException e) {
+                    LOGGER.warn("Retroactive fetching timed out after 2 minutes, some types may still be processing", e);
+
+                    // Cancel any futures that are still running to avoid unnecessary background work
+                    int cancelledCount = 0;
+                    for (CompletableFuture<Void> future : futures) {
+                        if (!future.isDone()) {
+                            boolean cancelled = future.cancel(true);
+                            if (cancelled) {
+                                cancelledCount++;
+                            }
+                        }
+                    }
+                    if (cancelledCount > 0) {
+                        LOGGER.info("Cancelled {} incomplete retroactive fetch tasks after timeout", cancelledCount);
+                    } else {
+                        LOGGER.debug("No incomplete retroactive fetch tasks to cancel after timeout");
+                    }
+                }
+                catch (Exception e) {
+                    LOGGER.error("Error waiting for retroactive fetching to complete", e);
+                }
+            }
+            catch (Exception e) {
+                LOGGER.error("Error during retroactive fetching", e);
+            }
+        });
+    }
+
+    private void fetchAllPokemonByType(String type, List<Pokemon> resultList)
+    {
+        LOGGER.info("Background thread: Gathering all Pokemon of type: {}", type);
+        int currentPage = 1;
+        int totalAllPokemon = pokemonService.getTotalPokemon(null);
+        int maxPages = (int) Math.ceil((double) totalAllPokemon / this.pkmnPerPage);
+        maxPages = (int) Math.ceil((double) totalAllPokemon % this.pkmnPerPage) == 0
+                ? maxPages
+                : maxPages + 1; // for any remainder pokemon left over
+
+        // Fetch all Pokemon and filter by type
+        while (currentPage <= maxPages) {
+            NamedApiResourceList<Pokemon> pokemonList = pokemonService.getAllPokemons(this.pkmnPerPage, ((currentPage - 1) * this.pkmnPerPage));
+            if (pokemonList != null && !pokemonList.results().isEmpty()) {
+                for (NamedApiResource<Pokemon> pkmnResource : pokemonList.results()) {
+                    try {
+                        Pokemon pokemon = pokemonService.getPokemonByIdOrName(pkmnResource.name());
+                        // Check if Pokemon has the chosen type
+                        boolean hasType = pokemon.types().stream()
+                                .anyMatch(pokemonType -> type.equalsIgnoreCase(pokemonType.getType().name()));
+
+                        if (hasType) {
+                            // Get species data for color
+                            String color = "white";
+                            PokemonSpecies speciesData = null;
+                            try {
+                                speciesData = pokemonService.getPokemonSpeciesData(pokemon.id().toString());
+                                if (speciesData != null && speciesData.getColor() != null) {
+                                    color = speciesData.getColor().name();
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error("No speciesData found for pokemon id: {}", pokemon.id());
+                            }
+
+                            // Build type string
+                            String pokemonType;
+                            List<PokemonType> types = pokemon.types();
+                            if (types.size() > 1) {
+                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1)
+                                        + " & " + types.get(1).getType().name().substring(0, 1).toUpperCase() + types.get(1).getType().name().substring(1);
+                            } else {
+                                pokemonType = types.get(0).getType().name().substring(0, 1).toUpperCase() + types.get(0).getType().name().substring(1);
+                            }
+
+                            // Create enhanced Pokemon object
+                            PokemonSprites sprites = pokemon.sprites();
+                            pokemon = Pokemon.from(pokemon, Map.of(
+                                    "id", pokemon.id(),
+                                    "type", pokemonType,
+                                    "defaultImage", sprites.getFrontDefault(),
+                                    "officialImage", OFFICIAL_IMAGE_URL(pokemon.id()),
+                                    "gifImage", GIF_IMAGE_URL(pokemon.id()),
+                                    "color", color,
+                                    "flavorTexts", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                    "descriptions", speciesData != null ? speciesData.getFlavorTextEntries() : new ArrayList<>(),
+                                    "description", speciesData != null && !speciesData.getFlavorTextEntries().isEmpty()
+                                            ? speciesData.getFlavorTextEntries().getFirst().getFlavorText()
+                                            : "No description available."
+                            ));
+
+                            // Check pokemon gifImage for existence.
+                            // If image returns 404, reset gifImage to official image.
+                            // If image returns 200, no change is needed
+                            try {
+                                HttpResponse<String> response = pokemonService.callUrl(pokemon.gifImage());
+                                if (response.statusCode() == 404) {
+                                    LOGGER.debug("GIF image not found for {}, using official image instead", pokemon.name());
+                                    pokemon = Pokemon.from(pokemon, Map.of(
+                                            "gifImage", pokemon.officialImage()
+                                    ));
+                                }
+                            } catch (Exception e) {
+                                LOGGER.debug("Error validating GIF image for {}, using official image instead", pokemon.name());
+                                pokemon = Pokemon.from(pokemon, Map.of(
+                                        "gifImage", pokemon.officialImage()
+                                ));
+                            }
+
+                            resultList.add(pokemon);
+                            LOGGER.debug("Added {} to filtered list. Total so far: {}", pokemon.name(), resultList.size());
+                        }
+                    } catch (Exception e) {
+                        LOGGER.error("Error processing pokemon: {}", pkmnResource.name(), e);
+                    }
+                }
+            }
+            currentPage++;
+        }
+
+        LOGGER.info("Background thread: Total Pokemon of type {}: {}", type, resultList.size());
     }
 }

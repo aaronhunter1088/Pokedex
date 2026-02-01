@@ -71,13 +71,13 @@ public class PokemonListController extends BaseController
         mav.addObject("pokemonMap", pokemonMap);
         this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
-        mav.addObject("defaultImagePresent", defaultImagePresent);
-        mav.addObject("officialImagePresent", officialImagePresent);
-        mav.addObject("gifImagePresent", gifImagePresent);
+        //mav.addObject("defaultImagePresent", defaultImagePresent);
+        //mav.addObject("officialImagePresent", officialImagePresent);
+        //mav.addObject("gifImagePresent", gifImagePresent);
         mav.addObject("showGifs", showGifs);
         mav.addObject("pkmnPerPage", pkmnPerPage);
         mav.addObject("totalPokemon", totalPokemon);
-        mav.addObject("totalPages", (int) Math.ceil((double) totalPokemon / pkmnPerPage));
+        mav.addObject("totalPages", (int) Math.floor((double) totalPokemon / pkmnPerPage));
         mav.addObject("page", page);
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
