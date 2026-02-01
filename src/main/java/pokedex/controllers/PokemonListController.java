@@ -81,7 +81,8 @@ public class PokemonListController extends BaseController
         mav.addObject("page", page);
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
-        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
+        isDarkMode = darkmode.equals("true");
+        mav.addObject("isDarkMode", isDarkMode);
         mav.addObject("baseUrl", baseUrl);
         mav.setViewName("index");
         return mav;

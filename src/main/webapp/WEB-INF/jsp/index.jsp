@@ -96,6 +96,14 @@
                     <span class="slider round"></span>
                 </label>
             </div>
+
+            <div class="mobile-menu-item mobile-gif-item">
+                <label>${isDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}</label>
+                <label class="switch" title="Toggle darkmode">
+                    <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''} onclick="toggleDarkmode('${isDarkMode}');">
+                    <span class="slider round"></span>
+                </label>
+            </div>
             
             <div class="mobile-menu-item">
                 <label for="pageNumberMobile">Jump to Page</label>
@@ -149,6 +157,15 @@
             </label>
             &nbsp;
             <label style="margin:10px auto;width:auto;padding-top:0;">Show GIFs</label>
+            &emsp;
+            <label class="switch" title="Toggle darkmode">
+                <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''} onclick="toggleDarkmode('${isDarkMode}');">
+                <span class="slider round"></span>
+            </label>
+            &nbsp;
+            <label style="margin:10px auto;width:auto;padding-top:0;">
+                ${isDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}
+            </label>
             &emsp;
             <div id="jumpToPage" style="display:flex;">
                 <label for="pageNumber"></label>
@@ -370,6 +387,13 @@
                     }
                 }
             });
+        }
+
+        function toggleDarkmode(isDarkMode) {
+            let updatedDarkmode = isDarkMode === 'true' ? 'false' : 'true';
+            setTimeout(() => {
+                window.location.href = '${pageContext.request.contextPath}/?darkmode=' + updatedDarkmode;
+            }, 500);
         }
 
         function updateGifToggle(reload, data) {
