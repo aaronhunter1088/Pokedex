@@ -108,7 +108,7 @@
             <div class="mobile-menu-item">
                 <label for="searchMobile">Search for Pkmn</label>
                 <input id="searchMobile" name="searchMobile" type="text" placeholder="Name or ID"/>
-                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search</button>
+                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search for Pkmn</button>
             </div>
             
             <div class="mobile-menu-item">
@@ -120,7 +120,7 @@
             <div class="mobile-menu-item">
                 <label for="showPkmnNumberMobile">Pok&#233mon Per Page</label>
                 <input id="showPkmnNumberMobile" name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"/>
-                <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pokemon">Show Pokemon</button>
+                <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">Show Pok&#233mon</button>
             </div>
             
             <div class="mobile-menu-item">
@@ -188,7 +188,7 @@
             <div id="showPokemon" style="display:flex;">
                 <label for="showPkmnNumber"></label>
                 <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:75px;"/>
-                <button class="icon" onclick="setPkmnPerPage();" title="Show Pokemon">Show Pokemon</button>
+                <button class="icon" onclick="setPkmnPerPage();" title="Show Pok&#233mon">Show Pok&#233mon</button>
             </div>
             &emsp;
             <div id="typeList" style="display:flex;">
@@ -571,7 +571,7 @@
                 // update heading text with selectedType
                 const heading = $("#loadingHeader");
                 if (heading) {
-                    heading.text('Fetching all ' + selectedType + ' Pokemon');
+                    heading.text('Fetching all ' + selectedType + ' Pok&#233mon');
                 }
 
             }
