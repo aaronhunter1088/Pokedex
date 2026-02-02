@@ -20,8 +20,10 @@
 .info-display-div {
     display: inline-flex;
     width: 300px;
-    max-width: 90%;
+    height: 200px;
     justify-content: center;
+    overflow-y:scroll;
+    overflow-x:hidden;
 }
 
 .mobile-back-link i {

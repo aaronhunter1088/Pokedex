@@ -84,6 +84,6 @@
         color: white;
     }
     .darkmode input {
-        color: black;
+        color: black !important;
     }
 </style>

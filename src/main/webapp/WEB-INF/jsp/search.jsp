@@ -17,11 +17,11 @@
 
     <h4 style="vertical-align: middle;">
         <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
-        <input id="nameOrId" name="nameOrId" placeholder="Pokemon Name/ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
+        <input id="search" name="nameOrId" placeholder="Pokemon Name/ID" type="text" style="color:${isDarkMode?'white':'black'} !important;" class="${isDarkMode?'darkmode':'lightmode'}"/>
         <button type="submit" style="background:none;border:none;padding:0;cursor:zoom-in;" title="Search">
             <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
                  class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
-                 onclick="getPokemonFromSearch($('#nameOrId').val(), ${isDarkMode})">
+                 onclick="searchForPkmn(${isDarkMode})">
         </button>
     </h4>
 
@@ -44,26 +44,39 @@
         });
     });
 
-    function getPokemonFromSearch(nameOrId, isDarkMode) {
-        //event.preventDefault();
-        //const nameOrId = $('#nameOrId').val();
-        let url = '';
-        if (nameOrId) {
-            url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+    function searchForPkmn(isDarkMode) {
+        let nameOrId = $("#search").val().trim();
+        if (nameOrId === '') {
+            nameOrId = $("#searchMobile").val().trim();
         }
-        //if (nameOrId === undefined) nameOrId = $('#pokemonName').val();
         console.log('nameOrId: ' + nameOrId);
-        console.log('mode: ' + isDarkMode);
 
-        //const raw = $("#nameOrId").trim();
-        //if (!raw) return;
-
-        //const ctx = '${pageContext.request.contextPath}';   // e.g. /pokedexapi (or "")
-        //const url = ctx + '/pokedex/' + raw + '?darkmode=' + isDarkMode;
-
-        console.log('Navigating to: ' + url);
-        window.location.href = url; // navigates like a normal link
-        //loadPokedexPageAjax(url);
+        $.ajax({
+            type: "GET",
+            url: "/springboot/pokemon/" + nameOrId + "/validateNameOrId",
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    console.log('200 validatePkmn');
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    let url = '';
+                    if (nameOrId) {
+                        url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+                    }
+                    console.log('Navigating to: ' + url);
+                    window.location.href = url; // navigates like a normal link
+                },
+                404: function(data) {
+                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+                    alert("Pok\u00e9mon not found. Please check the Name or ID and try again.");
+                },
+                500: function() {
+                    alert('Pok\u00e9mon search failed. Please try again later.');
+                }
+            }
+        });
     }
 
     function loadPokedexPageAjax(url) {

@@ -68,83 +68,7 @@
             </div>
         </div>
         
-        <!-- Mobile Header -->
-        <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
-            <div class="pokemon-logo">
-                <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" title="Search">
-                    <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
-                </a>
-            </div>
-            <button class="mobile-menu-button" onclick="toggleMobileMenu();" aria-label="Menu">
-                <i class="fa-solid fa-ellipsis-vertical"></i>
-            </button>
-        </div>
-        
-        <!-- Mobile Menu Overlay -->
-        <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu();"></div>
-        
-        <!-- Mobile Menu -->
-        <div class="mobile-menu ${isDarkMode?'darkmode':'lightmode'}" id="mobileMenu">
-            <button class="mobile-menu-close" onclick="closeMobileMenu();" aria-label="Close menu">
-                <i class="fa-solid fa-times"></i>
-            </button>
-            
-            <div class="mobile-menu-item mobile-gif-item">
-                <label>Show GIFs</label>
-                <label class="switch" title="If GIF is not present, official artwork will show!">
-                    <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-
-            <div class="mobile-menu-item mobile-gif-item">
-                <label>${isDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}</label>
-                <label class="switch" title="Toggle darkmode">
-                    <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''} onclick="toggleDarkmode('${isDarkMode}');">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-
-            <div class="mobile-menu-item">
-                <label for="searchMobile">Search for Pkmn</label>
-                <input id="searchMobile" name="searchMobile" type="text" placeholder="Name or ID"/>
-                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search for Pkmn</button>
-            </div>
-            
-            <div class="mobile-menu-item">
-                <label for="pageNumberMobile">Jump to Page</label>
-                <input id="pageNumberMobile" name="pageNumberMobile" type="text" placeholder="Page #"/>
-                <button class="icon" onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">Go</button>
-            </div>
-            
-            <div class="mobile-menu-item">
-                <label for="showPkmnNumberMobile">Pok&#233mon Per Page</label>
-                <input id="showPkmnNumberMobile" name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"/>
-                <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">Show Pok&#233mon</button>
-            </div>
-            
-            <div class="mobile-menu-item">
-                <label for="typeDropdownMobile">Filter by Type</label>
-                <select id="typeDropdownMobile" title="Type" class="icon" onchange="getByPkmnType(this);">
-                    <option value="none" selected>Type (All)</option>
-                    <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
-                        <c:if test="${chosenType.equals(type)}">
-                            <option value="${type}" selected>${type}</option>
-                        </c:if>
-                        <c:if test="${!chosenType.equals(type)}">
-                            <option value="${type}">${type}</option>
-                        </c:if>
-                    </c:forEach>
-                </select>
-            </div>
-            
-            <div class="mobile-menu-item">
-                <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
-                        title="Return to Landing Page">
-                    Back to Landing Page
-                </button>
-            </div>
-        </div>
+        <jsp:include page="mobileMenu.jsp"/>
         
         <!-- Desktop Header -->
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
@@ -319,31 +243,9 @@
             });
         });
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('mobileMenuOverlay');
-            menu.classList.toggle('active');
-            overlay.classList.toggle('active');
-            // Prevent body scroll when menu is open
-            if (menu.classList.contains('active')) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
+        // mobile menu functions
 
-        function closeMobileMenu() {
-            const menu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('mobileMenuOverlay');
-            menu.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
 
-        function setPkmnPerPageMobile() {
-            let value = $("#showPkmnNumberMobile").val();
-            setPkmnPerPageImpl(value, true);
-        }
 
         function setPkmnPerPage() {
             let value = $("#showPkmnNumber").val();

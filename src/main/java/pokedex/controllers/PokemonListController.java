@@ -139,19 +139,6 @@ public class PokemonListController extends BaseController
         return ResponseEntity.ok().body("PkmnPerPage set");
     }
 
-
-
-    public List<String> getUniqueTypes()
-    {
-        try {
-            return pokemonService.getAllTypes();
-        }
-        catch (Exception e) {
-            LOGGER.error("Error retrieving unique types: {}", e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
     @GetMapping(value = "/getPokemonByType")
     @ResponseBody
     public ResponseEntity<String> getPokemonByType(@RequestParam(name = "chosenType", required = false, defaultValue = "") String chosenType,

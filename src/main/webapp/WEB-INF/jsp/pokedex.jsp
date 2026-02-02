@@ -41,35 +41,8 @@
 </head>
 <body style="justify-content:space-evenly;text-align:center;"
       class="${isDarkMode?'darkmode':'lightmode'}">
-    
-    <!-- Mobile Header -->
-    <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
-        <div class="pokemon-logo">
-            <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" title="Search">
-                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
-            </a>
-        </div>
-        <button class="mobile-menu-button" onclick="toggleMobileMenu();" aria-label="Menu">
-            <i class="fa-solid fa-ellipsis-vertical"></i>
-        </button>
-    </div>
-    
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu();"></div>
-    
-    <!-- Mobile Menu -->
-    <div class="mobile-menu ${isDarkMode?'darkmode':'lightmode'}" id="mobileMenu">
-        <button class="mobile-menu-close" onclick="closeMobileMenu();" aria-label="Close menu">
-            <i class="fa-solid fa-times"></i>
-        </button>
-        
-        <div class="mobile-menu-item">
-            <button class="icon" onclick="navigateToHomePage()"
-                    title="Return to Home Page">
-                Back to Home
-            </button>
-        </div>
-    </div>
+
+    <jsp:include page="mobileMenu.jsp"/>
     
     <!-- Desktop Header -->
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
@@ -145,7 +118,7 @@
                     <h3 id="moves" class="listStyle">${moveName}</h3>
                 </c:forEach>
                 </div>
-                <div id="evolvesHowDiv" style="overflow-y:scroll;overflow-x:hidden;height:200px;">
+                <div id="evolvesHowDiv" class="info-display-div">
                     <jsp:include page="evolves-how.jsp" />
                 </div>
             </div>

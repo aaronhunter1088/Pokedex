@@ -66,6 +66,7 @@ public class PokedexController extends BaseController
                 new Random().nextInt(pokemon.descriptions().size()) : 0);
         isDarkMode = darkmode != null ? darkmode.equals("true") : isDarkMode;
         mav.addObject("isDarkMode", isDarkMode);
+        mav.addObject("uniqueTypes", getUniqueTypes());
         mav.setViewName("pokedex");
         return mav;
     }

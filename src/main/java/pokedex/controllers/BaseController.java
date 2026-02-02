@@ -599,4 +599,15 @@ public class BaseController
 
         LOGGER.info("Background thread: Total Pokemon of type {}: {}", type, resultList.size());
     }
+
+    protected List<String> getUniqueTypes()
+    {
+        try {
+            return pokemonService.getAllTypes();
+        }
+        catch (Exception e) {
+            LOGGER.error("Error retrieving unique types: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
 }
