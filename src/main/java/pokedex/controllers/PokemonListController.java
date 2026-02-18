@@ -14,21 +14,9 @@ import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
-import skaro.pokeapi.resource.NamedApiResource;
-import skaro.pokeapi.resource.NamedApiResourceList;
-import skaro.pokeapi.resource.pokemon.Pokemon;
-import skaro.pokeapi.resource.pokemon.PokemonSprites;
-import skaro.pokeapi.resource.pokemon.PokemonType;
-import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import static pokedexapi.utilities.Constants.GIF_IMAGE_URL;
-import static pokedexapi.utilities.Constants.OFFICIAL_IMAGE_URL;
 
 @Controller
 public class PokemonListController extends BaseController
@@ -150,11 +138,6 @@ public class PokemonListController extends BaseController
         this.page = 1;
         // Clear the pokemon map to force reload
         this.pokemonMap.clear();
-        // If switching from a type to no filter, clear the filtered cache
-        if (this.chosenType == null && previousType != null) {
-            this.filteredPokemonByType.clear();
-            this.filteringInProgress.clear();
-        }
         LOGGER.info("Type filter set to: {}", this.chosenType);
         return ResponseEntity.ok().body("chosenType set");
     }
