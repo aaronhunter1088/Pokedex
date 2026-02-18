@@ -56,9 +56,7 @@
         </style>
     </head>
 
-    <body style="justify-content:space-evenly;text-align:center;"
-            class="${isDarkMode?'darkmode':'lightmode'}">
-        
+    <body style="justify-content:space-evenly;text-align:center;" class="${isDarkMode?'darkmode':'lightmode'}">
         <!-- Loading Overlay -->
         <div id="loadingOverlay">
             <div id="loadingContent">
@@ -100,7 +98,9 @@
             <div id="searchForPkmn" style="display:flex;">
                 <label for="searchForPkmn"></label>
                 <input id="search" name="search" type="text" placeholder="Name or ID" style="width:100px;"/>
-                <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search for Pkmn</button>
+                <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+                     class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
+                     onclick="searchForPkmn(${isDarkMode})">
             </div>
             &emsp;
             <div id="jumpToPage" style="display:flex;">
@@ -200,7 +200,7 @@
         $(function(){
             updateGifToggle(false, "${showGifs}");
 
-            let ids = ${pokemonIds};
+            let ids = "${pokemonIds}".replace(/[\[\]]/g, '').split(',').map(id => id.trim());
             for(let i=0; i<ids.length; i++) {
                 let pokemonBox = document.getElementById("pokemon"+(ids[i])+"Box");
                 let currentColor = pokemonBox.style.backgroundColor;
@@ -406,7 +406,7 @@
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
                         location.reload();
 
-                        let ids = ${pokemonIds};
+                        let ids = "${pokemonIds}".replace(/[\[\]]/g, '').split(',').map(id => id.trim());
                         for(let i=0; i<ids.length; i++) {
                             let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");
                             let currentColor = pokemonBox.style.backgroundColor;
@@ -473,7 +473,7 @@
                 // update heading text with selectedType
                 const heading = $("#loadingHeader");
                 if (heading) {
-                    heading.text('Fetching all ' + selectedType + ' Pok&#233mon');
+                    heading.html('Fetching all ' + selectedType + ' Pok&#233mon');
                 }
 
             }
@@ -487,7 +487,11 @@
         }
 
         function navigateToLandingPage() {
-            window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            return isMobile
+                ? window.location.href = 'http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}'
+                : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
+
         }
 
     </script>
