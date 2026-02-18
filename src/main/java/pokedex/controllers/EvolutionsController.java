@@ -90,7 +90,8 @@ public class EvolutionsController extends BaseController
     private void setupEvolutions()
     {
         pokemonFamilyIDs = pokemonIDToEvolutionChainMap.get(pokemonChainID);
-        if (pokemonFamilyIDs != null && pokemonFamilyIDs.size() != 1) {
+        if (pokemonFamilyIDs != null &&
+                (pokemonFamilyIDs.size() != 1 || pokemonFamilyIDs.getFirst().size() != 1)) {
             setFamilySize();
             setStages();
             setAllIDs();
