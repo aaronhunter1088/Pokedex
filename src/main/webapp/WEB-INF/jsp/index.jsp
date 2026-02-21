@@ -487,10 +487,11 @@
         }
 
         function navigateToLandingPage() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            return isMobile
-                ? window.location.href = 'http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}'
-                : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
+            //const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            //return isMobile && (env === 'dev' || env === 'local')
+            //    ? window.location.href = 'http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}'
+            //    : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
+            return window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
 
         }
 
