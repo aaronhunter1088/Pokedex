@@ -63,7 +63,7 @@
         width: 60%;
         height: auto;
     }
-    
+
     /* Menu button */
     .mobile-menu-button {
         background: dodgerblue;
@@ -105,15 +105,22 @@
         top: 0;
         right: -100%;
         width: 80%;
-        max-width: 300px;
-        height: 100%;
+        max-width: 400px;
+        height: 100vh;
         background-color: white;
-        z-index: 1002;
-        padding: 60px 20px 40px 20px;
-        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        transition: right 0.3s ease-in-out;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+
+        transition: right 0.3s ease;
+        z-index: 1001;
+        overflow-y: auto;
+        padding: 80px 20px 80px; /* increased top padding so top controls (close/toggles) don't overlap */
+        padding-bottom: 80px; /* Extra padding at bottom for last item */
+    }
+
+    /* ensure close button renders above menu content */
+    .mobile-menu .mobile-menu-close {
+        z-index: 1002;
     }
     
     .mobile-menu.darkmode {
