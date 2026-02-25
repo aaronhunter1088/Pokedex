@@ -127,7 +127,7 @@
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
                 <c:set var="pokemonId" value="${pokemon.value.id}" />
                 <div id="pokemon${pokemonId}">
-                    <a href="pokedex/${pokemon.value.id}?darkmode=${isDarkMode}">
+                    <a href="pokedexEntry/${pokemon.value.id}?darkmode=${isDarkMode}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
                                 <h3 id="name" style="color:black;">${pokemon.value.name.substring(0,1).toUpperCase()}${pokemon.value.name.substring(1)}</h3>
@@ -356,7 +356,7 @@
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
                         let url = '';
                         if (nameOrId) {
-                            url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+                            url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
                         }
                         console.log('Navigating to: ' + url);
                         window.location.href = url; // navigates like a normal link
@@ -472,12 +472,15 @@
         }
 
         function navigateToLandingPage() {
-            //const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             //return isMobile && (env === 'dev' || env === 'local')
             //    ? window.location.href = 'http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}'
             //    : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
-            return window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
-
+            let url = '';
+            url = isMobile
+                ? `http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}`
+                : `http://localhost:4200?tileNumber=1&darkmode=${isDarkMode}`;
+            window.location.href = url;
         }
 
     </script>

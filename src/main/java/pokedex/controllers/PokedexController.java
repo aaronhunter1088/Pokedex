@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +33,9 @@ public class PokedexController extends BaseController
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")
-    public ModelAndView pokedex(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav,
-                                HttpSession httpSession,
-                                @RequestParam(name = "darkmode", required = false) String darkmode)
+    public ModelAndView pokedexEntry(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav,
+                                     HttpSession httpSession,
+                                     @RequestParam(name = "darkmode", required = false) String darkmode)
     {
         @SuppressWarnings("unchecked")
         Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
