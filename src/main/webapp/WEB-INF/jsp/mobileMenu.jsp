@@ -56,21 +56,6 @@
     </div>
 
     <div class="mobile-menu-item">
-        <label for="typeDropdownMobile">Filter by Type</label>
-        <select id="typeDropdownMobile" title="Type" class="icon" onchange="getByPkmnType(this);">
-            <option value="none" selected>Type (All)</option>
-            <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
-                <c:if test="${chosenType.equals(type)}">
-                    <option value="${type}" selected>${type}</option>
-                </c:if>
-                <c:if test="${!chosenType.equals(type)}">
-                    <option value="${type}">${type}</option>
-                </c:if>
-            </c:forEach>
-        </select>
-    </div>
-
-    <div class="mobile-menu-item">
         <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
                 title="Return to Landing Page">
             Back to Landing Page

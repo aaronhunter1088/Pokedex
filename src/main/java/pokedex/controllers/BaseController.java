@@ -226,100 +226,103 @@ public class BaseController
 
     protected Map<Integer, Pokemon> updateSessionMap(Map<Integer, Pokemon> pokemonMap)
     {
-        if (chosenType != null && !"none".equals(chosenType)) {
-            // Use putIfAbsent to avoid race conditions
-            List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
-            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(chosenType, synchronizedList);
-            
-            if (existingList == null) {
-                // We successfully added the type, so we should fetch it
-                LOGGER.info("Type {} not yet cached, starting fetch", chosenType);
-                filteringInProgress.put(chosenType, true);
-                
-                // Start background thread to fetch all Pokemon
-                filterExecutor.submit(() -> {
-                    try {
-                        fetchAllPokemonByType(chosenType, synchronizedList);
-                    } finally {
-                        filteringInProgress.put(chosenType, false);
-                        LOGGER.info("Completed gathering all Pokemon of type: {}", chosenType);
-                    }
-                });
-            }
-            
-            // Get the list for this type
-            List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
-            
-            // Determine how many Pokemon we need for the current page
-            int startIndex = (page - 1) * pkmnPerPage;
-            int minRequired = startIndex + pkmnPerPage;
-            
-            LOGGER.info("Waiting for at least {} Pokemon of type {} (page {} needs {}..{})", 
-                minRequired, chosenType, page, startIndex, minRequired);
-            
-            int waitCount = 0;
-            // Wait up to 3 seconds for minimum required Pokemon
-            int maxWait = MAX_WAIT_ITERATIONS;
-            
-            // Wait only until we have enough Pokemon for the requested page
-            while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
-                int currentCount;
-                synchronized (allOfType) {
-                    currentCount = allOfType.size();
-                }
-                
-                // If we have enough Pokemon for the current page, we can stop waiting
-                if (currentCount >= minRequired) {
-                    LOGGER.info("Found {} Pokemon of type {}, sufficient for page {}", currentCount, chosenType, page);
-                    break;
-                }
-                
-                try {
-                    Thread.sleep(WAIT_INTERVAL_MS);
-                    waitCount++;
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    LOGGER.error("Interrupted while waiting for Pokemon", e);
-                    break;
-                }
-            }
-            
-            // Check if fetching is still in progress
-            boolean stillFetching = filteringInProgress.getOrDefault(chosenType, false);
-            int currentSize;
-            synchronized (allOfType) {
-                currentSize = allOfType.size();
-            }
-            
-            if (stillFetching) {
-                LOGGER.info("Fetching still in progress for type {}, but have {} Pokemon to display (continuing in background)", 
-                    chosenType, currentSize);
-                // Use current size as temporary total, will be updated when fetching completes
-                totalPokemon = currentSize;
-            } else {
-                // Fetching complete, use final count
-                totalPokemon = currentSize;
-                LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
-            }
-            
-            int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
-
-            this.pokemonMap.clear();
-            if (startIndex < totalPokemon) {
-                synchronized (allOfType) {
-                    List<Pokemon> pageOfPokemon = new ArrayList<>(allOfType.subList(startIndex, endIndex));
-                    for (Pokemon pkmn : pageOfPokemon) {
-                        this.pokemonMap.put(pkmn.id(), pkmn);
-                    }
-                }
-            }
-            
-            return this.pokemonMap;
-        } else {
-            // No filter, use normal pagination
-            this.pokemonMap = getPokemonMap();
-            return this.pokemonMap;
-        }
+        this.pokemonMap = getPokemonMap();
+        return this.pokemonMap;
+        // TODO: Fix filterByType
+//        if (chosenType != null && !"none".equals(chosenType)) {
+//            // Use putIfAbsent to avoid race conditions
+//            List<Pokemon> synchronizedList = Collections.synchronizedList(new ArrayList<>());
+//            List<Pokemon> existingList = filteredPokemonByType.putIfAbsent(chosenType, synchronizedList);
+//
+//            if (existingList == null) {
+//                // We successfully added the type, so we should fetch it
+//                LOGGER.info("Type {} not yet cached, starting fetch", chosenType);
+//                filteringInProgress.put(chosenType, true);
+//
+//                // Start background thread to fetch all Pokemon
+//                filterExecutor.submit(() -> {
+//                    try {
+//                        fetchAllPokemonByType(chosenType, synchronizedList);
+//                    } finally {
+//                        filteringInProgress.put(chosenType, false);
+//                        LOGGER.info("Completed gathering all Pokemon of type: {}", chosenType);
+//                    }
+//                });
+//            }
+//
+//            // Get the list for this type
+//            List<Pokemon> allOfType = filteredPokemonByType.get(chosenType);
+//
+//            // Determine how many Pokemon we need for the current page
+//            int startIndex = (page - 1) * pkmnPerPage;
+//            int minRequired = startIndex + pkmnPerPage;
+//
+//            LOGGER.info("Waiting for at least {} Pokemon of type {} (page {} needs {}..{})",
+//                minRequired, chosenType, page, startIndex, minRequired);
+//
+//            int waitCount = 0;
+//            // Wait up to 3 seconds for minimum required Pokemon
+//            int maxWait = MAX_WAIT_ITERATIONS;
+//
+//            // Wait only until we have enough Pokemon for the requested page
+//            while (filteringInProgress.getOrDefault(chosenType, false) && waitCount < maxWait) {
+//                int currentCount;
+//                synchronized (allOfType) {
+//                    currentCount = allOfType.size();
+//                }
+//
+//                // If we have enough Pokemon for the current page, we can stop waiting
+//                if (currentCount >= minRequired) {
+//                    LOGGER.info("Found {} Pokemon of type {}, sufficient for page {}", currentCount, chosenType, page);
+//                    break;
+//                }
+//
+//                try {
+//                    Thread.sleep(WAIT_INTERVAL_MS);
+//                    waitCount++;
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                    LOGGER.error("Interrupted while waiting for Pokemon", e);
+//                    break;
+//                }
+//            }
+//
+//            // Check if fetching is still in progress
+//            boolean stillFetching = filteringInProgress.getOrDefault(chosenType, false);
+//            int currentSize;
+//            synchronized (allOfType) {
+//                currentSize = allOfType.size();
+//            }
+//
+//            if (stillFetching) {
+//                LOGGER.info("Fetching still in progress for type {}, but have {} Pokemon to display (continuing in background)",
+//                    chosenType, currentSize);
+//                // Use current size as temporary total, will be updated when fetching completes
+//                totalPokemon = currentSize;
+//            } else {
+//                // Fetching complete, use final count
+//                totalPokemon = currentSize;
+//                LOGGER.info("Total Pokemon of type {}: {}", chosenType, totalPokemon);
+//            }
+//
+//            int endIndex = Math.min(startIndex + pkmnPerPage, totalPokemon);
+//
+//            this.pokemonMap.clear();
+//            if (startIndex < totalPokemon) {
+//                synchronized (allOfType) {
+//                    List<Pokemon> pageOfPokemon = new ArrayList<>(allOfType.subList(startIndex, endIndex));
+//                    for (Pokemon pkmn : pageOfPokemon) {
+//                        this.pokemonMap.put(pkmn.id(), pkmn);
+//                    }
+//                }
+//            }
+//
+//            return this.pokemonMap;
+//        } else {
+//            // No filter, use normal pagination
+//            this.pokemonMap = getPokemonMap();
+//            return this.pokemonMap;
+//        }
     }
 
     public Map<Integer, Pokemon> getPokemonMap()

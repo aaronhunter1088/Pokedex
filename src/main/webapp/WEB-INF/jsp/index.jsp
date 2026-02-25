@@ -115,21 +115,6 @@
                 <button class="icon" onclick="setPkmnPerPage();" title="Show Pok&#233mon">Show Pok&#233mon</button>
             </div>
             &emsp;
-            <div id="typeList" style="display:flex;">
-                <label for="typeDropdown"></label>
-                <select id="typeDropdown" title="Type" class="icon" onchange="getByPkmnType(this);">
-                    <option value="none" selected>Type (All)</option>
-                    <c:forEach items="${uniqueTypes}" var="type" varStatus="status">
-                        <c:if test="${chosenType.equals(type)}">
-                            <option value="${type}" selected>${type}</option>
-                        </c:if>
-                        <c:if test="${!chosenType.equals(type)}">
-                            <option value="${type}">${type}</option>
-                        </c:if>
-                    </c:forEach>
-                </select>
-            </div>
-            &emsp;
             <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
                     title="Return to Landing Page">
                 Back to Landing Page
