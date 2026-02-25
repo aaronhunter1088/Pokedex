@@ -33,7 +33,7 @@ public class PokedexController extends BaseController
         super(pokemonService, pokeApiClient, null, objectMapper);
     }
 
-    @GetMapping(value = "/pokedex/{nameOrId}")
+    @GetMapping(value = "/pokedexEntry/{nameOrId}")
     public ModelAndView pokedex(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav,
                                 HttpSession httpSession,
                                 @RequestParam(name = "darkmode", required = false) String darkmode)

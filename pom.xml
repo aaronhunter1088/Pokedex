@@ -19,9 +19,9 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <outputDirectory>${basedir}/dist/${project.version}</outputDirectory>
         <main.class>pokedex.PokedexApplication</main.class>
-        <springdoc.openapi.swagger-ui>http://localhost:4201/pokedexapi/swagger-ui/index.html
+        <springdoc.openapi.swagger-ui>http://localhost:4201/springboot/swagger-ui/index.html
         </springdoc.openapi.swagger-ui>
-        <springdoc.openapi.url>http://localhost:4201/pokedexapi/v3/api-docs</springdoc.openapi.url>
+        <springdoc.openapi.url>http://localhost:4201/springboot/v3/api-docs</springdoc.openapi.url>
 
         <jakarta.servlet.jstl.version>3.0.1</jakarta.servlet.jstl.version>
         <jakarta.servlet.jstl-api.version>3.0.2</jakarta.servlet.jstl-api.version>

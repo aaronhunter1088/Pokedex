@@ -63,7 +63,7 @@
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     let url = '';
                     if (nameOrId) {
-                        url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+                        url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
                     }
                     console.log('Navigating to: ' + url);
                     window.location.href = url; // navigates like a normal link
