@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,9 +48,10 @@ public class EvolvesHowController extends BaseController
     @Autowired
     public EvolvesHowController(PokemonApiService pokemonService,
                                 PokeApiClient pokeApiClient,
-                                ObjectMapper objectMapper)
+                                ObjectMapper objectMapper,
+                                Environment environment)
     {
-        super(pokemonService, pokeApiClient, null, objectMapper);
+        super(pokemonService, pokeApiClient, null, objectMapper, environment);
     }
 
     @GetMapping(value = "/evolves-how")

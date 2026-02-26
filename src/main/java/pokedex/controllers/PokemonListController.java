@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import skaro.pokeapi.client.PokeApiClient;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Controller
 public class PokemonListController extends BaseController
@@ -31,9 +33,10 @@ public class PokemonListController extends BaseController
     public PokemonListController(PokemonApiService pokemonService,
                                  PokeApiClient pokeApiClient,
                                  PokemonLocationEncounterService pokemonLocationEncounterService,
-                                 ObjectMapper objectMapper)
+                                 ObjectMapper objectMapper,
+                                 Environment environment)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper);
+        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper, environment);
     }
 
     @GetMapping("/")
@@ -72,6 +75,9 @@ public class PokemonListController extends BaseController
         isDarkMode = darkmode.equals("true");
         mav.addObject("isDarkMode", isDarkMode);
         mav.addObject("baseUrl", baseUrl);
+        mav.addObject("env",
+                Arrays.asList(environment.getActiveProfiles())
+                        .contains("production") ? "production" : "dev");
         mav.setViewName("index");
         return mav;
     }

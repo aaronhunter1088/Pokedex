@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,9 +44,10 @@ public class EvolutionsController extends BaseController
     public EvolutionsController(PokemonApiService pokemonService,
                                 PokeApiClient pokeApiClient,
                                 PokemonLocationEncounterService pokemonLocationEncounterService,
-                                ObjectMapper objectMapper)
+                                ObjectMapper objectMapper,
+                                Environment environment)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper);
+        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper, environment);
         resetEvolutionParameters();
     }
 

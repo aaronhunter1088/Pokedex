@@ -7,6 +7,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import pokedexapi.service.PokemonApiService;
 import pokedexapi.service.PokemonLocationEncounterService;
@@ -43,7 +44,8 @@ public class BaseController
     protected final PokemonApiService pokemonService;
     protected final PokeApiClient pokeApiClient;
     protected final PokemonLocationEncounterService pokemonLocationEncounterService;
-    private final ObjectMapper objectMapper;
+    protected final ObjectMapper objectMapper;
+    protected final Environment environment;
     @Value("${skaro.pokeapi.baseUri}")
     protected String pokeApiBaseUrl;
     protected String pokemonId = "";
@@ -68,12 +70,14 @@ public class BaseController
     public BaseController(PokemonApiService pokemonService,
                           PokeApiClient pokeApiClient,
                           PokemonLocationEncounterService pokemonLocationEncounterService,
-                          ObjectMapper objectMapper)
+                          ObjectMapper objectMapper,
+                          Environment environment)
     {
         this.pokemonService = pokemonService;
         this.pokeApiClient = pokeApiClient;
         this.pokemonLocationEncounterService = pokemonLocationEncounterService;
         this.objectMapper = objectMapper;
+        this.environment = environment;
     }
 
     @PreDestroy

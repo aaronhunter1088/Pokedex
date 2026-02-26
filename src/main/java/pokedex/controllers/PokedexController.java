@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,9 +28,10 @@ public class PokedexController extends BaseController
     @Autowired
     public PokedexController(PokemonApiService pokemonService,
                              PokeApiClient pokeApiClient,
-                             ObjectMapper objectMapper)
+                             ObjectMapper objectMapper,
+                             Environment environment)
     {
-        super(pokemonService, pokeApiClient, null, objectMapper);
+        super(pokemonService, pokeApiClient, null, objectMapper, environment);
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")
