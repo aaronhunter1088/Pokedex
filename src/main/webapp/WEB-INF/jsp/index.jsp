@@ -134,32 +134,44 @@
                                 <div style="display: block;">&nbsp;&nbsp;&nbsp;&nbsp;</div>
                                 <h3 id="id" style="color:black;">ID: ${pokemon.value.id}</h3>
                             </div>
+                            <c:set var="defaultImagePresent" value="${pokemonSprites.get(pokemon.value.name)['defaultImagePresent']}" />
+                            <c:set var="gifImagePresent" value="${pokemonSprites.get(pokemon.value.name)['gifImagePresent']}" />
+
                             <div id="image">
                                 <c:choose>
-                                    <c:when test="${pokemon.value.defaultImage != null}">
-                                        <c:if test="${!showGifs}">
-                                            <img onmouseover="showArtwork(this, '${pokemon.value.officialImage}')" onmouseout="showArtwork(this, '${pokemon.value.defaultImage}');"
-                                                 src="${pokemon.value.defaultImage}" alt="${pokemon.value.name}-default" style="height:200px;width:200px;">
-                                        </c:if>
-                                        <c:if test="${showGifs && pokemon.value.gifImage != null}">
-                                            <img src="${pokemon.value.gifImage}" alt="${pokemon.value.name}-gif" style="height:200px;width:200px;">
-                                        </c:if>
-                                        <c:if test="${showGifs && pokemon.value.gifImage == null}">
-                                            <c:if test="${pokemon.value.officialImage != null}">
-                                                <img src="${pokemon.value.officialImage}" alt="${pokemon.value.name}-official">
-                                            </c:if>
-                                            <c:if test="${pokemon.value.officialImage == null}">
-                                                <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found">
-                                            </c:if>
-                                        </c:if>
+                                    <c:when test="${defaultImagePresent}">
+                                        <c:choose>
+                                            <c:when test="${showGifs and gifImagePresent}">
+                                                <img src="${pokemonSprites.get(pokemon.value.name)['gif']}" alt="${pokemon.value.name}-gif" style="height:200px;width:200px;">
+                                            </c:when>
+                                            <c:when test="${showGifs}">
+                                                <c:choose>
+                                                    <c:when test="${pokemonSprites.get(pokemon.value.name)['official']}">
+                                                        <img src="${pokemonSprites.get(pokemon.value.name)['official']}" alt="${pokemon.value.name}-official" style="height:200px;width:200px;">
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found" style="height:200px;width:200px;">
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img onmouseover="showArtwork(this, '${pokemon.value.officialImage}')"
+                                                     onmouseout="showArtwork(this, '${pokemon.value.defaultImage}');"
+                                                     src="${pokemonSprites.get(pokemon.value.name)['front']}"
+                                                     alt="${pokemon.value.name}-default"
+                                                     style="height:200px;width:200px;">
+                                            </c:otherwise>
+                                        </c:choose>
                                     </c:when>
-                                    <c:otherwise> <!-- officialImage -->
-                                        <c:if test="${pokemon.value.officialImage != null}">
-                                            <img src="${pokemon.value.officialImage}" alt="${pokemon.value.name}-official">
-                                        </c:if>
-                                        <c:if test="${pokemon.value.officialImage == null}">
-                                            <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found">
-                                        </c:if>
+                                    <c:otherwise>
+                                        <c:choose>
+                                            <c:when test="${not empty pokemonSprites.get(pokemon.value.name)['official']}">
+                                                <img src="${pokemonSprites.get(pokemon.value.name)['official']}" alt="${pokemon.value.name}-official" style="height:200px;width:200px;">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found" style="height:200px;width:200px;">
+                                            </c:otherwise>
+                                        </c:choose>
                                     </c:otherwise>
                                 </c:choose>
                             </div>

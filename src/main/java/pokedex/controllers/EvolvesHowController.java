@@ -47,11 +47,11 @@ public class EvolvesHowController extends BaseController
 
     @Autowired
     public EvolvesHowController(PokemonApiService pokemonService,
-                                PokeApiClient pokeApiClient,
+                                //PokeApiClient pokeApiClient,
                                 ObjectMapper objectMapper,
                                 Environment environment)
     {
-        super(pokemonService, pokeApiClient, null, objectMapper, environment);
+        super(pokemonService, null, objectMapper, environment);
     }
 
     @GetMapping(value = "/evolves-how")

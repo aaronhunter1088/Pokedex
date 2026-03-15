@@ -42,12 +42,12 @@ public class EvolutionsController extends BaseController
 
     @Autowired
     public EvolutionsController(PokemonApiService pokemonService,
-                                PokeApiClient pokeApiClient,
+                                //PokeApiClient pokeApiClient,
                                 PokemonLocationEncounterService pokemonLocationEncounterService,
                                 ObjectMapper objectMapper,
                                 Environment environment)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper, environment);
+        super(pokemonService, pokemonLocationEncounterService, objectMapper, environment);
         resetEvolutionParameters();
     }
 
@@ -55,7 +55,7 @@ public class EvolutionsController extends BaseController
     public ModelAndView getEvolutions(@PathVariable String pokemonId, ModelAndView mav,
                                       @RequestParam(name = "darkmode", required = false, defaultValue = "false") String darkmode)
     {
-        pokemonMap = updateSessionMap(pokemonMap);
+        //updateSessionMap();
         resetEvolutionParameters();
         this.pokemonId = pokemonId;
         this.pokemonChainID = getEvolutionChainID(pokemonIDToEvolutionChainMap, pokemonId);

@@ -21,11 +21,11 @@ public class SearchController extends BaseController
 
     @Autowired
     public SearchController(PokemonApiService pokemonService,
-                            PokeApiClient pokeApiClient,
+                            //PokeApiClient pokeApiClient,
                             ObjectMapper objectMapper,
                             Environment environment)
     {
-        super(pokemonService, pokeApiClient, null, objectMapper, environment);
+        super(pokemonService, null, objectMapper, environment);
     }
 
     @GetMapping("/search")

@@ -16,6 +16,7 @@ import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 import tools.jackson.databind.ObjectMapper;
 
+import java.net.http.HttpResponse;
 import java.util.Map;
 import java.util.Random;
 
@@ -27,11 +28,11 @@ public class PokedexController extends BaseController
 
     @Autowired
     public PokedexController(PokemonApiService pokemonService,
-                             PokeApiClient pokeApiClient,
+                             //PokeApiClient pokeApiClient,
                              ObjectMapper objectMapper,
                              Environment environment)
     {
-        super(pokemonService, pokeApiClient, null, objectMapper, environment);
+        super(pokemonService, null, objectMapper, environment);
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")
@@ -40,8 +41,8 @@ public class PokedexController extends BaseController
                                      @RequestParam(name = "darkmode", required = false) String darkmode)
     {
         @SuppressWarnings("unchecked")
-        Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
-        pokemonMap = updateSessionMap(pokemonMap);
+        //Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
+        //updateSessionMap();
         Pokemon pokemon = null;
         try { pokemon = pokemonMap.get(nameOrId); }
         catch (Exception _) {
@@ -80,10 +81,16 @@ public class PokedexController extends BaseController
             speciesData = pokemonService.getPokemonSpeciesData(String.valueOf(pokemon.id()));
         }
         catch (Exception e) {
-            logger.error("No species data found using {}", pokemon.id());
+            logger.warn("No species data found using {}", pokemon.id());
             logger.info("Trying with species: {}, url: {}", pokemon.species().name(), pokemon.species().url());
-            Pokemon speciesPkmn = pokemonService.getPokemonByIdOrName(pokemon.species().name());
-            speciesData = pokemonService.getPokemonSpeciesData(speciesPkmn.id().toString());
+            try {
+                HttpResponse<String> data = pokemonService.callUrl(pokemon.species().url());
+                if (data.statusCode() == 200) {
+                    speciesData = objectMapper.readValue(data.body(), PokemonSpecies.class);
+                }
+            } catch (Exception e2) {
+                logger.warn("No species data found using {}", pokemon.id());
+            }
         }
         try {
             pokemon = createPokemon(pokemon, speciesData);

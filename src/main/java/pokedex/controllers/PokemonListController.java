@@ -5,6 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jackson.autoconfigure.JacksonProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,9 @@ import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
 import pokedexapi.service.PokemonLocationEncounterService;
 import skaro.pokeapi.client.PokeApiClient;
+import skaro.pokeapi.resource.pokemon.OtherSprites;
+import skaro.pokeapi.resource.pokemon.Pokemon;
+import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -26,17 +30,17 @@ public class PokemonListController extends BaseController
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(PokemonListController.class);
 
-    @Value("${app.base.url}")
-    private String baseUrl;
+//    @Value("${app.base.url}")
+//    private String baseUrl;
 
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
-                                 PokeApiClient pokeApiClient,
+                                 //PokeApiClient pokeApiClient,
                                  PokemonLocationEncounterService pokemonLocationEncounterService,
                                  ObjectMapper objectMapper,
                                  Environment environment)
     {
-        super(pokemonService, pokeApiClient, pokemonLocationEncounterService, objectMapper, environment);
+        super(pokemonService, pokemonLocationEncounterService, objectMapper, environment);
     }
 
     @GetMapping("/")
@@ -45,10 +49,9 @@ public class PokemonListController extends BaseController
     {
 
         lastPageSearched = page;
-        if (pokemonMap.isEmpty() || chosenType != null) {
+        if (pokemonMap.isEmpty()) { // || chosenType != null) {
             //pokemonMap.clear();
-            pokemonMap = updateSessionMap(pokemonMap);
-            //httpSession.setAttribute("pokemonMap", pokemonMap);
+            updateSessionMap();
         }
         
         // Start retroactive fetching of Pokemon by type in the background
@@ -60,11 +63,10 @@ public class PokemonListController extends BaseController
 //        }
         
         mav.addObject("pokemonMap", pokemonMap);
+        mav.addObject("pokemonSprites", getPokemonSprites());
         this.page = lastPageSearched;
         mav.addObject("pokemonIds", new ArrayList<>(pokemonMap.keySet()));
-        //mav.addObject("defaultImagePresent", defaultImagePresent);
-        //mav.addObject("officialImagePresent", officialImagePresent);
-        //mav.addObject("gifImagePresent", gifImagePresent);
+        mav.addObject("defaultImagePresent", defaultImagePresent);
         mav.addObject("showGifs", showGifs);
         mav.addObject("pkmnPerPage", pkmnPerPage);
         mav.addObject("totalPokemon", totalPokemon);
@@ -74,7 +76,7 @@ public class PokemonListController extends BaseController
         mav.addObject("chosenType", chosenType);
         isDarkMode = darkmode.equals("true");
         mav.addObject("isDarkMode", isDarkMode);
-        mav.addObject("baseUrl", baseUrl);
+        //mav.addObject("baseUrl", baseUrl);
         mav.addObject("env",
                 Arrays.asList(environment.getActiveProfiles())
                         .contains("production") ? "production" : "dev");
@@ -86,8 +88,8 @@ public class PokemonListController extends BaseController
     @ResponseBody
     public Boolean toggleGifs()
     {
-        LOGGER.info("showGifs: {}", !showGifs);
         showGifs = !showGifs;
+        LOGGER.info("showGifs: {}", showGifs);
         return showGifs;
     }
 
