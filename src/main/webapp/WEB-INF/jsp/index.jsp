@@ -478,7 +478,7 @@
             //    : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
             let url = '';
             url = `${env}` !== 'prod' && isMobile
-                ? `http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}`
+                ? `http://`+window.location.hostname+`:4200?tileNumber=1&darkmode=${isDarkMode}`
                 : `http://localhost:4200?tileNumber=1&darkmode=${isDarkMode}`;
             url = `${env}` === 'production' ? `https://mypokedex.us?tileNumber=1&darkmode=${isDarkMode}` : url;
             window.location.href = url;
