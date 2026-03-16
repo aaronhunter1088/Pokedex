@@ -18,7 +18,7 @@
     <h4 style="vertical-align: middle;">
         <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
         <label for="search" style="display:none;"></label>
-        <input id="search" name="nameOrId" placeholder="Pokemon Name/ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
+        <input id="search" name="nameOrId" placeholder="Name or ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
         <img alt="Get Pokémon"
              src="${pageContext.request.contextPath}/images/pokeball1.jpg"
              style="width:30px; height:30px; cursor: pointer;"

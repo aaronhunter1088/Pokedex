@@ -100,7 +100,7 @@
                 <label for="search" style="display:none;"></label>
                 <input id="search" name="search" type="text" placeholder="Name or ID" style="width:100px;"/>
                 <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
-                     class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
+                     class="button cursor" title="Search for Pokemon" style="height:30px;width:30px;"
                      onclick="searchForPkmn(${isDarkMode})">
             </div>
             &emsp;
@@ -116,7 +116,7 @@
                 <label for="showPkmnNumber"></label>
                 <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:75px;"/>
                 <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
-                   onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">
+                   onclick="setPkmnPerPage();" title="Show Pok&#233mon">
                 </i>
             </div>
             &emsp;
