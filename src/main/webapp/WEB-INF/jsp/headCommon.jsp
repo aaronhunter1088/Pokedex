@@ -35,14 +35,19 @@
 
 <!-- Common styling -->
 <style>
+    html * {
+        margin: 0;
+    }
     html {
         background-position: center center;
         background-repeat: no-repeat;
         background-attachment: fixed;
         background-size: cover;
+        height: 100%;
     }
 
     body {
+        height: 100%;
         display: block;
         margin: 8px;
         background-position: center center;
@@ -83,7 +88,24 @@
         background-color: black;
         color: white;
     }
-    .darkmode input {
+    .lightmode input {
         color: black !important;
+        background-color: white !important;
+    }
+    .darkmode input {
+        color: white !important;
+        background-color: black !important;
+    }
+    .back-to-landing-btn {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
     }
 </style>

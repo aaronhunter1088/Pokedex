@@ -27,12 +27,31 @@
         <jakarta.servlet.jstl-api.version>3.0.2</jakarta.servlet.jstl-api.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <pokedex.api.version>1.6.0</pokedex.api.version>
+        <spring.boot.version>4.1.0-M2</spring.boot.version>
         <taglibs.standard.version>1.2.5</taglibs.standard.version>
         <taglibs.standard.impl.version>1.2.5</taglibs.standard.impl.version>
     </properties>
 
-    <!-- Included in Parent. Left as a reference -->
+    <!-- Included in Parent. Left as a reference
     <dependencyManagement/>
+    -->
+    <!-- swagger-core-jakarta:2.2.38 (latest) declares jackson-annotations:2.20 directly,
+         but jackson-databind:2.21.0 (also pulled in by swagger) requires jackson-annotations:2.21
+         (JsonSerializeAs was added there). Maven resolves annotations down to 2.20, causing
+         NoClassDefFoundError at startup. Pin to 2.21.0 to align the whole 2.x family.
+         Note: Jackson 3.x (tools.jackson, used by Spring Boot 4.x) and 2.x (com.fasterxml.jackson,
+         used by swagger-core-jakarta) have different package names and coexist safely.
+         Remove when Swaggerdoc's upgrades to Jackson 3.x. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.21</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Classifier "code" jar contains the main code classes -->

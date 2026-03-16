@@ -17,29 +17,25 @@
 
     <h4 style="vertical-align: middle;">
         <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
-        <input id="search" name="nameOrId" placeholder="Pokemon Name/ID" type="text" style="color:${isDarkMode?'white':'black'} !important;" class="${isDarkMode?'darkmode':'lightmode'}"/>
-        <button type="submit" style="background:none;border:none;padding:0;cursor:zoom-in;" title="Search">
-            <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
-                 class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
-                 onclick="searchForPkmn(${isDarkMode})">
-        </button>
+        <label for="search" style="display:none;"></label>
+        <input id="search" name="nameOrId" placeholder="Pokemon Name/ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
+        <img alt="Get Pokémon"
+             src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+             style="width:30px; height:30px; cursor: pointer;"
+             title="Search for Pkmn"
+             onclick="searchForPkmn('${isDarkMode}');">
     </h4>
-
-    <div id="pokedex" class="${isDarkMode?'darkmode':'lightmode'}"></div>
 
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script type="text/javascript">
     $(function(){
         $('#pokedex').hide();
         //checks whether the pressed key is "Enter"
-        $('#nameOrId').on('keypress', function(e) {
-            if ($('#nameOrId').val() === '') return;
+        $('#search').on('keypress', function(e) {
+            if ($('#search').val() === '') return;
             if (e.code === 'Enter' || e.code === 'Return') {
-                //getPokemonInfo();
-                //getPokemonFromSearch($('#pokemonName').val());
+                searchForPkmn('${isDarkMode}');
             }
         });
     });

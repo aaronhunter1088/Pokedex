@@ -4,8 +4,6 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.jackson.autoconfigure.JacksonProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -14,11 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
-import pokedexapi.service.PokemonLocationEncounterService;
-import skaro.pokeapi.client.PokeApiClient;
-import skaro.pokeapi.resource.pokemon.OtherSprites;
-import skaro.pokeapi.resource.pokemon.Pokemon;
-import skaro.pokeapi.resource.pokemon.PokemonSprites;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
@@ -35,12 +28,10 @@ public class PokemonListController extends BaseController
 
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
-                                 //PokeApiClient pokeApiClient,
-                                 PokemonLocationEncounterService pokemonLocationEncounterService,
                                  ObjectMapper objectMapper,
                                  Environment environment)
     {
-        super(pokemonService, pokemonLocationEncounterService, objectMapper, environment);
+        super(pokemonService, objectMapper, environment);
     }
 
     @GetMapping("/")
@@ -49,18 +40,9 @@ public class PokemonListController extends BaseController
     {
 
         lastPageSearched = page;
-        if (pokemonMap.isEmpty()) { // || chosenType != null) {
-            //pokemonMap.clear();
+        if (pokemonMap.isEmpty()) {
             updateSessionMap();
         }
-        
-        // Start retroactive fetching of Pokemon by type in the background
-        // This will happen after the initial page load and won't block it
-//        if (!retroactiveFetchingStarted.compareAndSet(false, true)) {
-//            LOGGER.info("Retroactive fetching already started, skipping");
-//        } else {
-//            startRetroactiveFetchingByType();
-//        }
         
         mav.addObject("pokemonMap", pokemonMap);
         mav.addObject("pokemonSprites", getPokemonSprites());
@@ -76,7 +58,6 @@ public class PokemonListController extends BaseController
         mav.addObject("chosenType", chosenType);
         isDarkMode = darkmode.equals("true");
         mav.addObject("isDarkMode", isDarkMode);
-        //mav.addObject("baseUrl", baseUrl);
         mav.addObject("env",
                 Arrays.asList(environment.getActiveProfiles())
                         .contains("production") ? "production" : "dev");

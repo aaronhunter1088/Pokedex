@@ -32,27 +32,36 @@
     <div class="mobile-menu-item mobile-gif-item">
         <label>${isDarkMode ? 'Turn on Light Mode' : 'Turn on Dark Mode'}</label>
         <label class="switch" title="Toggle darkmode">
-            <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''} onclick="toggleDarkmode('${isDarkMode}');">
+            <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''}
+                   onclick="toggleDarkmode('${isDarkMode}');">
             <span class="slider round"></span>
         </label>
     </div>
 
-    <div class="mobile-menu-item">
+    <div class="mobile-menu-item mobile-gif-item">
         <label for="searchMobile">Search for Pkmn</label>
         <input id="searchMobile" name="searchMobile" type="text" placeholder="Name or ID"/>
-        <button class="icon" onclick="searchForPkmn('${isDarkMode}');" title="Search for Pkmn">Search for Pkmn</button>
+        <img alt="Get Pokémon"
+             src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+             style="width:30px; height:30px; cursor: pointer;"
+             title="Search for Pkmn"
+             onclick="searchForPkmn('${isDarkMode}');">
     </div>
 
-    <div class="mobile-menu-item">
+    <div class="mobile-menu-item mobile-gif-item">
         <label for="pageNumberMobile">Jump to Page</label>
         <input id="pageNumberMobile" name="pageNumberMobile" type="text" placeholder="Page #"/>
-        <button class="icon" onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">Go</button>
+        <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
+           onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">
+        </i>
     </div>
 
-    <div class="mobile-menu-item">
+    <div class="mobile-menu-item mobile-gif-item">
         <label for="showPkmnNumberMobile">Pok&#233mon Per Page</label>
         <input id="showPkmnNumberMobile" name="showPkmnNumberMobile" type="text" placeholder="# of PkMn"/>
-        <button class="icon" onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">Show Pok&#233mon</button>
+        <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
+           onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">
+        </i>
     </div>
 
     <div class="mobile-menu-item">
@@ -64,6 +73,16 @@
 </div>
 
 <script>
+    $(function(){
+        //checks whether the pressed key is "Enter"
+        $('#searchMobile').on('keypress', function(e) {
+            if ($('#searchMobile').val() === '') return;
+            if (e.code === 'Enter' || e.code === 'Return') {
+                searchForPkmn('${isDarkMode}');
+            }
+        });
+    });
+
     function toggleMobileMenu() {
         const menu = document.getElementById('mobileMenu');
         const overlay = document.getElementById('mobileMenuOverlay');
@@ -92,10 +111,9 @@
         }
         console.log('nameOrId: ' + nameOrId);
 
-        let response = $.ajax({
+        $.ajax({
             type: "GET",
             url: "/springboot/pokemon/" + nameOrId + "/validateNameOrId",
-            //url: "/springboot/" + nameOrId + "/validateNameOrId",
             async: false,
             dataType: "application/json",
             crossDomain: true,
@@ -105,7 +123,7 @@
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     let url = '';
                     if (nameOrId) {
-                        url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
+                        url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
                     }
                     console.log('Navigating to: ' + url);
                     window.location.href = url; // navigates like a normal link
@@ -175,7 +193,7 @@
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     location.reload();
 
-                    let ids = ${pokemonIds};
+                    let ids = "${pokemonIds}".replace(/[\[\]]/g, '').split(',').map(id => id.trim());
                     for(let i=0; i<ids.length; i++) {
                         let pokemonBox = document.getElementById("pokemon"+(ids[0])+"Box");
                         let currentColor = pokemonBox.style.backgroundColor;

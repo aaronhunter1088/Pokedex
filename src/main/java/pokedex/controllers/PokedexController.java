@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
-import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 import tools.jackson.databind.ObjectMapper;
 
 import java.net.http.HttpResponse;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 @Controller
@@ -28,11 +27,10 @@ public class PokedexController extends BaseController
 
     @Autowired
     public PokedexController(PokemonApiService pokemonService,
-                             //PokeApiClient pokeApiClient,
                              ObjectMapper objectMapper,
                              Environment environment)
     {
-        super(pokemonService, null, objectMapper, environment);
+        super(pokemonService, objectMapper, environment);
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")
@@ -44,16 +42,18 @@ public class PokedexController extends BaseController
         //Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
         //updateSessionMap();
         Pokemon pokemon = null;
-        try { pokemon = pokemonMap.get(nameOrId); }
+        try {
+            pokemon = pokemonMap.get(nameOrId);
+            if (pokemon == null) throw new NullPointerException("Pokemon was not found in the map...");
+        }
         catch (Exception _) {
             logger.warn("Couldn't find {} in pokemonMap", nameOrId);
-            final var pokemonFound = pokemonMap.values().stream()
-                    .anyMatch(pkmn -> pkmn.name().equalsIgnoreCase(nameOrId));
-            if (pokemonFound) {
-                pokemon = pokemonMap.values().stream()
-                        .filter(pkmn -> pkmn.name().equalsIgnoreCase(nameOrId))
-                        .findFirst()
-                        .orElse(null);
+            final Optional<Pokemon> pokemonFound = pokemonMap.values().stream()
+                    .filter(pkmn -> pkmn.id().compareTo(Integer.valueOf(nameOrId)) == 0)
+                    .findFirst();
+            if (pokemonFound.isPresent()) {
+                logger.info("Found pokemon using id versus name");
+                pokemon = pokemonFound.get();
             }
         }
         if (pokemon == null) pokemon = pokemonService.getPokemonByIdOrName(nameOrId);

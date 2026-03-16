@@ -181,6 +181,15 @@
         margin-top: 5px;
         box-sizing: border-box;
     }
+    .darkmode .mobile-menu-item input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        box-sizing: border-box;
+        color: white !important;
+        background-color: black !important;
+    }
+
     
     .mobile-menu-item .switch {
         margin: 10px 0;

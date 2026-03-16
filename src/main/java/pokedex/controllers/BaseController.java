@@ -5,13 +5,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import pokedexapi.service.PokemonApiService;
-import pokedexapi.service.PokemonLocationEncounterService;
-import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
 import skaro.pokeapi.resource.NamedApiResourceList;
@@ -23,7 +19,6 @@ import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import static pokedexapi.utilities.Constants.*;
 
@@ -38,12 +33,8 @@ public class BaseController
     private static final int PROGRESS_LOG_INTERVAL = 50; // Log progress every 50 iterations (5 seconds)
     
     protected final PokemonApiService pokemonService;
-    //protected final PokeApiClient pokeApiClient;
-    protected final PokemonLocationEncounterService pokemonLocationEncounterService;
     protected final ObjectMapper objectMapper;
     protected final Environment environment;
-    @Value("${skaro.pokeapi.baseUri}")
-    protected String pokeApiBaseUrl;
     protected String pokemonId = "";
     protected int page = 1;
     protected int lastPageSearched = 1;
@@ -62,14 +53,10 @@ public class BaseController
 
     @Autowired
     public BaseController(PokemonApiService pokemonService,
-                          //PokeApiClient pokeApiClient,
-                          PokemonLocationEncounterService pokemonLocationEncounterService,
                           ObjectMapper objectMapper,
                           Environment environment)
     {
         this.pokemonService = pokemonService;
-        //this.pokeApiClient = pokeApiClient;
-        this.pokemonLocationEncounterService = pokemonLocationEncounterService;
         this.objectMapper = objectMapper;
         this.environment = environment;
     }
@@ -143,8 +130,7 @@ public class BaseController
         String description = !pokemonDescriptions.isEmpty() ?
                 pokemonDescriptions.get(new Random().nextInt(pokemonDescriptions.size())).getFlavorText().replace("\n", "")
                 : "No description available.";
-        //pokemon.setDescriptions(pokemonDescriptions);
-        //pokemon.setDescription(description);
+
         List<PokemonType> types = pokemon.types();
         String typeString = "";
         if (types.size() > 1) {

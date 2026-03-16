@@ -31,7 +31,7 @@
                                     <div id="pokemon${pokemon.id}"
                                          style="background-color:${pokemon.color};display:inline-block;" class="box">
                                         <div id="idAndName" style="display:inline-flex;">
-                                            <h3 id="${pokemon.name}-name">${pokemon.name}</h3>
+                                            <h3 id="${pokemon.name}-name">${pokemon.name.toUpperCase().substring(0,1)}${pokemon.name.substring(1)}</h3>
                                             <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
                                             <h3 id="${pokemon.id}-id">ID: ${pokemon.id}</h3>
                                         </div>

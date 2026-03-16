@@ -1,10 +1,8 @@
 package pokedex.controllers;
 
-import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +10,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedexapi.service.PokemonApiService;
-import pokedexapi.service.PokemonLocationEncounterService;
-import skaro.pokeapi.client.PokeApiClient;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
 import tools.jackson.databind.ObjectMapper;
@@ -42,12 +38,10 @@ public class EvolutionsController extends BaseController
 
     @Autowired
     public EvolutionsController(PokemonApiService pokemonService,
-                                //PokeApiClient pokeApiClient,
-                                PokemonLocationEncounterService pokemonLocationEncounterService,
                                 ObjectMapper objectMapper,
                                 Environment environment)
     {
-        super(pokemonService, pokemonLocationEncounterService, objectMapper, environment);
+        super(pokemonService, objectMapper, environment);
         resetEvolutionParameters();
     }
 

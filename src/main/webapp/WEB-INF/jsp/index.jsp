@@ -56,7 +56,7 @@
         </style>
     </head>
 
-    <body style="justify-content:space-evenly;text-align:center;" class="${isDarkMode?'darkmode':'lightmode'}">
+    <body class="${isDarkMode?'darkmode':'lightmode'}">
         <!-- Loading Overlay -->
         <div id="loadingOverlay">
             <div id="loadingContent">
@@ -87,7 +87,8 @@
             <label style="margin:10px auto;width:auto;padding-top:0;">Show GIFs</label>
             &emsp;
             <label class="switch" title="Toggle darkmode">
-                <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''} onclick="toggleDarkmode('${isDarkMode}');">
+                <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''}
+                       onclick="toggleDarkmode('${isDarkMode}');">
                 <span class="slider round"></span>
             </label>
             &nbsp;
@@ -96,7 +97,7 @@
             </label>
             &emsp;
             <div id="searchForPkmn" style="display:flex;">
-                <label for="searchForPkmn"></label>
+                <label for="search" style="display:none;"></label>
                 <input id="search" name="search" type="text" placeholder="Name or ID" style="width:100px;"/>
                 <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
                      class="button cursor" title="Find Pokemon" style="height:30px;width:30px;"
@@ -106,13 +107,17 @@
             <div id="jumpToPage" style="display:flex;">
                 <label for="pageNumber"></label>
                 <input id="pageNumber" name="pageNumber" type="text" placeholder="Page #" style="width:50px;"/>
-                <button class="icon" onclick="setPageToView();" title="Jump to Page">Jump to Page</button>
+                <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
+                   onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">
+                </i>
             </div>
             &emsp;
             <div id="showPokemon" style="display:flex;">
                 <label for="showPkmnNumber"></label>
                 <input id="showPkmnNumber" name="showPkmnNumber" type="text" placeholder="# of PkMn" style="width:75px;"/>
-                <button class="icon" onclick="setPkmnPerPage();" title="Show Pok&#233mon">Show Pok&#233mon</button>
+                <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
+                   onclick="setPkmnPerPageMobile();" title="Show Pok&#233mon">
+                </i>
             </div>
             &emsp;
             <button class="back-to-landing-btn icon" onclick="navigateToLandingPage()"
@@ -355,10 +360,9 @@
             }
             console.log('nameOrId: ' + nameOrId);
 
-            let response = $.ajax({
+            $.ajax({
                 type: "GET",
                 url: "/springboot/pokemon/" + nameOrId + "/validateNameOrId",
-                //url: "/springboot/" + nameOrId + "/validateNameOrId",
                 async: false,
                 dataType: "application/json",
                 crossDomain: true,
