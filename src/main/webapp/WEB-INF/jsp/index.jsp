@@ -80,7 +80,7 @@
         <!-- Desktop Controls -->
         <div class="desktop-controls" style="display:inline-flex;align-items:center;">
             <label class="switch" title="If GIF is not present, official artwork will show!">
-                <input id="gifSwitch" type="checkbox" onclick="toggleGifs();">
+                <input id="gifSwitch" type="checkbox" onclick="toggleGifs();" ${showGifs ? 'checked' : ''}>
                 <span class="slider round"></span>
             </label>
             &nbsp;
@@ -126,15 +126,13 @@
             </button>
         </div>
         <br>
-        <jsp:include page="navigation.jsp">
-            <jsp:param name="isDarkMode" value="${isDarkMode}" />
-        </jsp:include>
+        <jsp:include page="navigation.jsp"/>
 
         <div id="pokemonGrid" class="list-grid">
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
                 <c:set var="pokemonId" value="${pokemon.value.id}" />
                 <div id="pokemon${pokemonId}">
-                    <a href="pokedexEntry/${pokemon.value.id}?darkmode=${isDarkMode}">
+                    <a href="pokedexEntry/${pokemon.value.id}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
                                 <h3 id="name" style="color:black;">${pokemon.value.name.substring(0,1).toUpperCase()}${pokemon.value.name.substring(1)}</h3>
@@ -194,9 +192,7 @@
             </c:forEach>
         </div>
 
-        <jsp:include page="navigation.jsp">
-            <jsp:param name="isDarkMode" value="${isDarkMode}" />
-        </jsp:include>
+        <jsp:include page="navigation.jsp"/>
 
     </body>
 

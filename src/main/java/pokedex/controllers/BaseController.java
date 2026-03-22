@@ -8,7 +8,9 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.context.annotation.SessionScope;
 import pokedex.service.DarkmodeService;
+import pokedex.service.GifService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
@@ -38,6 +40,7 @@ public class BaseController
     protected final ObjectMapper objectMapper;
     protected final Environment environment;
     protected final DarkmodeService darkmodeService;
+    protected final GifService gifService;
     protected String pokemonId = "";
     protected int page = 1;
     protected int lastPageSearched = 1;
@@ -49,27 +52,30 @@ public class BaseController
         Math.min(Runtime.getRuntime().availableProcessors() * 2, 20));
     protected final AtomicBoolean retroactiveFetchingStarted = new AtomicBoolean(false);
     int totalPokemon = 0;
-    boolean defaultImagePresent = false,
-            showGifs = false;
+    boolean defaultImagePresent = false;
+    boolean showGifs = false;
     String chosenType;
-    boolean isDarkMode = false; // "light" or "dark"
+    boolean isDarkMode = false;
 
     @Autowired
     public BaseController(PokemonApiService pokemonService,
                           ObjectMapper objectMapper,
                           Environment environment,
-                          DarkmodeService darkmodeService)
+                          DarkmodeService darkmodeService,
+                          GifService gifService)
     {
         this.pokemonService = pokemonService;
         this.objectMapper = objectMapper;
         this.environment = environment;
         this.darkmodeService = darkmodeService;
+        this.gifService = gifService;
     }
 
     @PostConstruct
     public void postConstruct()
     {
         this.isDarkMode = darkmodeService.isDarkmode();
+        this.showGifs = gifService.isShowGifs();
     }
 
     @PreDestroy

@@ -24,7 +24,8 @@
     <div class="mobile-menu-item mobile-gif-item">
         <label>Show GIFs</label>
         <label class="switch" title="If GIF is not present, official artwork will show!">
-            <input id="gifSwitchMobile" type="checkbox" onclick="toggleGifs();">
+            <input id="gifSwitchMobile" type="checkbox" ${showGifs ? 'checked' : ''}
+                   onclick="toggleGifs();">
             <span class="slider round"></span>
         </label>
     </div>
@@ -81,6 +82,7 @@
                 searchForPkmn('${isDarkMode}');
             }
         });
+        $("#gifSwitchMobile").prop("checked", '${showGifs}' === 'true');
     });
 
     function toggleMobileMenu() {
@@ -102,6 +104,81 @@
         menu.classList.remove('active');
         overlay.classList.remove('active');
         document.body.style.overflow = '';
+    }
+
+    function toggleGifs() {
+        $.ajax({
+            type: "GET",
+            url: "../toggleGifs",
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(data) {
+                    updateGifToggle(false, data);
+                },
+                404: function() {
+                    console.log('Failed');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
+        setTimeout(() => {
+            this.closeMobileMenu();
+        }, 500);
+    }
+
+    function toggleDarkmode(updatedDarkmode) {
+        console.log('toggling darkmode: ' + updatedDarkmode);
+        $.ajax({
+            type: "GET",
+            url: "../toggleDarkmode",
+            data: {
+                darkmode: updatedDarkmode
+            },
+            async: false,
+            dataType: "application/json",
+            crossDomain: true,
+            statusCode: {
+                200: function(result) {
+                    //window.location.reload();
+                    console.log('toggleDarkmode: ' + JSON.stringify(result.responseText));
+                    const isDark = result.responseText === 'true';
+                    const $body = $('body');
+                    $body.toggleClass('dark darkmode', isDark);
+                    $body.toggleClass('light lightmode', !isDark);
+                    $("#switchDarkmodeLabel").text(isDark ? 'Dark Mode On' : 'Light Mode On');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                },
+                404: function() {
+                    console.log('Failed');
+                },
+                500: function() {
+                    console.log('Server Error');
+                }
+            }
+        });
+    }
+
+    function updateGifToggle(reload, data) {
+        let showGifs;
+        try {
+            showGifs = JSON.parse(data.responseText);
+        } catch (error) {
+            showGifs = data;
+        }
+        console.log("showGifs: " + showGifs);
+        $("#gifSwitch").attr("checked", showGifs === 'true');
+        $("#gifSwitchMobile").attr("checked", showGifs === 'true');
+        if (reload) {
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        }
     }
 
     function searchForPkmn(isDarkMode) {

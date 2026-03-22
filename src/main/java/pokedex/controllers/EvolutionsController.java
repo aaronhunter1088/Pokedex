@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedex.service.DarkmodeService;
+import pokedex.service.GifService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
@@ -41,9 +42,10 @@ public class EvolutionsController extends BaseController
     public EvolutionsController(PokemonApiService pokemonService,
                                 ObjectMapper objectMapper,
                                 Environment environment,
-                                DarkmodeService darkmodeService)
+                                DarkmodeService darkmodeService,
+                                GifService gifService)
     {
-        super(pokemonService, objectMapper, environment, darkmodeService);
+        super(pokemonService, objectMapper, environment, darkmodeService, gifService);
         resetEvolutionParameters();
     }
 

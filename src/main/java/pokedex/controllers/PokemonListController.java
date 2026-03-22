@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import pokedex.service.DarkmodeService;
+import pokedex.service.GifService;
 import pokedexapi.service.PokemonApiService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -29,9 +30,10 @@ public class PokemonListController extends BaseController
     public PokemonListController(PokemonApiService pokemonService,
                                  ObjectMapper objectMapper,
                                  Environment environment,
-                                 DarkmodeService darkmodeService)
+                                 DarkmodeService darkmodeService,
+                                 GifService gifService)
     {
-        super(pokemonService, objectMapper, environment, darkmodeService);
+        super(pokemonService, objectMapper, environment, darkmodeService, gifService);
     }
 
     @GetMapping("/")
@@ -50,6 +52,7 @@ public class PokemonListController extends BaseController
         //Object sessionDarkMode = httpSession.getAttribute("isDarkMode");
         //isDarkMode = sessionDarkMode instanceof Boolean && (Boolean) sessionDarkMode;
         isDarkMode = darkmodeService.isDarkmode();
+        showGifs = gifService.isShowGifs();
 
         lastPageSearched = page;
         if (pokemonMap.isEmpty()) {
@@ -81,7 +84,8 @@ public class PokemonListController extends BaseController
     @ResponseBody
     public Boolean toggleGifs()
     {
-        showGifs = !showGifs;
+        gifService.toggleShowGifs();
+        showGifs = gifService.isShowGifs();
         LOGGER.info("showGifs: {}", showGifs);
         return showGifs;
     }

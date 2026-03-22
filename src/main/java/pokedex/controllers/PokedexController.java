@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedex.service.DarkmodeService;
+import pokedex.service.GifService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
@@ -30,19 +31,15 @@ public class PokedexController extends BaseController
     public PokedexController(PokemonApiService pokemonService,
                              ObjectMapper objectMapper,
                              Environment environment,
-                             DarkmodeService darkmodeService)
+                             DarkmodeService darkmodeService,
+                             GifService gifService)
     {
-        super(pokemonService, objectMapper, environment, darkmodeService);
+        super(pokemonService, objectMapper, environment, darkmodeService, gifService);
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")
-    public ModelAndView pokedexEntry(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav,
-                                     HttpSession httpSession,
-                                     @RequestParam(name = "darkmode", required = false) String darkmode)
+    public ModelAndView pokedexEntry(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav)
     {
-        @SuppressWarnings("unchecked")
-        //Map<Integer, Pokemon> pokemonMap = (Map<Integer, Pokemon>) httpSession.getAttribute("pokemonMap");
-        //updateSessionMap();
         Pokemon pokemon = null;
         try {
             pokemon = pokemonMap.get(nameOrId);
@@ -68,8 +65,8 @@ public class PokedexController extends BaseController
         mav.addObject("pokemon", pokemon);
         mav.addObject("randomDescriptionNumber", !pokemon.descriptions().isEmpty() ?
                 new Random().nextInt(pokemon.descriptions().size()) : 0);
-        isDarkMode = darkmode != null ? darkmode.equals("true") : isDarkMode;
-        mav.addObject("isDarkMode", isDarkMode);
+        mav.addObject("isDarkMode", isDarkMode = darkmodeService.isDarkmode());
+        mav.addObject("showGifs", showGifs = gifService.isShowGifs());
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.setViewName("pokedex");
         return mav;

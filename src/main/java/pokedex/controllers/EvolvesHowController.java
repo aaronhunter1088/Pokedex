@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import pokedex.service.DarkmodeService;
+import pokedex.service.GifService;
 import pokedexapi.service.PokemonApiService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -47,9 +48,10 @@ public class EvolvesHowController extends BaseController
     public EvolvesHowController(PokemonApiService pokemonService,
                                 ObjectMapper objectMapper,
                                 Environment environment,
-                                DarkmodeService darkmodeService)
+                                DarkmodeService darkmodeService,
+                                GifService gifService)
     {
-        super(pokemonService, objectMapper, environment, darkmodeService);
+        super(pokemonService, objectMapper, environment, darkmodeService, gifService);
     }
 
     public ModelAndView evolvesHow(@RequestParam(name = "pokemonId") int pokemonId, ModelAndView mav)
