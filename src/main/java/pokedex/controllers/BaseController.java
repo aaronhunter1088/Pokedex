@@ -1,5 +1,6 @@
 package pokedex.controllers;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,6 +8,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
+import pokedex.service.DarkmodeService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
@@ -35,6 +37,7 @@ public class BaseController
     protected final PokemonApiService pokemonService;
     protected final ObjectMapper objectMapper;
     protected final Environment environment;
+    protected final DarkmodeService darkmodeService;
     protected String pokemonId = "";
     protected int page = 1;
     protected int lastPageSearched = 1;
@@ -54,11 +57,19 @@ public class BaseController
     @Autowired
     public BaseController(PokemonApiService pokemonService,
                           ObjectMapper objectMapper,
-                          Environment environment)
+                          Environment environment,
+                          DarkmodeService darkmodeService)
     {
         this.pokemonService = pokemonService;
         this.objectMapper = objectMapper;
         this.environment = environment;
+        this.darkmodeService = darkmodeService;
+    }
+
+    @PostConstruct
+    public void postConstruct()
+    {
+        this.isDarkMode = darkmodeService.isDarkmode();
     }
 
     @PreDestroy

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import pokedex.service.DarkmodeService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.pokemon.Pokemon;
 import skaro.pokeapi.resource.pokemonspecies.PokemonSpecies;
@@ -28,9 +29,10 @@ public class PokedexController extends BaseController
     @Autowired
     public PokedexController(PokemonApiService pokemonService,
                              ObjectMapper objectMapper,
-                             Environment environment)
+                             Environment environment,
+                             DarkmodeService darkmodeService)
     {
-        super(pokemonService, objectMapper, environment);
+        super(pokemonService, objectMapper, environment, darkmodeService);
     }
 
     @GetMapping(value = "/pokedexEntry/{nameOrId}")

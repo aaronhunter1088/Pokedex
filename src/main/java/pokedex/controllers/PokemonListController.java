@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import pokedex.service.DarkmodeService;
 import pokedexapi.service.PokemonApiService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -23,21 +24,32 @@ public class PokemonListController extends BaseController
     /* Logging instance */
     private static final Logger LOGGER = LogManager.getLogger(PokemonListController.class);
 
-//    @Value("${app.base.url}")
-//    private String baseUrl;
 
     @Autowired
     public PokemonListController(PokemonApiService pokemonService,
                                  ObjectMapper objectMapper,
-                                 Environment environment)
+                                 Environment environment,
+                                 DarkmodeService darkmodeService)
     {
-        super(pokemonService, objectMapper, environment);
+        super(pokemonService, objectMapper, environment, darkmodeService);
     }
 
     @GetMapping("/")
     public ModelAndView homepage(ModelAndView mav, HttpSession httpSession,
-           @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode)
+           @RequestParam(name = "darkmode", required = false) String darkmode)
     {
+        // The URL changes but keeps darkmode
+        // From http://localhost:4201?darkmode=true/false
+        // To   http://localhost:4201
+        if (darkmode != null) {
+            httpSession.setAttribute("isDarkMode", Boolean.parseBoolean(darkmode));
+            darkmodeService.setDarkmode(Boolean.parseBoolean(darkmode));
+            return new ModelAndView("redirect:/");
+        }
+
+        //Object sessionDarkMode = httpSession.getAttribute("isDarkMode");
+        //isDarkMode = sessionDarkMode instanceof Boolean && (Boolean) sessionDarkMode;
+        isDarkMode = darkmodeService.isDarkmode();
 
         lastPageSearched = page;
         if (pokemonMap.isEmpty()) {
@@ -56,7 +68,7 @@ public class PokemonListController extends BaseController
         mav.addObject("page", page);
         mav.addObject("uniqueTypes", getUniqueTypes());
         mav.addObject("chosenType", chosenType);
-        isDarkMode = darkmode.equals("true");
+        //isDarkMode = darkmode.equals("true");
         mav.addObject("isDarkMode", isDarkMode);
         mav.addObject("env",
                 Arrays.asList(environment.getActiveProfiles())
@@ -74,9 +86,19 @@ public class PokemonListController extends BaseController
         return showGifs;
     }
 
+    @GetMapping("/toggleDarkmode")
+    @ResponseBody
+    public Boolean toggleDarkmode()
+    {
+        darkmodeService.setDarkmode(!darkmodeService.isDarkmode());
+        isDarkMode = darkmodeService.isDarkmode();
+        LOGGER.info("isDarkMode: {}", isDarkMode);
+        return isDarkMode;
+    }
+
     @GetMapping(value = "/page")
     public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
-                             @RequestParam(name = "darkmode", required = true, defaultValue = "false") String darkmode,
+                             @RequestParam(name = "darkmode", required = false) String darkmode,
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);

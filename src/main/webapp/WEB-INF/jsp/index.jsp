@@ -88,11 +88,11 @@
             &emsp;
             <label class="switch" title="Toggle darkmode">
                 <input id="gifSwitchDarkmode" type="checkbox" ${isDarkMode ? 'checked' : ''}
-                       onclick="toggleDarkmode('${isDarkMode}');">
+                       onclick="toggleDarkmode(${!isDarkMode});">
                 <span class="slider round"></span>
             </label>
             &nbsp;
-            <label style="margin:10px auto;width:auto;padding-top:0;">
+            <label id="switchDarkmodeLabel" style="margin:10px auto;width:auto;padding-top:0;">
                 ${isDarkMode ? 'Dark Mode On' : 'Light Mode On'}
             </label>
             &emsp;
@@ -126,7 +126,9 @@
             </button>
         </div>
         <br>
-        <jsp:include page="navigation.jsp"/>
+        <jsp:include page="navigation.jsp">
+            <jsp:param name="isDarkMode" value="${isDarkMode}" />
+        </jsp:include>
 
         <div id="pokemonGrid" class="list-grid">
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
@@ -192,14 +194,16 @@
             </c:forEach>
         </div>
 
-        <jsp:include page="navigation.jsp"/>
+        <jsp:include page="navigation.jsp">
+            <jsp:param name="isDarkMode" value="${isDarkMode}" />
+        </jsp:include>
 
     </body>
 
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script>
-        $(function(){
+        $(function() {
             updateGifToggle(false, "${showGifs}");
 
             let ids = "${pokemonIds}".replace(/[\[\]]/g, '').split(',').map(id => id.trim());
@@ -303,13 +307,43 @@
                     }
                 }
             });
+            setTimeout(() => {
+                this.closeMobileMenu();
+            }, 500);
         }
 
-        function toggleDarkmode(isDarkMode) {
-            let updatedDarkmode = isDarkMode === 'true' ? 'false' : 'true';
-            setTimeout(() => {
-                window.location.href = '${pageContext.request.contextPath}/?darkmode=' + updatedDarkmode;
-            }, 500);
+        function toggleDarkmode(updatedDarkmode) {
+            console.log('toggling darkmode: ' + updatedDarkmode);
+            $.ajax({
+                type: "GET",
+                url: "toggleDarkmode",
+                data: {
+                    darkmode: updatedDarkmode
+                },
+                async: false,
+                dataType: "application/json",
+                crossDomain: true,
+                statusCode: {
+                    200: function(result) {
+                        //window.location.reload();
+                        console.log('toggleDarkmode: ' + JSON.stringify(result.responseText));
+                        const isDark = result.responseText === 'true';
+                        const $body = $('body');
+                        $body.toggleClass('dark darkmode', isDark);
+                        $body.toggleClass('light lightmode', !isDark);
+                        $("#switchDarkmodeLabel").text(isDark ? 'Dark Mode On' : 'Light Mode On');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    },
+                    404: function() {
+                        console.log('Failed');
+                    },
+                    500: function() {
+                        console.log('Server Error');
+                    }
+                }
+            });
         }
 
         function updateGifToggle(reload, data) {
@@ -320,13 +354,8 @@
                 showGifs = data;
             }
             console.log("showGifs: " + showGifs);
-            if (showGifs === 'true') {
-                $("#gifSwitch").attr("checked", true);
-                $("#gifSwitchMobile").attr("checked", true);
-            } else {
-                $("#gifSwitch").attr("checked", false);
-                $("#gifSwitchMobile").attr("checked", false);
-            }
+            $("#gifSwitch").attr("checked", showGifs === 'true');
+            $("#gifSwitchMobile").attr("checked", showGifs === 'true');
             if (reload) {
                 setTimeout(function() {
                     location.reload();
