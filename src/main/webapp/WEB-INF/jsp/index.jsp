@@ -70,7 +70,7 @@
         
         <!-- Desktop Header -->
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
-            <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
+            <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
                 <span class="center">
                 <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
             </a>
@@ -132,7 +132,7 @@
             <c:forEach items="${pokemonMap.entrySet()}" var="pokemon">
                 <c:set var="pokemonId" value="${pokemon.value.id}" />
                 <div id="pokemon${pokemonId}">
-                    <a href="pokedexEntry/${pokemon.value.id}">
+                    <a href="pokedex/${pokemon.value.id}">
                         <div id="pokemon${pokemonId}Box" class="box" title="Click for more info" style="background-color:${pokemon.value.color};">
                             <div id="nameAndId" style="display:inline-flex;">
                                 <h3 id="name" style="color:black;">${pokemon.value.name.substring(0,1).toUpperCase()}${pokemon.value.name.substring(1)}</h3>
@@ -397,7 +397,7 @@
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
                         let url = '';
                         if (nameOrId) {
-                            url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
+                            url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
                         }
                         console.log('Navigating to: ' + url);
                         window.location.href = url; // navigates like a normal link
@@ -473,7 +473,7 @@
                     200: function(data) {
                         console.log('200 chosenType');
                         // Navigate to homepage instead of reload to avoid duplicate fetching
-                        window.location.href = '${pageContext.request.contextPath}/?darkmode=${isDarkMode}';
+                        window.location.href = '${pageContext.request.contextPath}/';
                     },
                     400: function(data) {
                         console.log(JSON.parse(JSON.stringify(data.responseText)));
@@ -514,9 +514,6 @@
 
         function navigateToLandingPage() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            //return isMobile && (env === 'dev' || env === 'local')
-            //    ? window.location.href = 'http://192.168.1.152:4200?tileNumber=1&darkmode=${isDarkMode}'
-            //    : window.location.href = '${baseUrl}?tileNumber=1&darkmode=${isDarkMode}';
             let url = '';
             url = `${env}` !== 'prod' && isMobile
                 ? `http://`+window.location.hostname+`:4200?tileNumber=1&darkmode=${isDarkMode}`

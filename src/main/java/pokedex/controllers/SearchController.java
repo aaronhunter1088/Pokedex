@@ -30,12 +30,11 @@ public class SearchController extends BaseController
     }
 
     @GetMapping("/search")
-    public ModelAndView searchPage(ModelAndView mav,
-           @RequestParam(name = "darkmode", defaultValue = "false") String darkmode)
+    public ModelAndView searchPage(ModelAndView mav)
     {
         LOGGER.info("/search page called");
         //mav.addObject("pokemonId", 0);
-        mav.addObject("isDarkMode", isDarkMode = darkmode.equals("true"));
+        mav.addObject("isDarkMode", isDarkMode = darkmodeService.isDarkmode());
         mav.setViewName("search");
         return mav;
     }

@@ -101,8 +101,7 @@ public class PokemonListController extends BaseController
     }
 
     @GetMapping(value = "/page")
-    public ModelAndView page(@RequestParam(name = "pageNumber", required = false, defaultValue = "1") int pageNumber,
-                             @RequestParam(name = "darkmode", required = false) String darkmode,
+    public ModelAndView page(@RequestParam(name = "pageNumber", required = true) int pageNumber,
                              ModelAndView mav, HttpSession httpSession)
     {
         LOGGER.info("pagination, page to view: {}", pageNumber);
@@ -118,7 +117,7 @@ public class PokemonListController extends BaseController
         this.pokemonMap.clear();
         // Clear session cache when changing pages
         httpSession.removeAttribute("pokemonMap");
-        return homepage(mav, httpSession, darkmode);
+        return homepage(mav, httpSession, darkmodeService.isDarkmode() ? "true" : "false");
     }
 
     @GetMapping("/pkmnPerPage")
@@ -129,8 +128,12 @@ public class PokemonListController extends BaseController
         if (pkmnPerPage <= 0) {
             return ResponseEntity.badRequest().body("Invalid number of Pokemon per page");
         } else {
-            if (pkmnPerPage > 50) LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
-            this.pkmnPerPage = pkmnPerPage;
+            if (pkmnPerPage > 50) {
+                LOGGER.info(pkmnPerPage + " is too high. Defaulting to 50");
+                this.pkmnPerPage = 50;
+            } else {
+                this.pkmnPerPage = pkmnPerPage;
+            }
         }
         // Clear pokemon map to force reload with new page size
         this.pokemonMap.clear();

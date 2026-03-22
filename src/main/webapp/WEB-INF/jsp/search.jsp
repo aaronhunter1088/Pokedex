@@ -9,14 +9,14 @@
 <body style="justify-content:space-evenly;text-align:center;"
       class="${isDarkMode?'darkmode':'lightmode'}">
     <h1 id="searchImgReloadPage" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>
     </h1>
 
     <h4 style="vertical-align: middle;">
-        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
+        <a href="${pageContext.request.contextPath}/" title="Go back to list"><i class="fas fa-arrow-left" style="${isDarkMode?'color:white':'color:#000000'}"></i></a>
         <label for="search" style="display:none;"></label>
         <input id="search" name="nameOrId" placeholder="Name or ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
         <img alt="Get Pokémon"
@@ -59,7 +59,7 @@
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     let url = '';
                     if (nameOrId) {
-                        url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
+                        url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
                     }
                     console.log('Navigating to: ' + url);
                     window.location.href = url; // navigates like a normal link

@@ -37,12 +37,12 @@ public class PokedexController extends BaseController
         super(pokemonService, objectMapper, environment, darkmodeService, gifService);
     }
 
-    @GetMapping(value = "/pokedexEntry/{nameOrId}")
-    public ModelAndView pokedexEntry(@PathVariable(name = "nameOrId") String nameOrId, ModelAndView mav)
+    @GetMapping(value = "/pokedex/{nameOrId}")
+    public ModelAndView pokedex(@PathVariable String nameOrId, ModelAndView mav)
     {
         Pokemon pokemon = null;
         try {
-            pokemon = pokemonMap.get(nameOrId);
+            pokemon = pokemonMap.get(Integer.valueOf(nameOrId)); // try as an Integer
             if (pokemon == null) throw new NullPointerException("Pokemon was not found in the map...");
         }
         catch (Exception _) {
@@ -53,9 +53,10 @@ public class PokedexController extends BaseController
             if (pokemonFound.isPresent()) {
                 logger.info("Found pokemon using id versus name");
                 pokemon = pokemonFound.get();
+            } else {
+                pokemon = pokemonService.getPokemonByIdOrName(nameOrId);
             }
         }
-        if (pokemon == null) pokemon = pokemonService.getPokemonByIdOrName(nameOrId);
         pokemon = setupPokedex(pokemon);
         mav.addObject("pokemonId", super.pokemonId);
         mav.addObject("defaultImage", pokemon.defaultImage());

@@ -46,7 +46,7 @@
     
     <!-- Desktop Header -->
     <h1 id="pokedexSearchImgSearchLink" style="vertical-align:middle;">
-        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" style="cursor:zoom-in;" title="Search">
+        <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
         </a>
@@ -57,7 +57,7 @@
                 <!-- Back arrow, Name, and ID -->
                 <div id="backAndName" class="parent-div">
                     <div id="backArrow" class="left-div">
-                        <a href="${pageContext.request.contextPath}/?darkmode=${isDarkMode}"><i class="fas fa-arrow-left fa-2x"></i></a>
+                        <a href="${pageContext.request.contextPath}/"><i class="fas fa-arrow-left fa-2x"></i></a>
                     </div>
                     <div id="nameAndID" class="center-div" style="display:inline-flex;gap:20px;">
                         <h3 id="name">Name: ${pokemon.name.substring(0,1).toUpperCase()}${pokemon.name.substring(1)}</h3>
@@ -288,7 +288,7 @@
     function setEvolutionsDiv() {
         let response = $.ajax({
             type: "GET",
-            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}?darkmode=${isDarkMode}",
+            url: "${pageContext.request.contextPath}/evolutions/" + "${pokemonId}",
             async: false,
             dataType: "json",
             crossDomain: true,
@@ -355,7 +355,7 @@
     }
 
     function navigateToHomePage() {
-        window.location.href = '${pageContext.request.contextPath}/?darkmode=${isDarkMode}';
+        window.location.href = '${pageContext.request.contextPath}/';
     }
 
 </script>

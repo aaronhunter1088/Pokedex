@@ -26,7 +26,7 @@
                     <div style="overflow-y:scroll;overflow-x:hidden;max-height:500px;width:auto;">
                         <c:forEach var="pokemon" items="${pokemonList}" varStatus="status">
                             <div class="evolution-grid" style="">
-                                <a href="${pageContext.request.contextPath}/pokedexEntry/${pokemon.id}?darkmode=${isDarkMode}"
+                                <a href="${pageContext.request.contextPath}/pokedex/${pokemon.id}"
                                    style="text-decoration:none;color:black;">
                                     <div id="pokemon${pokemon.id}"
                                          style="background-color:${pokemon.color};display:inline-block;" class="box">

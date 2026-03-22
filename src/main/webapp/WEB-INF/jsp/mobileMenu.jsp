@@ -3,7 +3,7 @@
 <!-- Mobile Header -->
 <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
     <div class="pokemon-logo">
-        <a href="${pageContext.request.contextPath}/search?darkmode=${isDarkMode}" title="Search">
+        <a href="${pageContext.request.contextPath}/search" title="Search">
             <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
         </a>
     </div>
@@ -46,14 +46,14 @@
              src="${pageContext.request.contextPath}/images/pokeball1.jpg"
              style="width:30px; height:30px; cursor: pointer;"
              title="Search for Pkmn"
-             onclick="searchForPkmn('${isDarkMode}');">
+             onclick="searchForPkmn();">
     </div>
 
     <div class="mobile-menu-item mobile-gif-item">
         <label for="pageNumberMobile">Jump to Page</label>
         <input id="pageNumberMobile" name="pageNumberMobile" type="text" placeholder="Page #"/>
         <i class="fa-regular fa-circle-right" style="font-size:30px; cursor:pointer; color:${isDarkMode?'white':'black'}"
-           onclick="setPageToView($('#pageNumberMobile').val());" title="Jump to Page">
+           onclick="setPageToViewMobile();" title="Jump to Page">
         </i>
     </div>
 
@@ -172,8 +172,7 @@
             showGifs = data;
         }
         console.log("showGifs: " + showGifs);
-        $("#gifSwitch").attr("checked", showGifs === 'true');
-        $("#gifSwitchMobile").attr("checked", showGifs === 'true');
+        $("#gifSwitchMobile").prop("checked", showGifs === 'true');
         if (reload) {
             setTimeout(function() {
                 location.reload();
@@ -181,10 +180,10 @@
         }
     }
 
-    function searchForPkmn(isDarkMode) {
-        let nameOrId = $("#search").val().trim();
+    function searchForPkmn() {
+        let nameOrId = $("#searchMobile").val().trim();
         if (nameOrId === '') {
-            nameOrId = $("#searchMobile").val().trim();
+            return alert('Name or ID is required');
         }
         console.log('nameOrId: ' + nameOrId);
 
@@ -200,7 +199,7 @@
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
                     let url = '';
                     if (nameOrId) {
-                        url = 'pokedexEntry/' + nameOrId + '?darkmode=' + isDarkMode;
+                        url = '/springboot/pokedex/' + nameOrId // + '?darkmode=' + isDarkMode;
                     }
                     console.log('Navigating to: ' + url);
                     window.location.href = url; // navigates like a normal link
@@ -217,15 +216,16 @@
     }
 
     function setPkmnPerPageMobile() {
-        let value = $("#showPkmnNumberMobile").val();
+        let value = $("#showPkmnNumberMobile").val().trim();
         setPkmnPerPageImpl(value, true);
+        closeMobileMenu();
     }
 
     function setPkmnPerPageImpl(value, isMobile) {
-        console.log("showPkmnNumber: " + value);
+        console.log("show " + value + " pokemon");
         $.ajax({
             type: "GET",
-            url: "pkmnPerPage",
+            url: "/springboot/pkmnPerPage",
             data: {
                 pkmnPerPage: value
             },
@@ -251,15 +251,18 @@
         });
     }
 
-    function setPageToView(pageNumber) {
-        let value = $("#pageNumber").val();
-        if (pageNumber !== undefined) value = pageNumber;
-        console.log("page to view: " + value);
+    function setPageToViewMobile() {
+        let pageNumber = $('#pageNumberMobile').val().trim();
+        if (pageNumber === undefined || pageNumber === '')
+        {
+            return alert('Page number is required');
+        }
+        console.log("page to view: " + pageNumber);
         $.ajax({
             type: "GET",
-            url: "page",
+            url: "/springboot/page",
             data: {
-                pageNumber: value
+                pageNumber: pageNumber
             },
             async: false,
             dataType: "application/json",
@@ -278,7 +281,8 @@
                     }
                 },
                 400: function(data) {
-                    console.log(JSON.parse(JSON.stringify(data.responseText)));
+
+                    //console.log(JSON.parse(JSON.stringify(data.responseText)));
                 },
                 404: function() {
                     console.log('Resource not found');
@@ -311,7 +315,7 @@
                 200: function(data) {
                     console.log('200 chosenType');
                     // Navigate to homepage instead of reload to avoid duplicate fetching
-                    window.location.href = '${pageContext.request.contextPath}/?darkmode=${isDarkMode}';
+                    window.location.href = '${pageContext.request.contextPath}/';
                 },
                 400: function(data) {
                     console.log(JSON.parse(JSON.stringify(data.responseText)));
