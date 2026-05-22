@@ -8,9 +8,8 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.context.annotation.SessionScope;
-import pokedex.service.DarkmodeService;
-import pokedex.service.GifService;
+import pokedex.services.DarkmodeService;
+import pokedex.services.GifService;
 import pokedexapi.service.PokemonApiService;
 import skaro.pokeapi.resource.FlavorText;
 import skaro.pokeapi.resource.NamedApiResource;
@@ -81,7 +80,7 @@ public class BaseController
     @PreDestroy
     public void cleanup()
     {
-        LOGGER.info("Shutting down filter executor service");
+        LOGGER.info("Shutting down filter executor services");
         filterExecutor.shutdown();
         try {
             if (!filterExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -124,22 +123,22 @@ public class BaseController
                 ? pokemon.defaultImage()
                 : DEFAULT_IMAGE_URL(pokemon.id()) != null
                     ? DEFAULT_IMAGE_URL(pokemon.id())
-                    : "/images/pokeball1.jpg";
+                    : "/images/pokeball_search.png";
         String officialImage = pokemon.officialImage() != null
                 ? pokemon.officialImage()
                 : OFFICIAL_IMAGE_URL(pokemon.getId()) != null
                     ? OFFICIAL_IMAGE_URL(pokemon.getId())
-                    : "/images/pokeball1.jpg";
+                    : "/images/pokeball_search.png";
         String gifImage = pokemon.gifImage() != null
                 ? pokemon.gifImage()
                 : GIF_IMAGE_URL(pokemon.id()) != null
                     ? GIF_IMAGE_URL(pokemon.id())
-                    : "/images/pokeball1.jpg";
+                    : "/images/pokeball_search.png";
         String shinyImage = pokemon.shinyImage() != null
                 ? pokemon.shinyImage()
                 : SHINY_IMAGE_URL(pokemon.id()) != null
                     ? SHINY_IMAGE_URL(pokemon.id())
-                    : "/images/pokeball1.jpg";
+                    : "/images/pokeball_search.png";
         List<FlavorText> flavorTexts = speciesData.getFlavorTextEntries();
         List<FlavorText> pokemonDescriptions = flavorTexts != null ?
                 flavorTexts.stream().filter(entry -> entry.getLanguage().name().equals("en"))

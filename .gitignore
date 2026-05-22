@@ -38,7 +38,7 @@ build/
 src/.DS_Store
 src/main/.DS_Store
 src/main/resources/.DS_Store
+src/main/resources/pom.properties
 src/main/webapp/.DS_Store
 src/main/webapp/images/.DS_Store
 logs/
-pom.properties

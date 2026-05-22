@@ -72,7 +72,7 @@
         <h1 id="indexSearchImgSearchLink" style="vertical-align:middle;">
             <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
                 <span class="center">
-                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
+                <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.png" style="width:100%;"></span>
             </a>
         </h1>
         <br>
@@ -99,7 +99,7 @@
             <div id="searchForPkmn" style="display:flex;">
                 <label for="search" style="display:none;"></label>
                 <input id="search" name="search" type="text" placeholder="Name or ID" style="width:100px;"/>
-                <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+                <img alt="pokéball" src="${pageContext.request.contextPath}/images/pokeball_search.png"
                      class="button cursor" title="Search for Pokemon" style="height:30px;width:30px;"
                      onclick="searchForPkmn(${isDarkMode})">
             </div>
@@ -155,7 +155,7 @@
                                                         <img src="${pokemonSprites.get(pokemon.value.name)['official']}" alt="${pokemon.value.name}-official" style="height:200px;width:200px;">
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found" style="height:200px;width:200px;">
+                                                        <img src="${pageContext.request.contextPath}/images/pokeball_search.png" alt="no image found" style="height:200px;width:200px;">
                                                     </c:otherwise>
                                                 </c:choose>
                                             </c:when>
@@ -174,7 +174,7 @@
                                                 <img src="${pokemonSprites.get(pokemon.value.name)['official']}" alt="${pokemon.value.name}-official" style="height:200px;width:200px;">
                                             </c:when>
                                             <c:otherwise>
-                                                <img src="${pageContext.request.contextPath}/images/pokeball1.jpg" alt="no image found" style="height:200px;width:200px;">
+                                                <img src="${pageContext.request.contextPath}/images/pokeball_search.png" alt="no image found" style="height:200px;width:200px;">
                                             </c:otherwise>
                                         </c:choose>
                                     </c:otherwise>

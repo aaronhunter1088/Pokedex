@@ -11,7 +11,7 @@
     <h1 id="searchImgReloadPage" style="vertical-align:middle;">
         <a href="${pageContext.request.contextPath}/search" style="cursor:zoom-in;" title="Search">
             <span class="center">
-            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg" style="width:100%;"></span>
+            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.png" style="width:100%;"></span>
         </a>
     </h1>
 
@@ -20,7 +20,7 @@
         <label for="search" style="display:none;"></label>
         <input id="search" name="nameOrId" placeholder="Name or ID" type="text" class="${isDarkMode?'darkmode':'lightmode'}"/>
         <img alt="Get Pokémon"
-             src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+             src="${pageContext.request.contextPath}/images/pokeball_search.png"
              style="width:30px; height:30px; cursor: pointer;"
              title="Search for Pkmn"
              onclick="searchForPkmn('${isDarkMode}');">
@@ -202,7 +202,7 @@
             case 'default' : {
                 image = sprites["frontDefault"];
                 if (image === null) {
-                    image = "/images/pokeball1.jpg";
+                    image = "/images/pokeball_search.png";
                 }
                 $('#pokemonDefaultImgBtn').css('font-weight', 'bold');
                 $('#pokemonShinyImgBtn').css('font-weight', 'normal');
@@ -211,14 +211,14 @@
             case 'shiny' : {
                 image = sprites["frontShiny"];
                 if (image === null) {
-                    image = "/images/pokeball1.jpg";
+                    image = "/images/pokeball_search.png";
                 }
                 $('#pokemonDefaultImgBtn').css('font-weight', 'normal');
                 $('#pokemonShinyImgBtn').css('font-weight', 'bold');
                 break;
             }
             default : {
-                image = "/images/pokeball1.jpg";
+                image = "/images/pokeball_search.png";
                 break;
             }
         }

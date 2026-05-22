@@ -4,7 +4,7 @@
 <div class="mobile-header ${isDarkMode?'darkmode':'lightmode'}">
     <div class="pokemon-logo">
         <a href="${pageContext.request.contextPath}/search" title="Search">
-            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.jpg">
+            <img alt="pokedex" src="${pageContext.request.contextPath}/images/pokedex.png">
         </a>
     </div>
     <button class="mobile-menu-button" onclick="toggleMobileMenu();" aria-label="Menu">
@@ -43,7 +43,7 @@
         <label for="searchMobile">Search for Pkmn</label>
         <input id="searchMobile" name="searchMobile" type="text" placeholder="Name or ID"/>
         <img alt="Get Pokémon"
-             src="${pageContext.request.contextPath}/images/pokeball1.jpg"
+             src="${pageContext.request.contextPath}/images/pokeball_search.png"
              style="width:30px; height:30px; cursor: pointer;"
              title="Search for Pkmn"
              onclick="searchForPkmn();">

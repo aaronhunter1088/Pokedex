@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import pokedex.service.DarkmodeService;
-import pokedex.service.GifService;
+import pokedex.services.DarkmodeService;
+import pokedex.services.GifService;
 import pokedexapi.service.PokemonApiService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -94,7 +94,8 @@ public class PokemonListController extends BaseController
     @ResponseBody
     public Boolean toggleDarkmode()
     {
-        darkmodeService.setDarkmode(!darkmodeService.isDarkmode());
+        //darkmodeService.setDarkmode(!darkmodeService.isDarkmode());
+        darkmodeService.toggleDarkMode();
         isDarkMode = darkmodeService.isDarkmode();
         LOGGER.info("isDarkMode: {}", isDarkMode);
         return isDarkMode;
