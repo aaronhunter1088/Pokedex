@@ -1,4 +1,4 @@
-# Pokedex - A Spring Boot App
+# Pokédex - A Spring Boot App
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
