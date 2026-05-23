@@ -2,6 +2,23 @@
 
 <img width="1582" height="1036" alt="Homepage" src="https://github.com/user-attachments/assets/3288bcc8-bb7c-479b-9669-ccffa563785a" />
 
+# v1.6.1
+This version introduced many GitHub instruction files used to add context for new AI tools introduced recently. There
+was also a small fix included which addressed an issue when searching for a particular Pokémon. Now, if a 'name' is
+given for a search, we will identify if the name is 'singular' versus 'plural'. So a clear example of a singular name
+would be 'pikachu' while in this example, a plural name would be 'dexoys-normal'. Simply put, if there is a dash or space
+or any other common word separator, then we will identify it as a plural name. The name is separated into parts, and
+each portion will be used to search for a pokemon. The first match will be used to display the Pokémon info. 
+This is a small fix, but it ensures that we can search for Pokémon like 'deoxys', the app will return, Deoxys-Normal, and
+the user can see the other 'forms' in the family section below the main info page. At least this will not immediately 
+fail when a general user makes a search for 'deoxys' and does not know about the various forms of that Pokémon. 
+
+# v1.6.0
+This version updates the site according to the v1.6.0 PokedexApi code. There was also a major coordination effort to
+ensure this site matched the other flavors of the Pokedex application. This also included an update to how dark mode is
+toggled on and off, updates to the mobile version, and various other adjustments to ensure the experience would be
+consistent.
+
 # v1.5.0
 This version fixes an issue when filtering by type. Now, as the homepage is loaded, the various Pokémon types
 are fetched retroactively. There is a cache map containing the types to their list of Pokémon. When a type is selected,
