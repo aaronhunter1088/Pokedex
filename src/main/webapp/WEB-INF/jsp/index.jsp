@@ -215,6 +215,14 @@
             if (element !== undefined) {
                 element.addClass("active");
             }
+            $('#search').on('keypress', function(e) {
+                if ($('#search').val() === '') return;
+                if (e.code === 'Enter' || e.code === 'Return') {
+                    searchForPkmn('${isDarkMode}');
+                }
+            });
+
+            // mobile version in mobileMenu.jsp
 
             $('#pageNumber').on('keypress', function(e) {
                 if ($('#pageNumber').val() === '') return;
@@ -246,8 +254,6 @@
         });
 
         // mobile menu functions
-
-
 
         function setPkmnPerPage() {
             let value = $("#showPkmnNumber").val();

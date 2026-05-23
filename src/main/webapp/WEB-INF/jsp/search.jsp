@@ -47,32 +47,6 @@
         }
         console.log('nameOrId: ' + nameOrId);
 
-        // $.ajax({
-        //     type: "GET",
-        //     url: "/springboot/pokemon/" + nameOrId + "/validateNameOrId",
-        //     dataType: "application/json",
-        //     crossDomain: true,
-        //     statusCode: {
-        //         200: function(data) {
-        //             console.log('200 validatePkmn');
-        //             console.log(JSON.parse(JSON.stringify(data.responseText)));
-        //             let url = '';
-        //             if (nameOrId) {
-        //                 url = 'pokedex/' + nameOrId + '?darkmode=' + isDarkMode;
-        //             }
-        //             console.log('Navigating to: ' + url);
-        //             window.location.href = url; // navigates like a normal link
-        //         },
-        //         404: function(data) {
-        //             console.log(JSON.parse(JSON.stringify(data.responseText)));
-        //             alert("Pok\u00e9mon not found. Please check the Name or ID and try again.");
-        //         },
-        //         500: function() {
-        //             alert('Pok\u00e9mon search failed. Please try again later.');
-        //         }
-        //     }
-        // });
-
         const contextPath = "${pageContext.request.contextPath}";
         const encodedNameOrId = encodeURIComponent(nameOrId);
 

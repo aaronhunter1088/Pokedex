@@ -39,14 +39,18 @@ public class PokedexController extends BaseController
     public ModelAndView pokedex(@PathVariable String nameOrId, ModelAndView mav)
     {
         Pokemon pokemon = null;
+        if (nameOrId.equalsIgnoreCase("deoxys")) {
+            nameOrId = "deoxys-normal";
+        }
         try {
             pokemon = pokemonMap.get(Integer.valueOf(nameOrId)); // try as an Integer
             if (pokemon == null) throw new NullPointerException("Pokemon was not found in the map...");
         }
         catch (Exception _) {
             logger.warn("Couldn't find {} in pokemonMap", nameOrId);
+            String finalNameOrId = nameOrId;
             final Optional<Pokemon> pokemonFound = pokemonMap.values().stream()
-                    .filter(pkmn -> pkmn.id().compareTo(Integer.valueOf(nameOrId)) == 0)
+                    .filter(pkmn -> pkmn.id().compareTo(Integer.valueOf(finalNameOrId)) == 0)
                     .findFirst();
             if (pokemonFound.isPresent()) {
                 logger.info("Found pokemon using id versus name");
