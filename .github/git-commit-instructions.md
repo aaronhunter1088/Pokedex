@@ -6,7 +6,7 @@ Format:
 - <type>/<summary>
 
 Types:
-- feat/a_new_feature
+- feature/a_new_feature
 - fix/a_bug_fix
 
 Summary:
@@ -19,5 +19,5 @@ Rules for Summary Line:
 - Separate each word by an underscore.
 
 Examples:
-feat/add_hexadecimal_conversion_support
+feature/add_hexadecimal_conversion_support
 fix/prevent_divide_by_zero_exception
